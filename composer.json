@@ -1,0 +1,21 @@
+{
+    "name": "poirot/http",
+    "description": "HTTP Request and Response .",
+    "type"       : "library",
+    "authors": [
+        {
+            "name": "Payam Naderi",
+            "email": "naderi.payam@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "poirot/core": "dev-master"
+    },
+    "target-dir": "Poirot/Http",
+    "autoload"  : {
+        "psr-0": {
+            "Poirot\\Http": "."
+        }
+    }
+}
