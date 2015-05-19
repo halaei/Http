@@ -2,6 +2,8 @@
 namespace Poirot\Http\Interfaces;
 
 use Poirot\Core\Entity;
+use Poirot\Core\Interfaces\iPoirotEntity;
+use Poirot\Stream\Interfaces\iStreamable;
 
 interface iHMessage
 {
@@ -29,14 +31,23 @@ interface iHMessage
      *
      * ! headers may contains multiple values, such as cookie
      *
-     * @return Entity
+     * @param array|iHeaders $headers
+     *
+     * @return $this
      */
-    function headers();
+    function setHeaders($headers);
+
+    /**
+     * Get Headers
+     *
+     * @return iHeaders
+     */
+    function getHeaders();
 
     /**
      * Set Message Body Content
      *
-     * @param string $content
+     * @param string|iStreamable $content
      *
      * @return $this
      */
@@ -45,7 +56,7 @@ interface iHMessage
     /**
      * Get Message Body Content
      *
-     * @return string
+     * @return string|iStreamable
      */
     function getBody();
 

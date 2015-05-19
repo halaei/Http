@@ -37,6 +37,7 @@ abstract class AbstractHttpMessage
     function headers()
     {
         if (!$this->headers)
+            // TODO Headers From String
             $this->setHeaders(new Entity());
 
         return $this->headers;
@@ -45,13 +46,26 @@ abstract class AbstractHttpMessage
     /**
      * Set Meta Data
      *
-     * @param EntityInterface $meta
+     * @param array|EntityInterface $meta
      *
+     * @throws \Exception
      * @return $this
      */
-    function setHeaders(EntityInterface $meta)
+    function setHeaders($meta)
     {
-        $this->headers = $meta;
+        if ($meta instanceof EntityInterface) {
+            $this->headers = $meta;
+
+            $meta = [];
+        }
+
+        if (!is_array($meta))
+            throw new \Exception(sprintf(
+                'Headers must instance of EntityInterface or associated array, "%s" given instead.'
+                , is_object($meta) ? get_class($meta) : gettype($meta)
+            ));
+
+        $this->headers()->setFrom(new Entity($meta));
 
         return $this;
     }
