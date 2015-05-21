@@ -72,7 +72,22 @@ interface iHMRPhpServer extends iHMRServer
      */
     function get_Get();
 
-    function set_Files();
+    /**
+     * Create a new instance with the specified uploaded files
+     *
+     * note: This method MUST be implemented in such a way as to retain the
+     * immutability of the message
+     *
+     * @param array $params
+     *
+     * @return $this
+     */
+    function set_Files($params);
 
+    /**
+     * Retrieve normalized file upload data
+     *
+     * @return array
+     */
     function get_Files();
 }

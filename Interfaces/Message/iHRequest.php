@@ -1,5 +1,6 @@
 <?php
 namespace Poirot\Http\Interfaces;
+use Poirot\Core\Interfaces\iMetaProvider;
 
 /**
  * Provides the general representation of an HTTP request message.
@@ -12,7 +13,7 @@ namespace Poirot\Http\Interfaces;
  * @see iHMRServer
  *
  */
-interface iHRequest extends iHMessage
+interface iHRequest extends iHMessage, iMetaProvider
 {
     /**
      * Set Request Method
