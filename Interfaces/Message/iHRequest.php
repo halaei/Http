@@ -2,7 +2,6 @@
 namespace Poirot\Http\Interfaces\Message;
 
 use Poirot\PathUri\Interfaces\iHttpUri;
-use Poirot\PathUri\Interfaces\iSeqPathUri;
 
 /**
  * Provides the general representation of an HTTP request message.
