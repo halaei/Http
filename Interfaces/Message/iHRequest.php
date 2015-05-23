@@ -36,7 +36,7 @@ interface iHRequest extends iHMessage
     /**
      * Set Uri Target
      *
-     * @param iSeqPathUri|iHttpUri  $target
+     * @param string|iHttpUri  $target
      * @param bool $preserveHost When this argument is set to true,
      *                           the returned request will not update
      *                           the Host header of the returned message
@@ -50,7 +50,7 @@ interface iHRequest extends iHMessage
      *
      * - return "/" if no one composed
      *
-     * @return iSeqPathUri|iHttpUri
+     * @return iHttpUri
      */
     function getTarget();
 
@@ -73,6 +73,10 @@ interface iHRequest extends iHMessage
 
     /**
      * Get Host
+     *
+     * - During construction, implementations MUST
+     *   attempt to set the Host header from a provided
+     *   URI if no Host header is provided.
      *
      * @return string
      */
