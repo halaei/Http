@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Http\Interfaces;
+namespace Poirot\Http\Interfaces\Message;
 
 interface iHResponse extends iHMessage
 {
@@ -10,14 +10,14 @@ interface iHResponse extends iHMessage
      *
      * @return $this
      */
-    function setStatus($status);
+    function setStatCode($status);
 
     /**
      * Get Response Status Code
      *
      * @return int
      */
-    function getStatus();
+    function getStatCode();
 
     /**
      * Set Status Code Reason

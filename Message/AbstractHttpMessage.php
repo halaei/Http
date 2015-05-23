@@ -2,10 +2,11 @@
 namespace Poirot\Http\Message;
 
 use Poirot\Core\AbstractOptions;
+use Poirot\Core\DataField;
 use Poirot\Core\Entity;
-use Poirot\Core\Interfaces\EntityInterface;
-use Poirot\Core\Interfaces\iPoirotEntity;
-use Poirot\Http\Interfaces\iHMessage;
+use Poirot\Core\Interfaces\iDataField;
+use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Interfaces\Message\iHMessage;
 
 abstract class AbstractHttpMessage
     extends AbstractOptions
@@ -30,44 +31,19 @@ abstract class AbstractHttpMessage
     protected $version = self::VERSION_1p1;
 
     /**
-     * Set message metadata
-     *
-     * @return Entity
+     * @var DataField
      */
-    function headers()
-    {
-        if (!$this->headers)
-            // TODO Headers From String
-            $this->setHeaders(new Entity());
-
-        return $this->headers;
-    }
+    protected $_meta;
 
     /**
-     * Set Meta Data
-     *
-     * @param array|EntityInterface $meta
-     *
-     * @throws \Exception
-     * @return $this
+     * @return iDataField
      */
-    function setHeaders($meta)
+    function meta()
     {
-        if ($meta instanceof EntityInterface) {
-            $this->headers = $meta;
+        if (!$this->_meta)
+            $this->_meta = new DataField;
 
-            $meta = [];
-        }
-
-        if (!is_array($meta))
-            throw new \Exception(sprintf(
-                'Headers must instance of EntityInterface or associated array, "%s" given instead.'
-                , is_object($meta) ? get_class($meta) : gettype($meta)
-            ));
-
-        $this->headers()->setFrom(new Entity($meta));
-
-        return $this;
+        return $this->_meta;
     }
 
     /**
@@ -92,6 +68,33 @@ abstract class AbstractHttpMessage
     function getVersion()
     {
         return $this->version;
+    }
+
+    /**
+     * Set message metadata
+     *
+     * ! HTTP messages include case-insensitive header
+     *   field names
+     *
+     * ! headers may contains multiple values, such as cookie
+     *
+     * @param array|iHeader $headers
+     *
+     * @return $this
+     */
+    function setHeaders($headers)
+    {
+        // TODO implement header
+    }
+
+    /**
+     * Get Headers
+     *
+     * @return iHeader
+     */
+    function getHeaders()
+    {
+        // TODO implement header
     }
 
     /**
@@ -126,12 +129,14 @@ abstract class AbstractHttpMessage
     function toString()
     {
         $return = '';
-        foreach ($this->headers()->keys() as $key)
+        /*
+         foreach ($this->headers()->keys() as $key)
             $return .= sprintf(
                 "%s: %s\r\n",
                 (string) $key,
                 (string) $this->headers()->get($key)
             );
+        */
 
         $return .= "\r\n" . $this->getBody();
 

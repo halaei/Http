@@ -1,21 +1,12 @@
 <?php
-namespace Poirot\Http\Interfaces\Message;
+namespace Poirot\Http\Message;
 
+use Poirot\Http\Interfaces\Message\iHRequest;
 use Poirot\PathUri\Interfaces\iHttpUri;
 use Poirot\PathUri\Interfaces\iSeqPathUri;
 
-/**
- * Provides the general representation of an HTTP request message.
- * However, server-side requests need additional treatment, due to
- * the nature of the server-side environment.
- *
- * PHP has provided simplification around input marshaling via superglobals such as:
- * $_COOKIE, $_GET, $_POST, $_FILES, $_SERVER
- *
- * @see iHMRServer
- *
- */
-interface iHRequest extends iHMessage
+class HAbstractRequest extends AbstractHttpMessage
+    implements iHRequest
 {
     /**
      * Set Request Method
@@ -24,26 +15,35 @@ interface iHRequest extends iHMessage
      *
      * @return $this
      */
-    function setMethod($method);
+    function setMethod($method)
+    {
+        // TODO: Implement setMethod() method.
+    }
 
     /**
      * Get Request Method
      *
      * @return string
      */
-    function getMethod();
+    function getMethod()
+    {
+        // TODO: Implement getMethod() method.
+    }
 
     /**
      * Set Uri Target
      *
-     * @param iSeqPathUri|iHttpUri  $target
+     * @param iSeqPathUri|iHttpUri $target
      * @param bool $preserveHost When this argument is set to true,
      *                           the returned request will not update
      *                           the Host header of the returned message
      *
      * @return $this
      */
-    function setTarget($target, $preserveHost = true);
+    function setTarget($target, $preserveHost = true)
+    {
+        // TODO: Implement setTarget() method.
+    }
 
     /**
      * Get Uri Target
@@ -52,7 +52,10 @@ interface iHRequest extends iHMessage
      *
      * @return iSeqPathUri|iHttpUri
      */
-    function getTarget();
+    function getTarget()
+    {
+        // TODO: Implement getTarget() method.
+    }
 
     /**
      * Set Host
@@ -69,12 +72,18 @@ interface iHRequest extends iHMessage
      *
      * @return $this
      */
-    function setHost($host);
+    function setHost($host)
+    {
+        // TODO: Implement setHost() method.
+    }
 
     /**
      * Get Host
      *
      * @return string
      */
-    function getHost();
+    function getHost()
+    {
+        // TODO: Implement getHost() method.
+    }
 }
