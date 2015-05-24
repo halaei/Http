@@ -13,6 +13,16 @@ interface iHeader extends iPoirotOptions
     function getLabel();
 
     /**
+     * Build Header From Header String Representation
+     *
+     * @param string $line
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    function fromString($line);
+    
+    /**
      * Represent Header As String
      *
      * @return string

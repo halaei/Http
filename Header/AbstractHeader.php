@@ -28,6 +28,33 @@ abstract class AbstractHeader extends AbstractOptions
     }
 
     /**
+     * Set Options
+     *
+     * @param string|array|iHeader $options
+     *
+     * @return $this
+     */
+    function from($options)
+    {
+        if (is_string($options))
+            $this->fromString($options);
+        else
+            parent::from($options);
+
+        return $this;
+    }
+
+    /**
+     * Build Header From Header String Representation
+     *
+     * @param string $line
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    abstract function fromString($line);
+
+    /**
      * Represent Header As String
      *
      * - filter values just before output
@@ -35,6 +62,30 @@ abstract class AbstractHeader extends AbstractOptions
      * @return string
      */
     abstract function toString();
+
+
+    /**
+     * Parse Header line
+     *
+     * @param string $line
+     *
+     * @return array[string 'label', string 'value']
+     */
+    protected function parseHeader($line)
+    {
+        if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
+            throw new \InvalidArgumentException(sprintf(
+                'Header "%s" Type Mismatch.'
+                , $line
+            ));
+
+        if (!$this->isValid($matches['value']))
+            throw new \InvalidArgumentException(
+                'Header value is not valid or contains some unwanted chars.'
+            );
+
+        return [ 'label' => $matches['label'], 'value' => $matches['value'] ];
+    }
 
     /**
      * Filter a header value

@@ -10,6 +10,24 @@ class HBaseHeaderline extends AbstractHeader
     protected $headerLine;
 
     /**
+     * Build Header From Header String Representation
+     *
+     * @param string $line
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    function fromString($line)
+    {
+        $matches = $this->parseHeader($line);
+
+        $this->setLabel($matches['label']);
+        $this->setHeaderLine($matches['value']);
+
+        return $this;
+    }
+
+    /**
      * Set Header Label
      *
      * @param string $label
