@@ -1,12 +1,19 @@
 <?php
 namespace Poirot\Http\Interfaces;
 
-use Poirot\Core\Interfaces\iPoirotEntity;
+use Poirot\Core\Interfaces\iPoirotOptions;
 
-interface iHeader extends iPoirotEntity
+interface iHeader extends iPoirotOptions
 {
     /**
-     * Represent Headers As String
+     * Get Header Label
+     *
+     * @return string
+     */
+    function getLabel();
+
+    /**
+     * Represent Header As String
      *
      * @return string
      */
