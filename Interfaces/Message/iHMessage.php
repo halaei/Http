@@ -2,7 +2,6 @@
 namespace Poirot\Http\Interfaces\Message;
 
 use Poirot\Core\Interfaces\iMetaProvider;
-use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Stream\Interfaces\iStreamable;
 

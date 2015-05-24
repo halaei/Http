@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Header;
 
-class FactoryHeader extends BaseHeaderline
+class HeaderFactory extends HeaderLine
 {
     // TODO Implement factory plugin headers
 }
