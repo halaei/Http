@@ -4,7 +4,7 @@ namespace Poirot\Http\Interfaces\Message\Request;
 use Poirot\Core\Interfaces\EntityInterface;
 use Poirot\Core\Interfaces\iPoirotEntity;
 
-interface iHMRPhpServer extends iHMRServer
+interface iHttpPhpServerRequest extends iHttpServerRequest
 {
     /**
      * Retrieve server parameters.
