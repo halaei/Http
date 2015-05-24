@@ -3,9 +3,8 @@ namespace Poirot\Http\Message;
 
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
-use Poirot\Core\Entity;
 use Poirot\Core\Interfaces\iDataField;
-use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHMessage;
 
@@ -17,7 +16,7 @@ abstract class AbstractHttpMessage
     const VERSION_11 = '1.1';
 
     /**
-     * @var Entity
+     * @var iHeaderCollection
      */
     protected $headers;
 
@@ -85,7 +84,12 @@ abstract class AbstractHttpMessage
      */
     function setHeaders($headers)
     {
-        // TODO implement header
+        if ($headers instanceof iHeaderCollection)
+            $this->headers = $headers;
+
+        if (is_array($headers))
+            foreach ($headers as $h)
+                $this->getHeaders()->attach($h);
 
         return $this;
     }
@@ -97,7 +101,10 @@ abstract class AbstractHttpMessage
      */
     function getHeaders()
     {
-        // TODO implement header
+        if (!$this->headers)
+            $this->headers = new Headers();
+
+        return $this->headers;
     }
 
     /**
