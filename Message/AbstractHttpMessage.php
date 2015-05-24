@@ -5,6 +5,7 @@ use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
 use Poirot\Core\Interfaces\iDataField;
 use Poirot\Http\Headers;
+use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHMessage;
 
@@ -139,14 +140,10 @@ abstract class AbstractHttpMessage
     function toString()
     {
         $return = '';
-        /*
-         foreach ($this->headers()->keys() as $key)
-            $return .= sprintf(
-                "%s: %s\r\n",
-                (string) $key,
-                (string) $this->headers()->get($key)
-            );
-        */
+
+        /** @var iHeader $header */
+        foreach ($this->getHeaders() as $header)
+            $return .= $header->toString();
 
         $return .= "\r\n" . $this->getBody();
 
