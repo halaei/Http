@@ -14,7 +14,7 @@ use Poirot\PathUri\Interfaces\iHttpUri;
  * @see iHMRServer
  *
  */
-interface iHRequest extends iHMessage
+interface iHttpRequest extends iHttpMessage
 {
     /**
      * Set Request Method
@@ -80,4 +80,11 @@ interface iHRequest extends iHMessage
      * @return string
      */
     function getHost();
+
+    /**
+     * Return the formatted request line (first line) for this http request
+     *
+     * @return string
+     */
+    function renderRequestLine();
 }

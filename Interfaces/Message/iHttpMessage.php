@@ -5,7 +5,7 @@ use Poirot\Core\Interfaces\iMetaProvider;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Stream\Interfaces\iStreamable;
 
-interface iHMessage extends iMetaProvider
+interface iHttpMessage extends iMetaProvider
 {
     /**
      * Set Version

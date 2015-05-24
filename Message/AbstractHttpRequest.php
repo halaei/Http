@@ -1,12 +1,12 @@
 <?php
 namespace Poirot\Http\Message;
 
-use Poirot\Http\Interfaces\Message\iHRequest;
+use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
 
-class HAbstractRequest extends AbstractHttpMessage
-    implements iHRequest
+class AbstractHttpRequest extends AbstractHttpMessage
+    implements iHttpRequest
 {
     /**#@+
      * @const string METHOD constant names
@@ -139,5 +139,29 @@ class HAbstractRequest extends AbstractHttpMessage
         }
 
         return $this->host;
+    }
+
+    /**
+     * Return the formatted request line (first line) for this http request
+     *
+     * @return string
+     */
+    function renderRequestLine()
+    {
+        return $this->getMethod() . ' ' . $this->getTarget()->toString() . ' HTTP/' . $this->getVersion();
+    }
+
+    /**
+     * Render Http Message To String
+     *
+     * @return string
+     */
+    function toString()
+    {
+        $return = '';
+        $return .= $this->renderRequestLine();
+        $return .= parent::toString();
+
+        return $return;
     }
 }

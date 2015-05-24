@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Interfaces\Message;
 
-interface iHResponse extends iHMessage
+interface iHttpResponse extends iHttpMessage
 {
     /**
      * Set Response Status Code

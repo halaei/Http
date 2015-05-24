@@ -7,11 +7,11 @@ use Poirot\Core\Interfaces\iDataField;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
-use Poirot\Http\Interfaces\Message\iHMessage;
+use Poirot\Http\Interfaces\Message\iHttpMessage;
 
 abstract class AbstractHttpMessage
     extends AbstractOptions
-    implements iHMessage
+    implements iHttpMessage
 {
     const VERSION_10 = '1.0';
     const VERSION_11 = '1.1';

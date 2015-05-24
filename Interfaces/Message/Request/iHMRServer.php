@@ -1,9 +1,9 @@
 <?php
 namespace Poirot\Http\Interfaces\Message\Request;
 
-use Poirot\Http\Interfaces\Message\iHRequest;
+use Poirot\Http\Interfaces\Message\iHttpRequest;
 
-interface iHMRServer extends iHRequest
+interface iHMRServer extends iHttpRequest
 {
 
 }
