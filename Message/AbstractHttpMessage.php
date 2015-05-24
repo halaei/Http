@@ -6,6 +6,7 @@ use Poirot\Core\DataField;
 use Poirot\Core\Entity;
 use Poirot\Core\Interfaces\iDataField;
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHMessage;
 
 abstract class AbstractHttpMessage
@@ -71,26 +72,28 @@ abstract class AbstractHttpMessage
     }
 
     /**
-     * Set message metadata
+     * Set message headers or headers collection
      *
      * ! HTTP messages include case-insensitive header
      *   field names
      *
      * ! headers may contains multiple values, such as cookie
      *
-     * @param array|iHeader $headers
+     * @param array|iHeaderCollection $headers
      *
      * @return $this
      */
     function setHeaders($headers)
     {
         // TODO implement header
+
+        return $this;
     }
 
     /**
-     * Get Headers
+     * Get Headers collection
      *
-     * @return iHeader
+     * @return iHeaderCollection
      */
     function getHeaders()
     {

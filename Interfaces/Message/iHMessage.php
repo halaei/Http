@@ -3,6 +3,7 @@ namespace Poirot\Http\Interfaces\Message;
 
 use Poirot\Core\Interfaces\iMetaProvider;
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Stream\Interfaces\iStreamable;
 
 interface iHMessage extends iMetaProvider
@@ -24,23 +25,23 @@ interface iHMessage extends iMetaProvider
     function getVersion();
 
     /**
-     * Set message headers
+     * Set message headers or headers collection
      *
      * ! HTTP messages include case-insensitive header
      *   field names
      *
      * ! headers may contains multiple values, such as cookie
      *
-     * @param array|iHeader $headers
+     * @param array|iHeaderCollection $headers
      *
      * @return $this
      */
     function setHeaders($headers);
 
     /**
-     * Get Headers
+     * Get Headers collection
      *
-     * @return iHeader
+     * @return iHeaderCollection
      */
     function getHeaders();
 
