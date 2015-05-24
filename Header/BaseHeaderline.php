@@ -3,7 +3,7 @@ namespace Poirot\Http\Header;
 
 use Poirot\Core\AbstractOptions;
 
-class HBaseHeaderline extends AbstractHeader
+class BaseHeaderline extends AbstractHeader
 {
     protected $label;
 

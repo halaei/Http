@@ -12,8 +12,8 @@ abstract class AbstractHttpMessage
     extends AbstractOptions
     implements iHMessage
 {
-    const VERSION_1p0 = '1.0';
-    const VERSION_1p1 = '1.1';
+    const VERSION_10 = '1.0';
+    const VERSION_11 = '1.1';
 
     /**
      * @var Entity
@@ -28,7 +28,7 @@ abstract class AbstractHttpMessage
     /**
      * @var string
      */
-    protected $version = self::VERSION_1p1;
+    protected $version = self::VERSION_11;
 
     /**
      * @var DataField
