@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Interfaces;
 
-interface iHeaderCollection
-{
+use Poirot\Core\Interfaces\iObjectCollection;
 
-}
+interface iHeaderCollection extends iObjectCollection
+{ }
