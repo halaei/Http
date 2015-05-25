@@ -10,6 +10,11 @@ class MethodType extends AbstractService
     implements iCService
 {
     /**
+     * @var string Service Name
+     */
+    protected $name = 'MethodType'; // default name
+
+    /**
      * Is this an OPTIONS method request?
      *
      * @return bool
