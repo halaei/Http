@@ -10,6 +10,7 @@ use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Plugins\HttpPlugins;
+use Poirot\Http\Plugins\Request\MethodType;
 use Poirot\Stream\Interfaces\iStreamable;
 
 abstract class AbstractHttpMessage
@@ -72,7 +73,12 @@ abstract class AbstractHttpMessage
      */
     protected function _getPluginManager()
     {
-        return (new HttpPlugins())->setMessageObject($this);
+        return (new HttpPlugins())
+            ->setMessageObject($this)
+
+            // TODO build with default plugins on Request/Response Message Class
+            ->set(new MethodType(['name' => 'MethodType']))
+            ;
     }
 
     /**
