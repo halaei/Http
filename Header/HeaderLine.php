@@ -66,12 +66,22 @@ class HeaderLine extends AbstractHeader
     }
 
     /**
+     * Get Field Value As String
+     *
+     * @return string
+     */
+    function getValueString()
+    {
+        return $this->filter($this->getHeaderLine());
+    }
+
+    /**
      * Represent Header As String
      *
      * @return string
      */
     function toString()
     {
-        return $this->getLabel().':'.$this->filter($this->getHeaderLine());
+        return $this->getLabel().':'. $this->getValueString();
     }
 }

@@ -21,9 +21,18 @@ interface iHeader extends iPoirotOptions
      * @return $this
      */
     function fromString($line);
-    
+
+    /**
+     * Get Field Value As String
+     *
+     * @return string
+     */
+    function getValueString();
+
     /**
      * Represent Header As String
+     *
+     * label: value_string
      *
      * @return string
      */
