@@ -134,11 +134,13 @@ abstract class AbstractHttpMessage
     }
 
     /**
-     * Render Http Message To String
+     * Render Headers
+     *
+     * - include line break at bottom
      *
      * @return string
      */
-    function toString()
+    function renderHeaders()
     {
         $return = '';
 
@@ -147,7 +149,22 @@ abstract class AbstractHttpMessage
             $return .= $header->toString();
 
         $return .= "\r\n";
-        
+
+        return $return;
+    }
+
+    /**
+     * Render Http Message To String
+     *
+     * - render header
+     * - render body
+     *
+     * @return string
+     */
+    function toString()
+    {
+        $return = $this->renderHeaders();
+
         $body = $this->getBody();
         if ($body instanceof iStreamable) {
             while ($body->getResource()->isAlive() && !$body->getResource()->isEOF())
@@ -157,6 +174,35 @@ abstract class AbstractHttpMessage
         }
 
         return $return;
+    }
+
+    /**
+     * Flush String Representation To Output
+     *
+     * @return void
+     */
+    function flush()
+    {
+        ob_end_clean();
+        ob_start();
+        echo $this->renderHeaders();
+        ob_end_flush();
+        flush();
+
+        $body = $this->getBody();
+        ob_end_clean();
+        ob_start();
+        if ($body instanceof iStreamable) {
+            while ($body->getResource()->isAlive() && !$body->getResource()->isEOF())
+                ob_end_flush();
+                flush();
+                ob_start();
+                echo $body->read(24400);
+        } else {
+            echo $body;
+        }
+        ob_end_flush();
+        flush();
     }
 
     /**

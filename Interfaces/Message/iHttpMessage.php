@@ -61,9 +61,28 @@ interface iHttpMessage extends iMetaProvider
     function getBody();
 
     /**
+     * Render Headers
+     *
+     * - include line break at bottom
+     *
+     * @return string
+     */
+    function renderHeaders();
+
+    /**
      * Render Http Message To String
+     *
+     * - render header
+     * - render body
      *
      * @return string
      */
     function toString();
+
+    /**
+     * Flush String Representation To Output
+     *
+     * @return void
+     */
+    function flush();
 }

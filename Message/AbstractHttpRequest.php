@@ -157,6 +157,22 @@ class AbstractHttpRequest extends AbstractHttpMessage
     }
 
     /**
+     * Flush String Representation To Output
+     *
+     * @return void
+     */
+    function flush()
+    {
+        ob_end_clean();
+        ob_start();
+        echo $this->renderRequestLine();
+        ob_end_flush();
+        flush();
+
+        parent::flush();
+    }
+
+    /**
      * Render Http Message To String
      *
      * @return string
