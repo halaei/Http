@@ -8,6 +8,7 @@ use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Stream\Interfaces\iStreamable;
 
 abstract class AbstractHttpMessage
     extends AbstractOptions
@@ -145,7 +146,15 @@ abstract class AbstractHttpMessage
         foreach ($this->getHeaders() as $header)
             $return .= $header->toString();
 
-        $return .= "\r\n" . $this->getBody();
+        $return .= "\r\n";
+        
+        $body = $this->getBody();
+        if ($body instanceof iStreamable) {
+            while ($body->getResource()->isAlive() && !$body->getResource()->isEOF())
+                $return .= $body->read(24400);
+        } else {
+            $return .= $body;
+        }
 
         return $return;
     }

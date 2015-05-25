@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Http\Message;
 
+use Poirot\Http\Header\HeaderLine;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
@@ -113,6 +114,10 @@ class AbstractHttpRequest extends AbstractHttpMessage
     function setHost($host)
     {
         $this->host = strtolower($host);
+        $this->getHeaders()->attach(new HeaderLine([
+            'label'       => 'Host',
+            'header_line' => $host,
+        ]));
 
         return $this;
     }
