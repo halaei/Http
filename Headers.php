@@ -9,6 +9,33 @@ class Headers extends ObjectCollection
     implements iHeaderCollection
 {
     /**
+     * Attach Object
+     *
+     * - replace object with new data if exists
+     *
+     * note: recommend that object index by Unified ETag
+     *       for better search and performance
+     *
+     * @param object $object
+     * @param array $data    associate array that it can be used to attach some data
+     *                       this data can be available for some codes
+     *                       block that need this data ...
+     *                       in case of render, view renderer can match
+     *                       headers that attached by itself and make
+     *                       some condition.
+     *
+     * @throws \InvalidArgumentException Object Type Mismatch
+     * @return string ETag Hash Identifier of object
+     */
+    function attach($object, array $data = [])
+    {
+        /** @var iHeader $object */
+        $data['label'] = $object->getLabel();
+
+        return parent::attach($object, $data);
+    }
+
+    /**
      * @param $object
      *
      * @throws \InvalidArgumentException
