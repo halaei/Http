@@ -6,7 +6,7 @@ use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
 
-class AbstractHttpRequest extends AbstractHttpMessage
+class HttpRequest extends AbstractHttpMessage
     implements iHttpRequest
 {
     /**#@+

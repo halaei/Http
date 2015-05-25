@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Http\Message;
 
+use Poirot\Container\Plugins\InvokablePlugins;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
 use Poirot\Core\Interfaces\iDataField;
@@ -8,6 +9,7 @@ use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Http\Plugins\HttpPlugins;
 use Poirot\Stream\Interfaces\iStreamable;
 
 abstract class AbstractHttpMessage
@@ -36,6 +38,42 @@ abstract class AbstractHttpMessage
      * @var DataField
      */
     protected $_meta;
+
+    /**
+     * @var InvokablePlugins
+     */
+    protected $_plugins;
+
+    /**
+     * Plugin Manager
+     *
+     * @return InvokablePlugins
+     */
+    function plugin()
+    {
+        return $this->_getPluginInvokable();
+    }
+
+    /**
+     * @return InvokablePlugins
+     */
+    protected function _getPluginInvokable()
+    {
+        if (!$this->_plugins)
+            $this->_plugins = new InvokablePlugins(
+                $this->_getPluginManager()
+            );
+
+        return $this->_plugins;
+    }
+
+    /**
+     * @return HttpPlugins
+     */
+    protected function _getPluginManager()
+    {
+        return (new HttpPlugins())->setMessageObject($this);
+    }
 
     /**
      * @return iDataField
