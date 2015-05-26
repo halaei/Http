@@ -19,7 +19,7 @@ class HeaderLine extends AbstractHeader
      */
     function fromString($line)
     {
-        $matches = $this->parseHeader($line);
+        $matches = self::parseHeader($line);
 
         $this->setLabel($matches['label']);
         $this->setHeaderLine($matches['value']);
@@ -50,7 +50,14 @@ class HeaderLine extends AbstractHeader
      */
     function setHeaderLine($headerLine)
     {
-        $this->headerLine = (string) $headerLine;
+        $headerLine = (string) $headerLine;
+
+        if (!$this->isValid($headerLine))
+            throw new \InvalidArgumentException(
+                'Header value is not valid or contains some unwanted chars.'
+            );
+
+        $this->headerLine = $headerLine;
 
         return $this;
     }

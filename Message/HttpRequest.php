@@ -70,7 +70,7 @@ class HttpRequest extends AbstractHttpMessage
                 // headers end
                 continue;
 
-            $this->getHeaders()->attach(new HeaderFactory($nextLine));
+            $this->getHeaders()->attach(HeaderFactory::fromString($nextLine));
         }
 
         // body:
