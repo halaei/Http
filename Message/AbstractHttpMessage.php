@@ -6,6 +6,7 @@ use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
 use Poirot\Core\Interfaces\iDataField;
 use Poirot\Core\Interfaces\iPoirotOptions;
+use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
@@ -183,8 +184,13 @@ abstract class AbstractHttpMessage
             $this->headers = $headers;
 
         if (is_array($headers))
-            foreach ($headers as $h)
+            foreach ($headers as $label => $h) {
+                if (!$h instanceof iHeader)
+                    // Header-Label: value header
+                    $h = HeaderFactory::factory($label, $h);
+
                 $this->getHeaders()->attach($h);
+            }
 
         return $this;
     }

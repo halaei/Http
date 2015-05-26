@@ -1,6 +1,9 @@
 <?php
 namespace Poirot\Http\Header;
 
+/**
+ * Implement Plugins
+ */
 class HeaderFactory
 {
     protected static $headerAsParser;
@@ -14,7 +17,12 @@ class HeaderFactory
         // $headerPlugin->fromString($headerLine);
         // return header
 
-        return new HeaderLine($headerLine);
+        return self::factory($parsed['label'], $parsed['value']);
+    }
+
+    static function factory($label, $value)
+    {
+        return new HeaderLine(['label' => $label, 'header_line' => $value]);
     }
 
     protected static function _getHeaderParser()

@@ -29,6 +29,12 @@ class Headers extends ObjectCollection
      */
     function attach($object, array $data = [])
     {
+        if (!$object instanceof iHeader)
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid Header, must instance of iHeader. "%s" given.'
+                , is_object($object) ? get_class($object) : gettype($object)
+            ));
+
         /** @var iHeader $object */
         $data['label'] = $object->getLabel();
 
