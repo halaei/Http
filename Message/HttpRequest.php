@@ -214,7 +214,6 @@ class HttpRequest extends AbstractHttpMessage
      */
     function flush()
     {
-        ob_end_clean();
         ob_start();
         echo $this->renderRequestLine();
         ob_end_flush();
