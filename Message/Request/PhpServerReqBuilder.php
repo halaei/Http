@@ -22,19 +22,28 @@ class PhpServerReqBuilder extends AbstractReqBuilder
         $this->setMethod($method);
 
 
-        // ++-- headers:
-        foreach($_SERVER as $key => $val)
-            if (strpos($key, 'HTTP_') === 0) {
-                $name = str_replace(['HTTP_', '_'], ['', '-'], $key);
-                if (strtolower($name) == 'host')
-                    // ++-- host:
-                    $this->setHost($val);
+        // ++-- target:
+        $this->setTarget($_SERVER['REQUEST_URI']);
 
-                $headers[$name] = $val;
-            }
+        // ++-- headers:
+        $headers = [];
+        if (is_callable('apache_request_headers'))
+            $headers = apache_request_headers();
+        else
+            foreach($_SERVER as $key => $val)
+                if (strpos($key, 'HTTP_') === 0) {
+                    $name = strtr(substr($key, 5), '_', ' ');
+                    $name = strtr(ucwords(strtolower($name)), ' ', '-');
+
+                    $headers[$name] = $val;
+                }
+
+        // ++-- host:
+        if (isset($headers['Host']))
+            $this->setHost($headers['Host']);
+
 
         $this->setHeaders($headers);
-
 
         // ++-- body:
         $bodyStream = new Streamable(

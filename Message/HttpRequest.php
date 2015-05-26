@@ -2,7 +2,6 @@
 namespace Poirot\Http\Message;
 
 use Poirot\Http\Header\HeaderFactory;
-use Poirot\Http\Header\HeaderLine;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
@@ -201,6 +200,8 @@ class HttpRequest extends AbstractHttpMessage
      */
     function renderRequestLine()
     {
+        //TODO can implement protocol HTTP/HTTPS
+
         return $this->getMethod() . ' ' . $this->getTarget()->toString() . ' HTTP/' . $this->getVersion();
     }
 
