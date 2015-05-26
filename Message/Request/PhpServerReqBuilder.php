@@ -50,5 +50,8 @@ class PhpServerReqBuilder extends AbstractReqBuilder
             (new WrapperClient('php://input'))->getConnect()
         );
         $this->setBody($bodyStream);
+
+        // TODO Implement $_GET, $_POST, $_COOKIE
+        // ...
     }
 }
