@@ -10,7 +10,6 @@ use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Plugins\HttpPlugins;
-use Poirot\Http\Plugins\Request\MethodType;
 use Poirot\Stream\Interfaces\iStreamable;
 
 abstract class AbstractHttpMessage
@@ -46,6 +45,11 @@ abstract class AbstractHttpMessage
     protected $_plugins;
 
     /**
+     * @var HttpPlugins
+     */
+    protected $pluginManager;
+
+    /**
      * Plugin Manager
      *
      * @return InvokablePlugins
@@ -55,30 +59,30 @@ abstract class AbstractHttpMessage
         return $this->_getPluginInvokable();
     }
 
-    /**
-     * @return InvokablePlugins
-     */
-    protected function _getPluginInvokable()
-    {
-        if (!$this->_plugins)
-            $this->_plugins = new InvokablePlugins(
-                $this->_getPluginManager()
-            );
+        /**
+         * @return InvokablePlugins
+         */
+        protected function _getPluginInvokable()
+        {
+            if (!$this->_plugins)
+                $this->_plugins = new InvokablePlugins(
+                    $this->getPluginManager()
+                );
 
-        return $this->_plugins;
-    }
+            return $this->_plugins;
+        }
 
     /**
      * @return HttpPlugins
      */
-    protected function _getPluginManager()
+    function getPluginManager()
     {
-        return (new HttpPlugins())
-            ->setMessageObject($this)
+        if (!$this->pluginManager)
+            $this->pluginManager = (new HttpPlugins);
 
-            // TODO build with default plugins on Request/Response Message Class
-            ->set(new MethodType(['name' => 'MethodType']))
-            ;
+        $this->pluginManager->setMessageObject($this);
+
+        return $this->pluginManager;
     }
 
     /**
