@@ -165,10 +165,6 @@ class HttpRequest extends AbstractHttpMessage
     function setHost($host)
     {
         $this->host = strtolower($host);
-        $this->getHeaders()->attach(new HeaderLine([
-            'label'       => 'Host',
-            'header_line' => $host,
-        ]));
 
         return $this;
     }
@@ -189,7 +185,8 @@ class HttpRequest extends AbstractHttpMessage
             // attempt to get host from target uri
             $host = $this->getTarget()->getHost();
             if (!$host)
-                throw new \Exception('No Host Provided.');
+                if ($host = $this->getHeaders()->search(['label' => 'Host']))
+                    $host = $host[0]->toString();
 
             $this->setHost($host);
         }
