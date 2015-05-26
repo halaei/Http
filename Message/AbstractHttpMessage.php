@@ -73,6 +73,14 @@ abstract class AbstractHttpMessage
         }
 
     /**
+     * Get Plugins Manager
+     *
+     * note: it's recommended that create http message as
+     *       factory service on application level and build
+     *       pluginManager with required config builder and
+     *       keep it clear on this state
+     *
+     *
      * @return HttpPlugins
      */
     function getPluginManager()
