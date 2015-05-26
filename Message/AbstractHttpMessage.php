@@ -5,6 +5,7 @@ use Poirot\Container\Plugins\InvokablePlugins;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
 use Poirot\Core\Interfaces\iDataField;
+use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
@@ -49,6 +50,39 @@ abstract class AbstractHttpMessage
      */
     protected $pluginManager;
 
+
+    // Implement Options:
+
+    /**
+     * Set Options
+     *
+     * @param string|array|iPoirotOptions $options
+     *
+     * @return $this
+     */
+    function from($options)
+    {
+        if (is_string($options))
+            $this->fromString($options);
+        else
+            parent::from($options);
+
+        return $this;
+    }
+
+    /**
+     * Set Options From Http Message String
+     *
+     * @param string $message Message String
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    abstract function fromString($message);
+
+
+    // Implement Plugins Manager:
+
     /**
      * Plugin Manager
      *
@@ -92,6 +126,9 @@ abstract class AbstractHttpMessage
 
         return $this->pluginManager;
     }
+
+
+    // Implement Http Message Features:
 
     /**
      * @return iDataField
@@ -202,7 +239,7 @@ abstract class AbstractHttpMessage
 
         /** @var iHeader $header */
         foreach ($this->getHeaders() as $header)
-            $return .= $header->toString();
+            $return .= trim($header->toString())."\r\n";
 
         $return .= "\r\n";
 

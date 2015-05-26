@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Http\Message;
 
+use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Header\HeaderLine;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\PathUri\HttpUri;
@@ -27,6 +28,56 @@ class HttpRequest extends AbstractHttpMessage
     protected $method = self::METHOD_GET;
     protected $host;
     protected $target_uri;
+
+    /**
+     * Set Options From Http Message String
+     *
+     * @param string $message Message String
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    function fromString($message)
+    {
+         if (!preg_match_all('/.*[\n]?/', $message, $lines))
+             throw new \InvalidArgumentException('Error Parsing Request Message.');
+
+        $lines = $lines[0];
+
+        // request line:
+        $firstLine = array_shift($lines);
+        $matches = null;
+        $methods = implode('|', [
+            self::METHOD_OPTIONS, self::METHOD_GET, self::METHOD_HEAD, self::METHOD_POST,
+            self::METHOD_PUT, self::METHOD_DELETE, self::METHOD_TRACE, self::METHOD_CONNECT,
+            self::METHOD_PATCH
+        ]);
+        $regex     = '#^(?P<method>' . $methods . ')\s(?P<uri>[^ ]*)(?:\sHTTP\/(?P<version>\d+\.\d+)){0,1}#';
+        if (!preg_match($regex, $firstLine, $matches))
+            throw new \InvalidArgumentException(
+                'A valid request line was not found in the provided message.'
+            );
+
+        $this->setMethod($matches['method']);
+        $this->setTarget($matches['uri']);
+
+        if (isset($matches['version']))
+            $this->setVersion($matches['version']);
+
+        // headers:
+        while ($nextLine = array_shift($lines)) {
+            if ($nextLine == '')
+                // headers end
+                continue;
+
+            $this->getHeaders()->attach(new HeaderFactory($nextLine));
+        }
+
+        // body:
+        $this->setBody(implode("\r\n", $lines));
+
+        return $this;
+    }
 
     /**
      * Set Request Method
@@ -181,6 +232,7 @@ class HttpRequest extends AbstractHttpMessage
     {
         $return = '';
         $return .= $this->renderRequestLine();
+        $return .= "\r\n";
         $return .= parent::toString();
 
         return $return;
