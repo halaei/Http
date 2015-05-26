@@ -282,21 +282,19 @@ abstract class AbstractHttpMessage
      */
     function flush()
     {
-        ob_end_clean();
         ob_start();
         echo $this->renderHeaders();
         ob_end_flush();
         flush();
 
         $body = $this->getBody();
-        ob_end_clean();
         ob_start();
         if ($body instanceof iStreamable) {
             while ($body->getResource()->isAlive() && !$body->getResource()->isEOF())
+                echo $body->read(24400);
                 ob_end_flush();
                 flush();
                 ob_start();
-                echo $body->read(24400);
         } else {
             echo $body;
         }
