@@ -21,13 +21,20 @@ class PhpServerReqBuilder extends AbstractReqBuilder
 
         $this->setMethod($method);
 
+
         // ++-- headers:
         foreach($_SERVER as $key => $val)
             if (strpos($key, 'HTTP_') === 0) {
                 $name = str_replace(['HTTP_', '_'], ['', '-'], $key);
+                if (strtolower($name) == 'host')
+                    // ++-- host:
+                    $this->setHost($val);
+
                 $headers[$name] = $val;
             }
+
         $this->setHeaders($headers);
+
 
         // ++-- body:
         $bodyStream = new Streamable(
