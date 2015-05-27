@@ -42,7 +42,7 @@ interface iHttpRequest extends iHttpMessage
      *
      * @return $this
      */
-    function setTarget($target, $preserveHost = true);
+    function setUri($target, $preserveHost = true);
 
     /**
      * Get Uri Target
@@ -51,7 +51,7 @@ interface iHttpRequest extends iHttpMessage
      *
      * @return iHttpUri
      */
-    function getTarget();
+    function getUri();
 
     /**
      * Set Host

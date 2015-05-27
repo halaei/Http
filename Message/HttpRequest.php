@@ -58,7 +58,7 @@ class HttpRequest extends AbstractHttpMessage
             );
 
         $this->setMethod($matches['method']);
-        $this->setTarget($matches['uri']);
+        $this->setUri($matches['uri']);
 
         if (isset($matches['version']))
             $this->setVersion($matches['version']);
@@ -116,7 +116,7 @@ class HttpRequest extends AbstractHttpMessage
      *
      * @return $this
      */
-    function setTarget($target, $preserveHost = true)
+    function setUri($target, $preserveHost = true)
     {
         if ($target === null)
             $target = '/';
@@ -142,10 +142,10 @@ class HttpRequest extends AbstractHttpMessage
      *
      * @return iHttpUri
      */
-    function getTarget()
+    function getUri()
     {
         if (!$this->target_uri)
-            $this->setTarget(null);
+            $this->setUri(null);
 
         return $this->target_uri;
     }
@@ -182,7 +182,7 @@ class HttpRequest extends AbstractHttpMessage
     {
         if (!$this->host) {
             // attempt to get host from target uri
-            $host = $this->getTarget()->getHost();
+            $host = $this->getUri()->getHost();
             if (!$host)
                 if ($host = $this->getHeaders()->search(['label' => 'Host']))
                     $host = $host[0]->toString();
@@ -202,7 +202,7 @@ class HttpRequest extends AbstractHttpMessage
     {
         //TODO can implement protocol HTTP/HTTPS
 
-        return $this->getMethod() . ' ' . $this->getTarget()->toString() . ' HTTP/' . $this->getVersion();
+        return $this->getMethod() . ' ' . $this->getUri()->toString() . ' HTTP/' . $this->getVersion();
     }
 
     /**
