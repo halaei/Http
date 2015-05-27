@@ -57,12 +57,17 @@ class PhpServerReqBuilder extends AbstractReqBuilder
         );
 
         # multipart data
-        if ($contentType = $headers->search(['label' => 'Content-Type'])) {
+        $contentType = $headers->search(['label' => 'Content-Type']);
+        if (is_array($contentType) && $contentType = current($contentType)) {
             /** @var iHeader $contentType */
             $contentType = $contentType->getValueString();
             if (strpos($contentType, 'multipart') !== false) {
                 // it`s multipart form data
-                // TODO build body data
+                // TODO build body data,
+                // https://www.ietf.org/rfc/rfc2388.txt
+                // http://chxo.com/be2/20050724_93bf.html
+
+                # http://stackoverflow.com/questions/19707632/php-http-request-content-raw-data-enctype-multipart-form-data
             }
         }
 
