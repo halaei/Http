@@ -5,7 +5,7 @@ use Poirot\Container\Exception\ContainerInvalidPluginException;
 use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 
-class HttpPlugins extends AbstractPlugins
+class HttpPluginsManager extends AbstractPlugins
 {
     /**
      * @var iHttpMessage

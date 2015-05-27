@@ -11,7 +11,7 @@ use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
-use Poirot\Http\Plugins\HttpPlugins;
+use Poirot\Http\Plugins\HttpPluginsManager;
 use Poirot\Stream\Interfaces\iStreamable;
 
 abstract class AbstractHttpMessage
@@ -47,7 +47,7 @@ abstract class AbstractHttpMessage
     protected $_plugins;
 
     /**
-     * @var HttpPlugins
+     * @var HttpPluginsManager
      */
     protected $pluginManager;
 
@@ -116,12 +116,12 @@ abstract class AbstractHttpMessage
      *       keep it clear on this state
      *
      *
-     * @return HttpPlugins
+     * @return HttpPluginsManager
      */
     function getPluginManager()
     {
         if (!$this->pluginManager)
-            $this->pluginManager = (new HttpPlugins);
+            $this->pluginManager = (new HttpPluginsManager);
 
         $this->pluginManager->setMessageObject($this);
 
