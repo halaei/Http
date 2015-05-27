@@ -2,10 +2,13 @@
 namespace Poirot\Http\Plugins;
 
 use Poirot\Container\Exception\ContainerInvalidPluginException;
+use Poirot\Container\Interfaces\iContainerBuilder;
+use Poirot\Container\Interfaces\Respec\iCServiceAware;
 use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 
 class HttpPluginsManager extends AbstractPlugins
+    implements iHttpPlugin
 {
     /**
      * @var iHttpMessage
@@ -13,7 +16,30 @@ class HttpPluginsManager extends AbstractPlugins
     protected $_mess_object;
 
     /**
+     * @override
+     *
+     * Construct
+     *
+     * @param iContainerBuilder $cBuilder
+     *
+     * @throws \Exception
+     */
+    function __construct(iContainerBuilder $cBuilder = null)
+    {
+        parent::__construct($cBuilder);
+
+        // Add Initializer To Inject Http Message Instance:
+        $thisContainer = $this;
+        $this->initializer()->addMethod(function() use ($thisContainer) {
+            // Inject Service Container Inside
+            $this->setMessageObject($thisContainer->getMessageObject());
+        }, 10000);
+    }
+
+    /**
      * Set Http Message Object (Request|Response)
+     *
+     * note: so services can have access to http message instance
      *
      * @param iHttpMessage $httpMessage
      *
@@ -46,9 +72,9 @@ class HttpPluginsManager extends AbstractPlugins
      */
     function validatePlugin($pluginInstance)
     {
-        if (!is_object($pluginInstance))
+        if (!$pluginInstance instanceof iHttpPlugin)
             throw new ContainerInvalidPluginException(
-                'Invalid Plugin Instance.'
+                'Invalid Plugin Provided Instance.'
             );
     }
 }

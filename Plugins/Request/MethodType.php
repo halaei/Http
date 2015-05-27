@@ -4,15 +4,24 @@ namespace Poirot\Http\Plugins\Request;
 use Poirot\Container\Interfaces\iCService;
 use Poirot\Container\Service\AbstractService;
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\HttpRequest;
+use Poirot\Http\Plugins\iHttpPlugin;
 
 class MethodType extends AbstractService
-    implements iCService
+    implements iHttpPlugin,
+    iCService
 {
     /**
      * @var string Service Name
      */
     protected $name = 'MethodType'; // default name
+
+    /**
+     * @var iHttpMessage
+     */
+    protected $messageObject;
 
     /**
      * Is this an OPTIONS method request?
@@ -21,7 +30,7 @@ class MethodType extends AbstractService
      */
     function isOptions()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_OPTIONS);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_OPTIONS);
     }
 
     /**
@@ -31,7 +40,7 @@ class MethodType extends AbstractService
      */
     function isPropFind()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_PROPFIND);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_PROPFIND);
     }
 
     /**
@@ -41,7 +50,7 @@ class MethodType extends AbstractService
      */
     function isGet()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_GET);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_GET);
     }
 
     /**
@@ -51,7 +60,7 @@ class MethodType extends AbstractService
      */
     function isHead()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_HEAD);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_HEAD);
     }
 
     /**
@@ -61,7 +70,7 @@ class MethodType extends AbstractService
      */
     function isPost()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_POST);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_POST);
     }
 
     /**
@@ -71,7 +80,7 @@ class MethodType extends AbstractService
      */
     function isPut()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_PUT);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_PUT);
     }
 
     /**
@@ -81,7 +90,7 @@ class MethodType extends AbstractService
      */
     function isDelete()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_DELETE);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_DELETE);
     }
 
     /**
@@ -91,7 +100,7 @@ class MethodType extends AbstractService
      */
     function isTrace()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_TRACE);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_TRACE);
     }
 
     /**
@@ -101,7 +110,7 @@ class MethodType extends AbstractService
      */
     function isConnect()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_CONNECT);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_CONNECT);
     }
 
     /**
@@ -111,7 +120,7 @@ class MethodType extends AbstractService
      */
     function isPatch()
     {
-        return ($this->__getRequestObject()->getMethod() === HttpRequest::METHOD_PATCH);
+        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_PATCH);
     }
 
     /**
@@ -124,7 +133,7 @@ class MethodType extends AbstractService
     function isXmlHttpRequest()
     {
         /** @var iHeader $header */
-        $header = $this->__getRequestObject()->getHeaders()->search(['label' => 'X_REQUESTED_WITH']);
+        $header = $this->getMessageObject()->getHeaders()->search(['label' => 'X_REQUESTED_WITH']);
         return false !== $header && $header->getValueString() == 'XMLHttpRequest';
     }
 
@@ -136,16 +145,8 @@ class MethodType extends AbstractService
     function isFlashRequest()
     {
         /** @var iHeader $header */
-        $header = $this->__getRequestObject()->getHeaders()->search(['label' => 'USER_AGENT']);
+        $header = $this->getMessageObject()->getHeaders()->search(['label' => 'USER_AGENT']);
         return false !== $header && stristr($header->getValueString(), ' flash');
-    }
-
-    /**
-     * @return HttpRequest
-     */
-    protected function __getRequestObject()
-    {
-        return $this->getServiceContainer()->getMessageObject();
     }
 
     // Implement iCService:
@@ -158,5 +159,37 @@ class MethodType extends AbstractService
     function createService()
     {
         return $this;
+    }
+
+    /**
+     * Set Http Message Object (Request|Response)
+     *
+     * note: so services can have access to http message instance
+     *
+     * @param iHttpMessage $httpMessage
+     *
+     * @return $this
+     */
+    function setMessageObject(iHttpMessage $httpMessage)
+    {
+        if (!$httpMessage instanceof iHttpRequest)
+            throw new \InvalidArgumentException(sprintf(
+                'This plugin need request object instance of iHttpRequest, "%s" given.'
+                , get_class($httpMessage)
+            ));
+
+        $this->messageObject = $httpMessage;
+
+        return $this;
+    }
+
+    /**
+     * Get Http Message
+     *
+     * @return iHttpMessage
+     */
+    function getMessageObject()
+    {
+        return $this->messageObject;
     }
 }
