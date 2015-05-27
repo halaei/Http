@@ -2,12 +2,29 @@
 namespace Poirot\Http;
 
 use Poirot\Core\ObjectCollection;
+use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 
 class Headers extends ObjectCollection
     implements iHeaderCollection
 {
+    /**
+     * Construct
+     *
+     * @param array $headers
+     */
+    function __construct(array $headers = [])
+    {
+        foreach ($headers as $label => $h) {
+            if (!$h instanceof iHeader)
+                // Header-Label: value header
+                $h = HeaderFactory::factory($label, $h);
+
+            $this->attach($h);
+        }
+    }
+
     /**
      * Attach Object
      *
