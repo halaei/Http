@@ -1,6 +1,8 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
+use Poirot\Http\Headers;
+use Poirot\Http\Interfaces\iHeader;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
@@ -42,16 +44,28 @@ class PhpServerReqBuilder extends AbstractReqBuilder
         if (isset($headers['Host']))
             $this->setHost($headers['Host']);
 
+        // ++-- cookie:
+        $cookie = http_build_query($_COOKIE, '', '; ');;
+        $headers['Cookie'] = $cookie;
 
+        $headers = new Headers($headers);
         $this->setHeaders($headers);
 
         // ++-- body:
-        $bodyStream = new Streamable(
+        $body = new Streamable(
             (new WrapperClient('php://input'))->getConnect()
         );
-        $this->setBody($bodyStream);
 
-        // TODO Implement $_GET, $_POST, $_COOKIE
-        // ...
+        # multipart data
+        if ($contentType = $headers->search(['label' => 'Content-Type'])) {
+            /** @var iHeader $contentType */
+            $contentType = $contentType->getValueString();
+            if (strpos($contentType, 'multipart') !== false) {
+                // it`s multipart form data
+                // TODO build body data
+            }
+        }
+
+        $this->setBody($body);
     }
 }
