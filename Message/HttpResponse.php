@@ -9,6 +9,7 @@ class HttpResponse extends AbstractHttpMessage
 {
     protected $statCode;
     protected $statReason;
+    
     /**
      * Map of standard HTTP status code/reason phrases
      *
@@ -183,7 +184,7 @@ class HttpResponse extends AbstractHttpMessage
                     $this->setStatReason($this->phrases[$code])
                 )
             );
-        
+
         return $this->statReason;
     }
 }
