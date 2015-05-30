@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Http\Plugins\Request;
+namespace Poirot\Http\Plugins\Response;
 
 use Poirot\Container\Interfaces\iCService;
 use Poirot\Container\Service\AbstractService;
