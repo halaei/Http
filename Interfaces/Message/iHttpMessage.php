@@ -82,7 +82,9 @@ interface iHttpMessage extends iMetaProvider
     /**
      * Flush String Representation To Output
      *
+     * @param bool $withHeaders Include Headers
+     *
      * @return void
      */
-    function flush();
+    function flush($withHeaders = true);
 }

@@ -278,14 +278,18 @@ abstract class AbstractHttpMessage
     /**
      * Flush String Representation To Output
      *
+     * @param bool $withHeaders Include Headers
+     *
      * @return void
      */
-    function flush()
+    function flush($withHeaders = true)
     {
-        ob_start();
-        echo $this->renderHeaders();
-        ob_end_flush();
-        flush();
+        if ($withHeaders) {
+            ob_start();
+            echo $this->renderHeaders();
+            ob_end_flush();
+            flush();
+        }
 
         $body = $this->getBody();
         ob_start();

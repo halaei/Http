@@ -74,7 +74,7 @@ class PhpServer extends AbstractService
         if ($this->isContentSent())
             return $this;
 
-        $this->getMessageObject()->flush();
+        $this->getMessageObject()->flush(false);
 
         $this->isContentSent = true;
 

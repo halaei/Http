@@ -208,16 +208,20 @@ class HttpRequest extends AbstractHttpMessage
     /**
      * Flush String Representation To Output
      *
+     * @param bool $withHeaders Include Headers
+     *
      * @return void
      */
-    function flush()
+    function flush($withHeaders = true)
     {
-        ob_start();
-        echo $this->renderRequestLine();
-        ob_end_flush();
-        flush();
+        if ($withHeaders) {
+            ob_start();
+            echo $this->renderRequestLine();
+            ob_end_flush();
+            flush();
+        }
 
-        parent::flush();
+        parent::flush($withHeaders);
     }
 
     /**
