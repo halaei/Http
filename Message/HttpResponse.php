@@ -110,9 +110,9 @@ class HttpResponse extends AbstractHttpMessage
 
         // headers:
         while ($nextLine = array_shift($lines)) {
-            if ($nextLine == '')
+            if (trim($nextLine) == '')
                 // headers end
-                continue;
+                break;
 
             $this->getHeaders()->attach(HeaderFactory::fromString($nextLine));
         }
