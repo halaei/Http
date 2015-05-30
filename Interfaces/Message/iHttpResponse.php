@@ -34,4 +34,11 @@ interface iHttpResponse extends iHttpMessage
      * @return string
      */
     function getStatReason();
+
+    /**
+     * Render the status line header
+     *
+     * @return string
+     */
+    function renderStatusLine();
 }

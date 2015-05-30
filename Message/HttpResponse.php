@@ -9,7 +9,7 @@ class HttpResponse extends AbstractHttpMessage
 {
     protected $statCode;
     protected $statReason;
-    
+
     /**
      * Map of standard HTTP status code/reason phrases
      *
@@ -186,5 +186,37 @@ class HttpResponse extends AbstractHttpMessage
             );
 
         return $this->statReason;
+    }
+
+    /**
+     * Render the status line header
+     *
+     * @return string
+     */
+    function renderStatusLine()
+    {
+        $status = sprintf(
+            'HTTP/%s %d %s',
+            $this->getVersion(),
+            $this->getStatCode(),
+            $this->getStatReason()
+        );
+
+        return trim($status);
+    }
+
+    /**
+     * Render Http Message To String
+     *
+     * @return string
+     */
+    function toString()
+    {
+        $return = '';
+        $return .= $this->renderStatusLine();
+        $return .= "\r\n";
+        $return .= parent::toString();
+
+        return $return;
     }
 }
