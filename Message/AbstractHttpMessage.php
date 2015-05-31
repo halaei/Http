@@ -1,6 +1,8 @@
 <?php
 namespace Poirot\Http\Message;
 
+use Poirot\Container\Interfaces\Plugins\iInvokePluginsProvider;
+use Poirot\Container\Interfaces\Plugins\iPluginManagerProvider;
 use Poirot\Container\Plugins\InvokablePlugins;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
@@ -16,7 +18,9 @@ use Poirot\Stream\Interfaces\iStreamable;
 
 abstract class AbstractHttpMessage
     extends AbstractOptions
-    implements iHttpMessage
+    implements iHttpMessage,
+    iInvokePluginsProvider,
+    iPluginManagerProvider
 {
     const VERSION_10 = '1.0';
     const VERSION_11 = '1.1';
