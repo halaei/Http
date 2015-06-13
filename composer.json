@@ -11,7 +11,8 @@
     ],
     "require": {
         "poirot/core": "dev-master",
-        "poirot/container": "dev-master"
+        "poirot/container": "dev-master",
+        "poirot/pathuri": "dev-master"
     },
     "target-dir": "Poirot/Http",
     "autoload"  : {
