@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "poirot/core": "dev-master"
+        "poirot/core": "dev-master",
+        "poirot/container": "dev-master"
     },
     "target-dir": "Poirot/Http",
     "autoload"  : {
