@@ -25,7 +25,8 @@ class PhpServerReqBuilder extends AbstractReqBuilder
 
 
         // ++-- target:
-        $this->setUri($_SERVER['REQUEST_URI']);
+        $uri = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $this->setUri($uri);
 
         // ++-- headers:
         $headers = [];
