@@ -6,7 +6,7 @@ use Poirot\Http\Interfaces\iHeader;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
-class PhpServerReqBuilder extends AbstractReqBuilder
+class PhpServerOptsAware extends AbstractReqBuilder
 {
     /**
      * Construct
