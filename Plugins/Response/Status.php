@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Http\Plugins\Request;
+namespace Poirot\Http\Plugins\Response;
 
 use Poirot\Container\Interfaces\iCService;
 use Poirot\Container\Service\AbstractService;
@@ -111,7 +111,8 @@ class Status extends AbstractService
         return (200 <= $code && 300 > $code);
     }
 
-    // Implement iCService:
+
+    // Implement iCService
 
     /**
      * Create Service
@@ -122,6 +123,9 @@ class Status extends AbstractService
     {
         return $this;
     }
+
+
+    // Implement iHttpPlugin
 
     /**
      * Set Http Message Object (Request|Response)

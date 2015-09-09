@@ -96,7 +96,8 @@ class PhpServer extends AbstractService
         return $this;
     }
 
-    // Implement iCService:
+
+    // Implement iCService
 
     /**
      * Create Service
@@ -107,6 +108,9 @@ class PhpServer extends AbstractService
     {
         return $this;
     }
+
+
+    // Implement iHttpPlugin
 
     /**
      * Set Http Message Object (Request|Response)

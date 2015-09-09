@@ -2,7 +2,9 @@
 namespace Poirot\Http\Message;
 
 use Poirot\Container\Interfaces\Plugins\iInvokePluginsProvider;
+use Poirot\Container\Interfaces\Plugins\iPluginManagerAware;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerProvider;
+use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Container\Plugins\InvokablePlugins;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
@@ -16,11 +18,11 @@ use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Plugins\HttpPluginsManager;
 use Poirot\Stream\Interfaces\iStreamable;
 
-abstract class AbstractHttpMessage
-    extends AbstractOptions
-    implements iHttpMessage,
-    iInvokePluginsProvider,
-    iPluginManagerProvider
+abstract class AbstractHttpMessage extends AbstractOptions
+    implements iHttpMessage
+    , iInvokePluginsProvider
+    , iPluginManagerProvider
+    , iPluginManagerAware
 {
     const VERSION_10 = '1.0';
     const VERSION_11 = '1.1';
@@ -95,21 +97,13 @@ abstract class AbstractHttpMessage
      */
     function plugin()
     {
-        return $this->_getPluginInvokable();
+        if (!$this->_plugins)
+            $this->_plugins = new InvokablePlugins(
+                $this->getPluginManager()
+            );
+
+        return $this->_plugins;
     }
-
-        /**
-         * @return InvokablePlugins
-         */
-        protected function _getPluginInvokable()
-        {
-            if (!$this->_plugins)
-                $this->_plugins = new InvokablePlugins(
-                    $this->getPluginManager()
-                );
-
-            return $this->_plugins;
-        }
 
     /**
      * Get Plugins Manager
@@ -125,13 +119,32 @@ abstract class AbstractHttpMessage
     function getPluginManager()
     {
         if (!$this->pluginManager)
-            $this->pluginManager = (new HttpPluginsManager);
+            $this->setPluginManager(new HttpPluginsManager);
 
         $this->pluginManager->setMessageObject($this);
 
         return $this->pluginManager;
     }
 
+    /**
+     * Set Plugins Manager
+     *
+     * @param AbstractPlugins $plugins
+     *
+     * @return $this
+     */
+    function setPluginManager(AbstractPlugins $plugins)
+    {
+        if (!$plugins instanceof HttpPluginsManager)
+            throw new \InvalidArgumentException(sprintf(
+                'Plugins Manager must instance of (HttpPluginsManager) given (%s).'
+                , get_class($plugins)
+            ));
+
+        $this->pluginManager = $plugins;
+
+        return $this;
+    }
 
     // Implement Http Message Features:
 

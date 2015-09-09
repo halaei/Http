@@ -13,14 +13,10 @@ class MethodType extends AbstractService
     implements iHttpPlugin,
     iCService
 {
-    /**
-     * @var string Service Name
-     */
-    protected $name = 'MethodType'; // default name
+    /** @var string Service Name */
+    protected $name = 'MethodType';
 
-    /**
-     * @var iHttpMessage
-     */
+    /** @var iHttpMessage */
     protected $messageObject;
 
     /**
@@ -149,7 +145,8 @@ class MethodType extends AbstractService
         return false !== $header && stristr($header->getValueString(), ' flash');
     }
 
-    // Implement iCService:
+
+    // Implement iCService
 
     /**
      * Create Service
@@ -160,6 +157,9 @@ class MethodType extends AbstractService
     {
         return $this;
     }
+
+
+    // Implement iHttpPlugin
 
     /**
      * Set Http Message Object (Request|Response)

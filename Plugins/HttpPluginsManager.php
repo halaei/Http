@@ -3,7 +3,6 @@ namespace Poirot\Http\Plugins;
 
 use Poirot\Container\Exception\ContainerInvalidPluginException;
 use Poirot\Container\Interfaces\iContainerBuilder;
-use Poirot\Container\Interfaces\Respec\iCServiceAware;
 use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 
@@ -59,6 +58,9 @@ class HttpPluginsManager extends AbstractPlugins
      */
     function getMessageObject()
     {
+        if (!$this->_mess_object)
+            throw new \RuntimeException('Message Object is mandatory but not injected.');
+
         return $this->_mess_object;
     }
 
