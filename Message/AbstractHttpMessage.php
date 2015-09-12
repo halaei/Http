@@ -322,14 +322,4 @@ abstract class AbstractHttpMessage extends AbstractOptions
         ob_end_flush();
         flush();
     }
-
-    /**
-     * Render Http Message To String
-     *
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->toString();
-    }
 }
