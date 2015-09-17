@@ -196,6 +196,8 @@ class PhpServer extends AbstractService
     /**
      * Detect Base Url
      *
+     * TODO refactor
+     *
      * @throws \Exception
      * @return string
      */
@@ -265,6 +267,8 @@ class PhpServer extends AbstractService
 
     /**
      * Detect Base Path
+     *
+     * TODO refactor
      *
      * @throws \Exception
      * @return string
