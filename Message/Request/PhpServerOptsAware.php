@@ -13,6 +13,7 @@ class PhpServerOptsAware extends AbstractOptions
     protected $method;
     protected $headers;
     protected $body;
+    protected $version;
 
     /**
      * Set Host
@@ -83,11 +84,18 @@ class PhpServerOptsAware extends AbstractOptions
      */
     function getHeaders()
     {
-        if (!$this->headers) {
+        if (!$this->headers)
+        {
             $headers = [];
-            if (is_callable('apache_request_headers'))
-                $headers = apache_request_headers();
-            else
+
+            if (is_callable('apache_request_headers')) {
+                $apacheHeaders = apache_request_headers();
+                if (isset($apacheHeaders['Authorization']))
+                    $headers['AUTHORIZATION'] = $apacheHeaders['Authorization'];
+                elseif (isset($apacheHeaders['authorization']))
+                    $headers['AUTHORIZATION'] = $apacheHeaders['authorization'];
+                $headers = $apacheHeaders;
+            } else {
                 foreach($_SERVER as $key => $val)
                     if (strpos($key, 'HTTP_') === 0) {
                         $name = strtr(substr($key, 5), '_', ' ');
@@ -95,6 +103,7 @@ class PhpServerOptsAware extends AbstractOptions
 
                         $headers[$name] = $val;
                     }
+            }
 
             // ++-- cookie:
             $cookie = http_build_query($_COOKIE, '', '; ');;
@@ -208,4 +217,32 @@ class PhpServerOptsAware extends AbstractOptions
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    function getVersion()
+    {
+        if (isset($_SERVER['SERVER_PROTOCOL'])) {
+            $version = $_SERVER['SERVER_PROTOCOL'];
+            $isMatch = preg_match('(\d.\d+)', $version, $matches);
+            if ($isMatch)
+                $this->setVersion($matches[0]);
+        }
+
+        return $this->version;
+    }
+
+    /**
+     * @param mixed $version
+     * @return $this
+     */
+    function setVersion($version)
+    {
+        $this->version = $version;
+
+        return $this;
+    }
+
+
 }

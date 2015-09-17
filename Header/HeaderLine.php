@@ -54,7 +54,7 @@ class HeaderLine extends AbstractHeader
 
         if (!$this->isValid($headerLine))
             throw new \InvalidArgumentException(
-                'Header value is not valid or contains some unwanted chars.'
+                "Header value ({$headerLine}) is not valid or contains some unwanted chars."
             );
 
         $this->headerLine = $headerLine;
