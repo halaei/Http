@@ -14,14 +14,12 @@ class PhpServer extends AbstractService
     /** @var string Service Name */
     protected $name = 'PhpServer';
 
-
     protected $env;
     protected $get;
     protected $post;
     protected $cookie;
     protected $server;
     protected $files;
-
 
     /**
      * Set Env
@@ -195,6 +193,98 @@ class PhpServer extends AbstractService
             return new Entity($files);
         }
 
+    /**
+     * Detect Base Url
+     *
+     * @throws \Exception
+     * @return string
+     */
+    function getBaseUrl()
+    {
+        $baseUrl        = '';
+
+        $filename       = $this->getServer()->get('SCRIPT_FILENAME', '');
+        $scriptName     = $this->getServer()->get('SCRIPT_NAME');
+        $phpSelf        = $this->getServer()->get('PHP_SELF');
+        $origScriptName = $this->getServer()->get('ORIG_SCRIPT_NAME', false);
+
+        if ($scriptName !== null && basename($scriptName) === $filename) {
+            $baseUrl = $scriptName;
+        } elseif ($phpSelf !== null && basename($phpSelf) === $filename) {
+            $baseUrl = $phpSelf;
+        } elseif ($origScriptName !== null && basename($origScriptName) === $filename) {
+            // 1and1 shared hosting compatibility.
+            $baseUrl = $origScriptName;
+        } else {
+            // Backtrack up the SCRIPT_FILENAME to find the portion
+            // matching PHP_SELF.
+
+            $baseUrl  = '/';
+            $basename = basename($filename);
+            if ($basename) {
+                $path     = ($phpSelf ? trim($phpSelf, '/') : '');
+                $baseUrl .= substr($path, 0, strpos($path, $basename)) . $basename;
+            }
+        }
+
+        // Does the base URL have anything in common with the request URI?
+        $requestUri = $this->getMessageObject()->getUri()->getPath();
+        $requestUri = $requestUri->toString();
+
+        // Full base URL matches.
+        if (0 === strpos($requestUri, $baseUrl))
+            return $baseUrl;
+
+        // Directory portion of base path matches.
+        $baseDir = str_replace('\\', '/', dirname($baseUrl));
+        if (0 === strpos($requestUri, $baseDir))
+            return $baseDir;
+
+        $truncatedRequestUri = $requestUri;
+
+        if (false !== ($pos = strpos($requestUri, '?')))
+            $truncatedRequestUri = substr($requestUri, 0, $pos);
+
+        $basename = basename($baseUrl);
+
+        // No match whatsoever
+        if (empty($basename) || false === strpos($truncatedRequestUri, $basename))
+            return '';
+
+        // If using mod_rewrite or ISAPI_Rewrite strip the script filename
+        // out of the base path. $pos !== 0 makes sure it is not matching a
+        // value from PATH_INFO or QUERY_STRING.
+        if (strlen($requestUri) >= strlen($baseUrl)
+            && (false !== ($pos = strpos($requestUri, $baseUrl)) && $pos !== 0)
+        ) {
+            $baseUrl = substr($requestUri, 0, $pos + strlen($baseUrl));
+        }
+
+        return $baseUrl;
+    }
+
+    /**
+     * Detect Base Path
+     *
+     * @throws \Exception
+     * @return string
+     */
+    function getBasePath()
+    {
+        $filename = basename($this->getServer()->get('SCRIPT_FILENAME', ''));
+        $baseUrl  = $this->getBaseUrl();
+
+        // Empty base url detected
+        if ($baseUrl === '')
+            return '';
+
+        // basename() matches the script filename; return the directory
+        if (basename($baseUrl) === $filename)
+            return str_replace('\\', '/', dirname($baseUrl));
+
+        // Base path is identical to base URL
+        return rtrim($baseUrl, '/');
+    }
 
     // ...
 
