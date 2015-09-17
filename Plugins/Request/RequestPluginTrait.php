@@ -37,7 +37,7 @@ trait RequestPluginTrait
     /**
      * Get Http Message
      *
-     * @return iHttpMessage
+     * @return iHttpRequest
      */
     function getMessageObject()
     {
