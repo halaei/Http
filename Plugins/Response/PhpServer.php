@@ -4,7 +4,6 @@ namespace Poirot\Http\Plugins\Response;
 use Poirot\Container\Interfaces\iCService;
 use Poirot\Container\Service\AbstractService;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\Message\iHttpResponse;
 use Poirot\Http\Plugins\iHttpPlugin;
 
 class PhpServer extends AbstractService
@@ -17,11 +16,6 @@ class PhpServer extends AbstractService
      * @var string Service Name
      */
     protected $name = 'PhpServer'; // default name
-
-    /**
-     * @var iHttpResponse
-     */
-    protected $messageObject;
 
     protected $isHeadersSent;
     protected $isContentSent;

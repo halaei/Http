@@ -3,7 +3,6 @@ namespace Poirot\Http\Plugins\Response;
 
 use Poirot\Container\Interfaces\iCService;
 use Poirot\Container\Service\AbstractService;
-use Poirot\Http\Interfaces\Message\iHttpResponse;
 use Poirot\Http\Plugins\iHttpPlugin;
 
 class Status extends AbstractService
@@ -16,11 +15,6 @@ class Status extends AbstractService
      * @var string Service Name
      */
     protected $name = 'Status'; // default name
-
-    /**
-     * @var iHttpResponse
-     */
-    protected $messageObject;
 
     /**
      * Does the status code indicate a client error?
