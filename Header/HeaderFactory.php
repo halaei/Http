@@ -1,35 +1,73 @@
 <?php
 namespace Poirot\Http\Header;
 
-/**
- * Implement Plugins
- */
 class HeaderFactory
 {
-    protected static $headerAsParser;
+    /** @var HeaderPluginsManager */
+    static protected $pluginManager;
 
-    static function fromString($headerLine)
+    /**
+     * Factory Header Object From String
+     *
+     * Header-Label: value, values;
+     *
+     * @param string $headerLine
+     *
+     * @return HeaderLine
+     */
+    static function factoryString($headerLine)
     {
-        $parsed = self::_getHeaderParser()->parseHeader($headerLine);
-
-        // Looking for header plugin parsed[label]:
-        // TODO service plugin
-        // $headerPlugin->fromString($headerLine);
-        // return header
-
+        ## extract label and value from header
+        $parsed = HeaderLine::parseHeader( (string) $headerLine);
         return self::factory($parsed['label'], $parsed['value']);
     }
 
+    /**
+     * Factory Header Object
+     *
+     * @param string $label
+     * @param mixed  $value
+     *
+     * @return HeaderLine
+     */
     static function factory($label, $value)
     {
-        return new HeaderLine(['label' => $label, 'header_line' => $value]);
+        if (self::getPluginManager()->has($label))
+            $header = self::getPluginManager()->get($label);
+        else
+            $header = new HeaderLine;
+
+        if (is_string($value))
+            ## avoid to parse again header value
+            $header->from($label.': '. $value);
+        else {
+            $header->setLabel($label);
+            $header->from($value);
+        }
+
+        return $header;
     }
 
-    protected static function _getHeaderParser()
+    /**
+     * Headers Plugin Manager
+     *
+     * @return HeaderPluginsManager
+     */
+    static function getPluginManager()
     {
-        if (!self::$headerAsParser)
-            self::$headerAsParser = new HeaderLine;
+        if (!self::$pluginManager)
+            self::$pluginManager = new HeaderPluginsManager;
 
-        return self::$headerAsParser;
+        return self::$pluginManager;
+    }
+
+    /**
+     * Set Headers Plugin Manager
+     *
+     * @param HeaderPluginsManager $pluginsManager
+     */
+    static function setPluginManager(HeaderPluginsManager $pluginsManager)
+    {
+        self::$pluginManager = $pluginsManager;
     }
 }

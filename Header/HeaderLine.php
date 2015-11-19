@@ -20,9 +20,13 @@ class HeaderLine extends AbstractHeader
     function fromString($line)
     {
         $matches = self::parseHeader($line);
-
-        $this->setLabel($matches['label']);
-        $this->setHeaderLine($matches['value']);
+        if ($matches === false)
+            ## whole set as value
+            $this->setHeaderLine($line);
+        else {
+            $this->setLabel($matches['label']);
+            $this->setHeaderLine($matches['value']);
+        }
 
         return $this;
     }
@@ -37,7 +41,6 @@ class HeaderLine extends AbstractHeader
     function setLabel($label)
     {
         $this->label = (string) $label;
-
         return $this;
     }
 
@@ -58,7 +61,6 @@ class HeaderLine extends AbstractHeader
             );
 
         $this->headerLine = $headerLine;
-
         return $this;
     }
 

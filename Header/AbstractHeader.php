@@ -69,15 +69,12 @@ abstract class AbstractHeader extends AbstractOptions
      *
      * @param string $line
      *
-     * @return array[string 'label', string 'value']
+     * @return false|array[string 'label', string 'value']
      */
     static function parseHeader($line)
     {
         if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
-            throw new \InvalidArgumentException(sprintf(
-                'Header "%s" Type Mismatch.'
-                , $line
-            ));
+            return false;
 
         return [ 'label' => $matches['label'], 'value' => $matches['value'] ];
     }
