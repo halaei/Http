@@ -6,7 +6,7 @@ use Poirot\Http\Headers;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
-class PhpServerOptsAware extends AbstractOptions
+class PhpServerEnv extends AbstractOptions
 {
     protected $host;
     protected $uri;
