@@ -25,7 +25,6 @@ class PhpServerEnv extends AbstractOptions
     function setHost($host)
     {
         $this->host = $host;
-
         return $this;
     }
 
@@ -36,31 +35,14 @@ class PhpServerEnv extends AbstractOptions
      */
     function getHost()
     {
-        if (!$this->host) {
-            $headers = $this->getHeaders();
-            $hHost   = $headers->search(['label' => 'Host']);
-            if (!empty($hHost)) {
-                $hHost = current($hHost);
-                $this->setHost($hHost->getHeaderLine());
-            }
-        }
+        if ($this->host)
+            return $this->host;
 
-        return $this->host;
-    }
+        $headers = $this->getHeaders();
+        $hHost   = $headers->get('Host');
+        $this->setHost($hHost->getHeaderLine());
 
-    /**
-     * Get Request Uri
-     *
-     * @return string
-     */
-    function getUri()
-    {
-        if (!$this->uri) {
-            $uri = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-            $this->setUri($uri);
-        }
-
-        return $this->uri;
+        return $this->getHost();
     }
 
     /**
@@ -73,46 +55,23 @@ class PhpServerEnv extends AbstractOptions
     function setUri($uri)
     {
         $this->uri = $uri;
-
         return $this;
     }
 
     /**
-     * Get Headers
+     * Get Request Uri
      *
-     * @return Headers
+     * @return string
      */
-    function getHeaders()
+    function getUri()
     {
-        if (!$this->headers)
-        {
-            $headers = [];
+        if ($this->uri)
+            return $this->uri;
 
-            if (is_callable('apache_request_headers')) {
-                $apacheHeaders = apache_request_headers();
-                if (isset($apacheHeaders['Authorization']))
-                    $headers['AUTHORIZATION'] = $apacheHeaders['Authorization'];
-                elseif (isset($apacheHeaders['authorization']))
-                    $headers['AUTHORIZATION'] = $apacheHeaders['authorization'];
-                $headers = $apacheHeaders;
-            } else {
-                foreach($_SERVER as $key => $val)
-                    if (strpos($key, 'HTTP_') === 0) {
-                        $name = strtr(substr($key, 5), '_', ' ');
-                        $name = strtr(ucwords(strtolower($name)), ' ', '-');
+        $uri = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $this->setUri($uri);
 
-                        $headers[$name] = $val;
-                    }
-            }
-
-            // ++-- cookie:
-            $cookie = http_build_query($_COOKIE, '', '; ');;
-            $headers['Cookie'] = $cookie;
-
-            $this->setHeaders($headers);
-        }
-
-        return $this->headers;
+        return $this->getUri();
     }
 
     /**
@@ -134,8 +93,45 @@ class PhpServerEnv extends AbstractOptions
             ));
 
         $this->headers = $headers;
-
         return $this;
+    }
+
+    /**
+     * Get Headers
+     *
+     * @return Headers
+     */
+    function getHeaders()
+    {
+        if ($this->headers)
+            return $this->headers;
+
+        $headers = [];
+
+        if (is_callable('apache_request_headers')) {
+            $apacheHeaders = apache_request_headers();
+            if (isset($apacheHeaders['Authorization']))
+                $headers['AUTHORIZATION'] = $apacheHeaders['Authorization'];
+            elseif (isset($apacheHeaders['authorization']))
+                $headers['AUTHORIZATION'] = $apacheHeaders['authorization'];
+            $headers = $apacheHeaders;
+        } else {
+            foreach($_SERVER as $key => $val)
+                if (strpos($key, 'HTTP_') === 0) {
+                    $name = strtr(substr($key, 5), '_', ' ');
+                    $name = strtr(ucwords(strtolower($name)), ' ', '-');
+
+                    $headers[$name] = $val;
+                }
+        }
+
+        // ++-- cookie:
+        $cookie = http_build_query($_COOKIE, '', '; ');;
+        $headers['Cookie'] = $cookie;
+
+        $this->setHeaders($headers);
+
+        return $this->getHeaders();
     }
 
     /**
@@ -148,7 +144,6 @@ class PhpServerEnv extends AbstractOptions
     function setMethod($method)
     {
         $this->method = $method;
-
         return $this;
     }
 
@@ -159,49 +154,17 @@ class PhpServerEnv extends AbstractOptions
      */
     function getMethod()
     {
-        if (!$this->method) {
-            if (isset($_SERVER['HTTP_METHOD']))
-                $method = $_SERVER['HTTP_METHOD'];
-            else
-                $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null;
+        if ($this->method)
+            return $this->method;
 
-            $this->setMethod($method);
-        }
+        if (isset($_SERVER['HTTP_METHOD']))
+            $method = $_SERVER['HTTP_METHOD'];
+        else
+            $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null;
 
-        return $this->method;
-    }
+        $this->setMethod($method);
 
-    /**
-     * Get Body
-     *
-     * @return mixed
-     */
-    function getBody()
-    {
-        if (!$this->body) {
-            $body = new Streamable(
-                (new WrapperClient('php://input'))->getConnect()
-            );
-
-            # multipart data
-            $headers = $this->getHeaders();
-            $contentType = $headers->search(['label' => 'Content-Type']);
-            if (is_array($contentType) && $contentType = current($contentType)) {
-                $contentType = $contentType->getValueString();
-                if (strpos($contentType, 'multipart') !== false) {
-                    // it`s multipart form data
-                    // TODO build body data,
-                    // https://www.ietf.org/rfc/rfc2388.txt
-                    // http://chxo.com/be2/20050724_93bf.html
-
-                    # http://stackoverflow.com/questions/19707632/php-http-request-content-raw-data-enctype-multipart-form-data
-                }
-            }
-
-            $this->setBody($body);
-        }
-
-        return $this->body;
+        return $this->getMethod();
     }
 
     /**
@@ -214,7 +177,51 @@ class PhpServerEnv extends AbstractOptions
     function setBody($body)
     {
         $this->body = $body;
+        return $this;
+    }
 
+    /**
+     * Get Body
+     *
+     * @return mixed
+     */
+    function getBody()
+    {
+        if ($this->body)
+            return $this->body;
+
+        $body = new Streamable(
+            (new WrapperClient('php://input'))->getConnect()
+        );
+
+        # multipart data
+        $headers = $this->getHeaders();
+
+        if ($headers->has('Content-Type')) {
+            $contentType = $headers->get('Content-Type');
+            $contentType = $contentType->getValueString();
+            if (strpos($contentType, 'multipart') !== false) {
+                // it`s multipart form data
+                // TODO build body data,
+                // https://www.ietf.org/rfc/rfc2388.txt
+                // http://chxo.com/be2/20050724_93bf.html
+
+                # http://stackoverflow.com/questions/19707632/php-http-request-content-raw-data-enctype-multipart-form-data
+            }
+        }
+
+        $this->setBody($body);
+
+        return $this->getBody();
+    }
+
+    /**
+     * @param mixed $version
+     * @return $this
+     */
+    function setVersion($version)
+    {
+        $this->version = $version;
         return $this;
     }
 
@@ -232,17 +239,4 @@ class PhpServerEnv extends AbstractOptions
 
         return $this->version;
     }
-
-    /**
-     * @param mixed $version
-     * @return $this
-     */
-    function setVersion($version)
-    {
-        $this->version = $version;
-
-        return $this;
-    }
-
-
 }
