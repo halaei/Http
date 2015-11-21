@@ -10,7 +10,7 @@ interface iHeader extends iPoirotOptions
      *
      * @return string
      */
-    function getLabel();
+    function label();
 
     /**
      * Build Header From Header String Representation
@@ -23,18 +23,18 @@ interface iHeader extends iPoirotOptions
     function fromString($line);
 
     /**
-     * Get Field Value As String
-     *
-     * @return string
-     */
-    function getValueString();
-
-    /**
      * Represent Header As String
      *
      * label: value_string
      *
      * @return string
      */
-    function toString();
+    function render();
+
+    /**
+     * Get Field Value As String
+     *
+     * @return string
+     */
+    function renderValueLine();
 }

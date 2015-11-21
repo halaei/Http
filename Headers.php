@@ -50,7 +50,7 @@ class Headers
      */
     function set(iHeader $header)
     {
-        $search = ['label' => strtolower($header->getLabel())];
+        $search = ['label' => strtolower($header->label())];
 
         foreach($this->ObjectCollection->search($search) as $h)
             ## previously values must overwrite
@@ -99,6 +99,29 @@ class Headers
         return (boolean) $r;
     }
 
+    /**
+     * Delete a Header With Label Name
+     *
+     * - return an new instance on removed header of header object
+     *
+     * @param string $label
+     *
+     * @return $this
+     */
+    function del($label)
+    {
+        if (!$this->has($label))
+            return $this;
+
+        // ..
+
+        $new    = clone $this;
+        $header = $this->get($label);
+        $new->ObjectCollection->detach($header);
+
+        return $new;
+    }
+
 
     // Implement Traversable
 
@@ -112,5 +135,11 @@ class Headers
     public function getIterator()
     {
         return $this->ObjectCollection;
+    }
+
+
+    function __clone()
+    {
+        $this->ObjectCollection = clone $this->ObjectCollection;
     }
 }

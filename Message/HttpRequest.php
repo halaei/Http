@@ -2,6 +2,7 @@
 namespace Poirot\Http\Message;
 
 use Poirot\Http\Header\HeaderFactory;
+use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
@@ -184,8 +185,9 @@ class HttpRequest extends AbstractHttpMessage
             // attempt to get host from target uri
             $host = $this->getUri()->getHost();
             if (!$host)
-                if ($host = $this->getHeaders()->search(['label' => 'Host']))
-                    $host = $host[0]->toString();
+                /** @var iHeader $host */
+                if ($host = $this->getHeaders()->get('Host'))
+                    $host = $host->render();
 
             $this->setHost($host);
         }

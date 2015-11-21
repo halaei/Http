@@ -24,8 +24,8 @@ abstract class AbstractHttpMessage extends AbstractOptions
     , iPluginManagerProvider
     , iPluginManagerAware
 {
-    const VERSION_10 = '1.0';
-    const VERSION_11 = '1.1';
+    const Vx1_0 = '1.0';
+    const Vx1_1 = '1.1';
 
     /**
      * @var iHeaderCollection
@@ -40,7 +40,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     /**
      * @var string
      */
-    protected $version = self::VERSION_11;
+    protected $version = self::Vx1_1;
 
     /**
      * @var DataField
@@ -262,7 +262,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
 
         /** @var iHeader $header */
         foreach ($this->getHeaders() as $header)
-            $return .= trim($header->toString())."\r\n";
+            $return .= trim($header->render())."\r\n";
 
         $return .= "\r\n";
 

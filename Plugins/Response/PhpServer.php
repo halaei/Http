@@ -51,7 +51,7 @@ class PhpServer extends AbstractService
 
         /** @var iHeader $header */
         foreach ($this->getMessageObject()->getHeaders() as $header) {
-            header($header->toString());
+            header($header->render());
         }
 
         $this->isHeadersSent = true;

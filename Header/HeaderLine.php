@@ -2,6 +2,7 @@
 namespace Poirot\Http\Header;
 
 use Poirot\Core\AbstractOptions;
+use Poirot\Http\Util;
 
 class HeaderLine extends AbstractHeader
 {
@@ -19,14 +20,16 @@ class HeaderLine extends AbstractHeader
      */
     function fromString($line)
     {
-        $matches = self::parseHeader($line);
+        $matches = Util::headerParseLine($line);
+
         if ($matches === false)
-            ## whole set as value
-            $this->setHeaderLine($line);
-        else {
-            $this->setLabel($matches['label']);
-            $this->setHeaderLine($matches['value']);
-        }
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid Header (%s).'
+                , $line
+            ));
+
+        $this->setLabel(key($matches));
+        $this->setHeaderLine(current($matches));
 
         return $this;
     }
@@ -47,17 +50,22 @@ class HeaderLine extends AbstractHeader
     /**
      * Set Header Value String Line
      *
-     * @param string $headerLine
+     * @param string|array $headerLine
      *
      * @return $this
      */
     function setHeaderLine($headerLine)
     {
-        $headerLine = (string) $headerLine;
-
-        if (!$this->isValid($headerLine))
+        if ((is_string($headerLine)) && !Util::headerIsValidValue($headerLine))
             throw new \InvalidArgumentException(
                 "Header value ({$headerLine}) is not valid or contains some unwanted chars."
+            );
+        elseif (is_string($headerLine))
+            $headerLine = Util::headerParseParams($headerLine);
+
+        if (!is_array($headerLine))
+            throw new \InvalidArgumentException(
+                "Header must be valid string or array containing values."
             );
 
         $this->headerLine = $headerLine;
@@ -67,11 +75,19 @@ class HeaderLine extends AbstractHeader
     /**
      * Get Header Value String Line
      *
-     * @return string
+     * @return array
      */
     function getHeaderLine()
     {
-        return $this->headerLine;
+        $props = [];
+        foreach($this->props()->readable as $prop) {
+            if (in_array($prop, ['header_line']))
+                continue;
+
+            $props[$prop] = $this->__get($prop);
+        }
+
+        return (!empty($props)) ? \Poirot\Core\array_merge($this->headerLine, [$props]) : $this->headerLine;
     }
 
     /**
@@ -79,9 +95,11 @@ class HeaderLine extends AbstractHeader
      *
      * @return string
      */
-    function getValueString()
+    function renderValueLine()
     {
-        return $this->filter($this->getHeaderLine());
+        $params = $this->getHeaderLine();
+
+        return Util::headerFilterValue(Util::headerJoinParams($params));
     }
 
     /**
@@ -89,8 +107,8 @@ class HeaderLine extends AbstractHeader
      *
      * @return string
      */
-    function toString()
+    function render()
     {
-        return $this->getLabel().':'. $this->getValueString();
+        return $this->label().':'. $this->renderValueLine();
     }
 }

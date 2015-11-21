@@ -2,9 +2,11 @@
 namespace Poirot\Http\Header;
 
 use Poirot\Core\AbstractOptions;
+use Poirot\Core\OpenOptions;
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Util;
 
-abstract class AbstractHeader extends AbstractOptions
+abstract class AbstractHeader extends OpenOptions
     implements iHeader
 {
     protected $label;
@@ -14,7 +16,7 @@ abstract class AbstractHeader extends AbstractOptions
      *
      * @return string
      */
-    function getLabel()
+    function label()
     {
         $label = $this->label;
 
@@ -26,6 +28,27 @@ abstract class AbstractHeader extends AbstractOptions
 
         return $label;
     }
+
+
+    /**
+     * Build Header From Header String Representation
+     *
+     * @param string $line
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    abstract function fromString($line);
+
+    /**
+     * Represent Header As String
+     *
+     * - filter values just before output
+     *
+     * @return string
+     */
+    abstract function render();
+
 
     /**
      * Set Options
@@ -45,136 +68,22 @@ abstract class AbstractHeader extends AbstractOptions
     }
 
     /**
-     * Build Header From Header String Representation
+     * Get Field Value As String
      *
-     * @param string $line
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    abstract function fromString($line);
-
-    /**
-     * Represent Header As String
-     *
-     * - filter values just before output
+     * - it always override by implemented classes
      *
      * @return string
      */
-    abstract function toString();
-
-
-    /**
-     * Parse Header line
-     *
-     * @param string $line
-     *
-     * @return false|array[string 'label', string 'value']
-     */
-    static function parseHeader($line)
+    function renderValueLine()
     {
-        if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
-            return false;
-
-        return [ 'label' => $matches['label'], 'value' => $matches['value'] ];
-    }
-
-    /**
-     * Filter a header value
-     *
-     * Ensures CRLF header injection vectors are filtered.
-     *
-     * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal
-     * tabs are allowed in values; header continuations MUST consist of
-     * a single CRLF sequence followed by a space or horizontal tab.
-     *
-     * This method filters any values not allowed from the string, and is
-     * lossy.
-     *
-     * @see http://en.wikipedia.org/wiki/HTTP_response_splitting
-     * @param string $value
-     * @return string
-     */
-    function filter($value)
-    {
-        $value  = (string) $value;
-        $length = strlen($value);
-        $string = '';
-        for ($i = 0; $i < $length; $i += 1) {
-            $ascii = ord($value[$i]);
-
-            // Detect continuation sequences
-            if ($ascii === 13) {
-                $lf = ord($value[$i + 1]);
-                $ws = ord($value[$i + 2]);
-                if ($lf === 10 && in_array($ws, [9, 32], true)) {
-                    $string .= $value[$i] . $value[$i + 1];
-                    $i += 1;
-                }
-
+        $props = [];
+        foreach($this->props()->readable as $prop) {
+            if (in_array($prop, ['header_line']))
                 continue;
-            }
 
-            // Non-visible, non-whitespace characters
-            // 9 === horizontal tab
-            // 32-126, 128-254 === visible
-            // 127 === DEL
-            // 255 === null byte
-            if (($ascii < 32 && $ascii !== 9)
-                || $ascii === 127
-                || $ascii > 254
-            ) {
-                continue;
-            }
-
-            $string .= $value[$i];
+            $props[$prop] = $this->__get($prop);
         }
 
-        return $string;
-    }
-
-    /**
-     * Validate a header value.
-     *
-     * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal
-     * tabs are allowed in values; header continuations MUST consist of
-     * a single CRLF sequence followed by a space or horizontal tab.
-     *
-     * @see http://en.wikipedia.org/wiki/HTTP_response_splitting
-     * @param string $value
-     * @return bool
-     */
-    function isValid($value)
-    {
-        $value  = (string) $value;
-
-        // Look for:
-        // \n not preceded by \r, OR
-        // \r not followed by \n, OR
-        // \r\n not followed by space or horizontal tab; these are all CRLF attacks
-        if (preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $value)) {
-            return false;
-        }
-
-        $length = strlen($value);
-        for ($i = 0; $i < $length; $i += 1) {
-            $ascii = ord($value[$i]);
-
-            // Non-visible, non-whitespace characters
-            // 9 === horizontal tab
-            // 10 === line feed
-            // 13 === carriage return
-            // 32-126, 128-254 === visible
-            // 127 === DEL
-            // 255 === null byte
-            if (($ascii < 32 && ! in_array($ascii, [9, 10, 13], true))
-                || $ascii === 127
-                || $ascii > 254
-            ) {
-                return false;
-            }
-        }
-
-        return true;
+        return Util::headerFilterValue(Util::headerJoinParams($props));
     }
 }

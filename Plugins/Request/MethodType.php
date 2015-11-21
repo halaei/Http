@@ -130,7 +130,7 @@ class MethodType extends AbstractService
     {
         /** @var iHeader $header */
         $header = $this->getMessageObject()->getHeaders()->search(['label' => 'X_REQUESTED_WITH']);
-        return false !== $header && $header->getValueString() == 'XMLHttpRequest';
+        return false !== $header && $header->renderValueLine() == 'XMLHttpRequest';
     }
 
     /**
@@ -142,7 +142,7 @@ class MethodType extends AbstractService
     {
         /** @var iHeader $header */
         $header = $this->getMessageObject()->getHeaders()->search(['label' => 'USER_AGENT']);
-        return false !== $header && stristr($header->getValueString(), ' flash');
+        return false !== $header && stristr($header->renderValueLine(), ' flash');
     }
 
 

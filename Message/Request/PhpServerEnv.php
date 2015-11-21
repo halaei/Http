@@ -40,7 +40,7 @@ class PhpServerEnv extends AbstractOptions
 
         $headers = $this->getHeaders();
         $hHost   = $headers->get('Host');
-        $this->setHost($hHost->getHeaderLine());
+        $this->setHost($hHost->renderValueLine());
 
         return $this->getHost();
     }
@@ -199,7 +199,7 @@ class PhpServerEnv extends AbstractOptions
 
         if ($headers->has('Content-Type')) {
             $contentType = $headers->get('Content-Type');
-            $contentType = $contentType->getValueString();
+            $contentType = $contentType->renderValueLine();
             if (strpos($contentType, 'multipart') !== false) {
                 // it`s multipart form data
                 // TODO build body data,
@@ -207,6 +207,7 @@ class PhpServerEnv extends AbstractOptions
                 // http://chxo.com/be2/20050724_93bf.html
 
                 # http://stackoverflow.com/questions/19707632/php-http-request-content-raw-data-enctype-multipart-form-data
+                # http://www.chlab.ch/blog/archives/php/manually-parse-raw-http-data-php
             }
         }
 

@@ -1,6 +1,8 @@
 <?php
 namespace Poirot\Http\Header;
 
+use Poirot\Http\Util;
+
 class HeaderFactory
 {
     /** @var HeaderPluginsManager */
@@ -18,8 +20,14 @@ class HeaderFactory
     static function factoryString($headerLine)
     {
         ## extract label and value from header
-        $parsed = HeaderLine::parseHeader( (string) $headerLine);
-        return self::factory($parsed['label'], $parsed['value']);
+        $parsed = Util::headerParseLine( (string) $headerLine);
+        if ($parsed === false)
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid Header (%s)'
+                , $headerLine
+            ));
+
+        return self::factory(key($parsed), current($parsed));
     }
 
     /**
