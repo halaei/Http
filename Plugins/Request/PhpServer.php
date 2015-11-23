@@ -136,10 +136,25 @@ class PhpServer extends AbstractService
     function getServer()
     {
         if (!$this->server)
-            $this->server = new Entity($_SERVER);
+            $this->server = new Entity(
+                $this->__normalizeServer($_SERVER)
+            );
 
         return $this->server;
     }
+
+        protected function __normalizeServer(array $server)
+        {
+            if (is_callable('apache_request_headers')) {
+                $apacheHeaders = apache_request_headers();
+                if (isset($apacheHeaders['Authorization']))
+                    $server['HTTP_AUTHORIZATION'] = $apacheHeaders['Authorization'];
+                elseif (isset($apacheHeaders['authorization']))
+                    $server['HTTP_AUTHORIZATION'] = $apacheHeaders['authorization'];
+            }
+
+            return $server;
+        }
 
     /**
      * Set Files
@@ -160,12 +175,12 @@ class PhpServer extends AbstractService
     function getFiles()
     {
         if (!$this->files)
-            $this->files = $this->__getFiles();
+            $this->files = $this->__normalizeFiles();
 
         return $this->files;
     }
 
-        protected function __getFiles()
+        protected function __normalizeFiles()
         {
             $_F_mapFileParams = function(&$array, $paramName, $index, $value) use (&$_F_mapFileParams) {
                 if (!is_array($value))

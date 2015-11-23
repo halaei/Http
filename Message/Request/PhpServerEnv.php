@@ -2,18 +2,48 @@
 namespace Poirot\Http\Message\Request;
 
 use Poirot\Core\AbstractOptions;
+use Poirot\Core\Interfaces\iOptionImplement;
 use Poirot\Http\Headers;
+use Poirot\Http\Plugins\Request\PhpServer;
+use Poirot\PathUri\HttpUri;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
 class PhpServerEnv extends AbstractOptions
 {
+    /** @var PhpServer */
+    protected $server;
+
     protected $host;
     protected $uri;
     protected $method;
     protected $headers;
     protected $body;
     protected $version;
+
+    /**
+     * Construct
+     *
+     * - build server environment upon server object
+     *
+     * @param PhpServer              $phpServer
+     * @param array|iOptionImplement $options Options
+     */
+    function __construct(/*PhpServer*/ $phpServer = null, $options = null)
+    {
+        if ($phpServer === null)
+            $phpServer = new PhpServer;
+
+        if ($phpServer !== null && !$phpServer instanceof PhpServer)
+            throw new \InvalidArgumentException(sprintf(
+                'Php Server Object must instance of PhpServer. given: (%s).'
+                , \Poirot\Core\flatten($phpServer)
+            ));
+
+        $this->server = $phpServer;
+
+        parent::__construct($options);
+    }
 
     /**
      * Set Host
@@ -39,16 +69,19 @@ class PhpServerEnv extends AbstractOptions
             return $this->host;
 
         $headers = $this->getHeaders();
-        $hHost   = $headers->get('Host');
-        $this->setHost($hHost->renderValueLine());
+        if ($headers->has('Host'))
+            $host = $headers->get('Host')->renderValueLine();
+        else
+            $host = $this->getUri()->getHost();
 
+        $this->setHost($host);
         return $this->getHost();
     }
 
     /**
      * Set Request Uri
      *
-     * @param string $uri
+     * @param string|HttpUri $uri
      *
      * @return $this
      */
@@ -61,18 +94,128 @@ class PhpServerEnv extends AbstractOptions
     /**
      * Get Request Uri
      *
-     * @return string
+     * @return HttpUri
      */
     function getUri()
     {
         if ($this->uri)
             return $this->uri;
 
-        $uri = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-        $this->setUri($uri);
+        $uri = new HttpUri;
 
+        # scheme protocol
+        $scheme = 'http';
+        $https  = $this->server->getServer()->has('HTTPS')
+            ? $this->server->getServer()->get('HTTPS') : null;
+        if (($https && $https !== 'off')
+            || (
+                $this->getHeaders()->has('x-forwarded-proto') &&
+                $this->getHeaders()->get('x-forwarded-proto') === 'https'
+            )
+        )
+            $scheme = 'https';
+
+        if (! empty($scheme))
+            $uri->setScheme($scheme);
+
+        # host
+        $host = $this->__attainUriHost();
+        if ($host) {
+            $uri->setHost($host->host);
+            $uri->setPort($host->port);
+        }
+
+        # uri path
+        $path = $this->__attainUriPath();
+        if (($pos = strpos($path, '?')) !== false)
+            $path = substr($path, 0, $pos);
+        $uri->setPath($path);
+
+        # uri query
+        $query = ltrim($this->server->getServer()->get('QUERY_STRING', ''), '?');
+        if ($query)
+            $uri->setQuery($query);
+
+        $this->setUri($uri);
         return $this->getUri();
     }
+
+        protected function __attainUriHost()
+        {
+            $Server = $this->server->getServer();
+
+            $port = null;
+
+            if ($this->getHeaders()->has('Host')) {
+                ## Host from headers
+                $host = $this->getHeaders()->get('Host')->renderValueLine();
+                $port = null;
+
+                // works for regname, IPv4 & IPv6
+                if (preg_match('|\:(\d+)$|', $host, $matches)) {
+                    $host = substr($host, 0, -1 * (strlen($matches[1]) + 1));
+                    $port = (int) $matches[1];
+                }
+            } else {
+                if (! $Server->has('SERVER_NAME'))
+                    return null;
+
+                $host = $Server->get('SERVER_NAME');
+                if ($Server->has('SERVER_PORT'))
+                    $port = (int) $Server->get('SERVER_PORT');
+
+                if ($this->server->getServer()->has('SERVER_ADDR')
+                    || preg_match('/^\[[0-9a-fA-F\:]+\]$/', $host)
+                ) {
+                    ## Misinterpreted IPv6-Address
+                    $host = '[' . $Server->get('SERVER_ADDR') . ']';
+                    $port = $port ?: 80;
+                    if ($port . ']' == substr($host, strrpos($host, ':')+1))
+                        // The last digit of the IPv6-Address has been taken as port
+                        // Unset the port so the default port can be used
+                        $port = null;
+                }
+            }
+
+            return (object) ['host' => $host, 'port' => $port];
+        }
+
+        protected function __attainUriPath()
+        {
+            $Server = $this->server->getServer();
+
+
+            // IIS7 with URL Rewrite: make sure we get the unencoded url
+            // (double slash problem).
+            $iisUrlRewritten = $Server->get('IIS_WasUrlRewritten', null);
+            $unencodedUrl    = $Server->get('UNENCODED_URL', '');
+            if ('1' == $iisUrlRewritten && ! empty($unencodedUrl))
+                return $unencodedUrl;
+
+            // ..
+
+            $requestUri = $Server->get('REQUEST_URI');
+
+            // Check this first so IIS will catch.
+            $httpXRewriteUrl = $Server->get('HTTP_X_REWRITE_URL', null);
+            if ($httpXRewriteUrl !== null)
+                $requestUri = $httpXRewriteUrl;
+
+            // Check for IIS 7.0 or later with ISAPI_Rewrite
+            $httpXOriginalUrl = $Server->get('HTTP_X_ORIGINAL_URL', null);
+            if ($httpXOriginalUrl !== null)
+                $requestUri = $httpXOriginalUrl;
+
+
+            if ($requestUri !== null)
+                return preg_replace('#^[^/:]+://[^/]+#', '', $requestUri);
+
+            $origPathInfo = $Server->get('ORIG_PATH_INFO', '');
+            if (empty($origPathInfo))
+                return '/';
+
+            return $origPathInfo;
+        }
 
     /**
      * Set Headers
@@ -108,29 +251,19 @@ class PhpServerEnv extends AbstractOptions
 
         $headers = [];
 
-        if (is_callable('apache_request_headers')) {
-            $apacheHeaders = apache_request_headers();
-            if (isset($apacheHeaders['Authorization']))
-                $headers['AUTHORIZATION'] = $apacheHeaders['Authorization'];
-            elseif (isset($apacheHeaders['authorization']))
-                $headers['AUTHORIZATION'] = $apacheHeaders['authorization'];
-            $headers = $apacheHeaders;
-        } else {
-            foreach($_SERVER as $key => $val)
-                if (strpos($key, 'HTTP_') === 0) {
-                    $name = strtr(substr($key, 5), '_', ' ');
-                    $name = strtr(ucwords(strtolower($name)), ' ', '-');
+        foreach($this->server->getServer()->toArray() as $key => $val)
+            if (strpos($key, 'HTTP_') === 0) {
+                $name = strtr(substr($key, 5), '_', ' ');
+                $name = strtr(ucwords(strtolower($name)), ' ', '-');
 
-                    $headers[$name] = $val;
-                }
-        }
+                $headers[$name] = $val;
+            }
 
         // ++-- cookie:
         $cookie = http_build_query($_COOKIE, '', '; ');;
         $headers['Cookie'] = $cookie;
 
         $this->setHeaders($headers);
-
         return $this->getHeaders();
     }
 
@@ -157,13 +290,12 @@ class PhpServerEnv extends AbstractOptions
         if ($this->method)
             return $this->method;
 
-        if (isset($_SERVER['HTTP_METHOD']))
-            $method = $_SERVER['HTTP_METHOD'];
+        if ($this->server->getServer()->has('HTTP_METHOD'))
+            $method = $this->server->getServer()->get('HTTP_METHOD');
         else
-            $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null;
+            $method = $this->server->getServer()->get('REQUEST_METHOD', null);
 
         $this->setMethod($method);
-
         return $this->getMethod();
     }
 
@@ -231,8 +363,7 @@ class PhpServerEnv extends AbstractOptions
      */
     function getVersion()
     {
-        if (isset($_SERVER['SERVER_PROTOCOL'])) {
-            $version = $_SERVER['SERVER_PROTOCOL'];
+        if ($version = $this->server->getServer()->get('SERVER_PROTOCOL', false)) {
             $isMatch = preg_match('(\d.\d+)', $version, $matches);
             if ($isMatch)
                 $this->setVersion($matches[0]);
