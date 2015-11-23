@@ -6,6 +6,7 @@ use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
 use Poirot\Http\Util;
+use Poirot\Stream\Psr\StreamInterface;
 
 class HttpMessage implements MessageInterface
 {
@@ -16,6 +17,8 @@ class HttpMessage implements MessageInterface
     protected $version = self::Vx1_1;
     /** @var Headers */
     protected $headers;
+    /** @var StreamInterface */
+    protected $stream;
 
     /**
      * Retrieves the HTTP protocol version as a string.
@@ -86,7 +89,7 @@ class HttpMessage implements MessageInterface
     {
         $headers = [];
         /** @var iHeader $h */
-        foreach ($this->headers as $h)
+        foreach ($this->__getHeaders() as $h)
             $headers[$h->label()] = Util::headerParseParams($h->renderValueLine());
 
         return $headers;
@@ -102,7 +105,7 @@ class HttpMessage implements MessageInterface
      */
     function hasHeader($name)
     {
-        return $this->headers->has($name);
+        return $this->__getHeaders()->has($name);
     }
 
     /**
@@ -121,10 +124,10 @@ class HttpMessage implements MessageInterface
      */
     function getHeader($name)
     {
-        if (!$this->headers->has($name))
+        if (!$this->__getHeaders()->has($name))
             return [];
 
-        $header = $this->headers->get($name);
+        $header = $this->__getHeaders()->get($name);
 
         return Util::headerParseParams($header->renderValueLine());
     }
@@ -153,7 +156,7 @@ class HttpMessage implements MessageInterface
         if (!$this->headers->has($name))
             return '';
 
-        return $this->headers->get($name)->renderValueLine();
+        return $this->__getHeaders()->get($name)->renderValueLine();
     }
 
     /**
@@ -176,7 +179,7 @@ class HttpMessage implements MessageInterface
         $header = HeaderFactory::factory($name, $value);
 
         $new = clone $this;
-        $new->headers->set($header);
+        $new->__getHeaders()->set($header);
 
         return $new;
     }
@@ -207,7 +210,7 @@ class HttpMessage implements MessageInterface
                 , \Poirot\Core\flatten($value)
             ));
 
-        if (!$this->headers->has($name))
+        if (!$this->__getHeaders()->has($name))
             return $this->withHeader($name, $value);
 
 
@@ -225,7 +228,7 @@ class HttpMessage implements MessageInterface
                 // ['foo' => 'bar']
                 $header->__set($p, $b);
 
-        $new->headers->set($header);
+        $new->__getHeaders()->set($header);
 
         return $new;
     }
@@ -248,7 +251,7 @@ class HttpMessage implements MessageInterface
             return $this;
 
         $new     = clone $this;
-        $headers = $new->headers->del($name);
+        $headers = $new->__getHeaders()->del($name);
         $new->headers = $headers;
 
         return $new;
@@ -261,7 +264,7 @@ class HttpMessage implements MessageInterface
      */
     function getBody()
     {
-        // TODO: Implement getBody() method.
+        return $this->stream;
     }
 
     /**
@@ -279,11 +282,22 @@ class HttpMessage implements MessageInterface
      */
     function withBody(StreamInterface $body)
     {
-        // TODO: Implement withBody() method.
+        $new = clone $this;
+        $new->stream = $body;
+
+        return $new;
     }
 
-
     // ...
+
+    protected function __getHeaders()
+    {
+        if (!$this->headers)
+            $this->headers = new Headers;
+
+        return $this->headers;
+    }
+
 
     function __clone()
     {

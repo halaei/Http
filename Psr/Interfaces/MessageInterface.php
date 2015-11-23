@@ -1,5 +1,6 @@
 <?php
 namespace Poirot\Http\Psr\Interfaces;
+use Poirot\Stream\Psr\StreamInterface;
 
 /**
  * HTTP messages consist of requests from a client to a server and responses

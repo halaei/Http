@@ -30,6 +30,17 @@ interface iHeaderCollection //unknown error extends \Traversable
     function get($label);
 
     /**
+     * Delete a Header With Label Name
+     *
+     * - return an new instance on removed header of header object
+     *
+     * @param string $label
+     *
+     * @return $this
+     */
+    function del($label);
+
+    /**
      * Has Header With Specific Label?
      *
      * ! headers label are case-insensitive

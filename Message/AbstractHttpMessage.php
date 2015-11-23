@@ -206,7 +206,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
                     // Header-Label: value header
                     $h = HeaderFactory::factory($label, $h);
 
-                $this->getHeaders()->attach($h);
+                $this->getHeaders()->set($h);
             }
 
         return $this;
@@ -228,7 +228,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     /**
      * Set Message Body Content
      *
-     * @param string $content
+     * string|iStreamable $content
      *
      * @return $this
      */
@@ -242,7 +242,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     /**
      * Get Message Body Content
      *
-     * @return string
+     * @return string|iStreamable
      */
     function getBody()
     {

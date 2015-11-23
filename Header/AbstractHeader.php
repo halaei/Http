@@ -6,6 +6,11 @@ use Poirot\Core\OpenOptions;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Util;
 
+/**
+ * TODO Headers must implement properly built from array and toArray method that \
+ *      represent data from within header key
+ */
+
 abstract class AbstractHeader extends OpenOptions
     implements iHeader
 {
@@ -77,6 +82,7 @@ abstract class AbstractHeader extends OpenOptions
     function renderValueLine()
     {
         $props = [];
+        // TODO implement toArray
         foreach($this->props()->readable as $prop) {
             if (in_array($prop, ['header_line']))
                 continue;

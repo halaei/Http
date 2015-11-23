@@ -4,6 +4,10 @@ namespace Poirot\Http\Header;
 use Poirot\Core\AbstractOptions;
 use Poirot\Http\Util;
 
+/**
+ * TODO Implement fromArray/toArray
+ */
+
 class HeaderLine extends AbstractHeader
 {
     protected $label;

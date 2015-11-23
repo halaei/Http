@@ -117,7 +117,7 @@ class HttpRequest extends AbstractHttpMessage
      *
      * @return $this
      */
-    function setUri($target, $preserveHost = true)
+    function setUri($target = null, $preserveHost = true)
     {
         if ($target === null)
             $target = '/';
@@ -128,7 +128,7 @@ class HttpRequest extends AbstractHttpMessage
         if (!$target instanceof iHttpUri)
             throw new \InvalidArgumentException(sprintf(
                 'Invalid URI provided; must be null, a string, or a iHttpUri instance. "%s" given.'
-                , is_object($target) ? get_class($target) : gettype($target)
+                , \Poirot\Core\flatten($target)
             ));
 
         $this->target_uri = $target;
@@ -146,7 +146,8 @@ class HttpRequest extends AbstractHttpMessage
     function getUri()
     {
         if (!$this->target_uri)
-            $this->setUri(null);
+            ## build home absolute uri if not exists
+            $this->setUri();
 
         return $this->target_uri;
     }
