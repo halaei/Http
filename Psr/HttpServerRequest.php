@@ -1,12 +1,54 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Http\Psr\Interfaces\An;
 use Poirot\Http\Psr\Interfaces\ServerRequestInterface;
+use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
+use Poirot\Stream\Psr\StreamInterface;
 
 class HttpServerRequest extends HttpRequest
     implements ServerRequestInterface
 {
+    /** @var array */
+    protected $serverParams;
+    /** @var array */
+    protected $cookieParams;
+    /** @var array */
+    protected $queryParams;
+    /** @var array */
+    protected $uploadedFiles;
+    /** @var  */
+    protected $parsedBody;
+    /** @var array */
+    protected $attributes;
+
+    /**
+     * Construct
+     *
+     * @param array $serverParams Server parameters, typically from $_SERVER
+     * @param array $uploadedFiles Upload file information, a tree of UploadedFiles
+     * @param null|string $uri URI for the request, if any.
+     * @param null|string $method HTTP method for the request, if any.
+     * @param string|resource|StreamInterface $body Message body, if any.
+     * @param array $headers Headers for the message, if any.
+     *
+     * @throws \InvalidArgumentException for any invalid value.
+     */
+    function __construct(
+        array $serverParams = [],
+        array $uploadedFiles = [],
+        $uri = null,
+        $method = null,
+        $body = null,
+        array $headers = []
+    ) {
+        $this->__assertValidateUploadedFiles($uploadedFiles);
+
+        $this->serverParams  = $serverParams;
+        $this->uploadedFiles = $uploadedFiles;
+
+        parent::__construct($uri, $method, $body, $headers);
+    }
+
     /**
      * Retrieve server parameters.
      *
@@ -18,7 +60,7 @@ class HttpServerRequest extends HttpRequest
      */
     function getServerParams()
     {
-        // TODO: Implement getServerParams() method.
+        return $this->serverParams;
     }
 
     /**
@@ -33,7 +75,7 @@ class HttpServerRequest extends HttpRequest
      */
     function getCookieParams()
     {
-        // TODO: Implement getCookieParams() method.
+        return $this->cookieParams;
     }
 
     /**
@@ -55,7 +97,10 @@ class HttpServerRequest extends HttpRequest
      */
     function withCookieParams(array $cookies)
     {
-        // TODO: Implement withCookieParams() method.
+        $new = clone $this;
+        $new->cookieParams = $cookies;
+
+        return $new;
     }
 
     /**
@@ -72,7 +117,12 @@ class HttpServerRequest extends HttpRequest
      */
     function getQueryParams()
     {
-        // TODO: Implement getQueryParams() method.
+        if (!$this->queryParams) {
+            (!$this->getUri()->getQuery())
+                ?: parse_str($this->getUri()->getQuery(), $this->queryParams);
+        }
+
+        return $this->queryParams;
     }
 
     /**
@@ -99,7 +149,9 @@ class HttpServerRequest extends HttpRequest
      */
     function withQueryParams(array $query)
     {
-        // TODO: Implement withQueryParams() method.
+        $new = clone $this;
+        $new->queryParams = $query;
+        return $new;
     }
 
     /**
@@ -116,7 +168,7 @@ class HttpServerRequest extends HttpRequest
      */
     function getUploadedFiles()
     {
-        // TODO: Implement getUploadedFiles() method.
+        return $this->uploadedFiles;
     }
 
     /**
@@ -126,13 +178,18 @@ class HttpServerRequest extends HttpRequest
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
      *
-     * @param array An array tree of UploadedFileInterface instances.
+     * @param array $uploadedFiles array tree of UploadedFileInterface instances.
+     *
      * @return self
      * @throws \InvalidArgumentException if an invalid structure is provided.
      */
     function withUploadedFiles(array $uploadedFiles)
     {
-        // TODO: Implement withUploadedFiles() method.
+        $this->__assertValidateUploadedFiles($uploadedFiles);
+
+        $new = clone $this;
+        $new->uploadedFiles = $uploadedFiles;
+        return $new;
     }
 
     /**
@@ -152,7 +209,7 @@ class HttpServerRequest extends HttpRequest
      */
     function getParsedBody()
     {
-        // TODO: Implement getParsedBody() method.
+        return $this->parsedBody;
     }
 
     /**
@@ -185,7 +242,9 @@ class HttpServerRequest extends HttpRequest
      */
     function withParsedBody($data)
     {
-        // TODO: Implement withParsedBody() method.
+        $new = clone $this;
+        $new->parsedBody = $data;
+        return $new;
     }
 
     /**
@@ -201,7 +260,7 @@ class HttpServerRequest extends HttpRequest
      */
     function getAttributes()
     {
-        // TODO: Implement getAttributes() method.
+        return $this->attributes;
     }
 
     /**
@@ -221,7 +280,10 @@ class HttpServerRequest extends HttpRequest
      */
     function getAttribute($name, $default = null)
     {
-        // TODO: Implement getAttribute() method.
+        if (! array_key_exists($name, $this->attributes))
+            return $default;
+
+        return $this->attributes[$name];
     }
 
     /**
@@ -241,7 +303,9 @@ class HttpServerRequest extends HttpRequest
      */
     function withAttribute($name, $value)
     {
-        // TODO: Implement withAttribute() method.
+        $new = clone $this;
+        $new->attributes[$name] = $value;
+        return $new;
     }
 
     /**
@@ -260,6 +324,51 @@ class HttpServerRequest extends HttpRequest
      */
     function withoutAttribute($name)
     {
-        // TODO: Implement withoutAttribute() method.
+        if (! isset($this->attributes[$name]))
+            return clone $this;
+
+        $new = clone $this;
+        unset($new->attributes[$name]);
+        return $new;
+    }
+
+    /**
+     * Retrieves the HTTP method of the request.
+     *
+     * ! To ensure the method is never empty;
+     *   if no method is present, it returns 'GET'.
+     *
+     * @return string
+     */
+    function getMethod()
+    {
+        if (empty($this->method))
+            return 'GET';
+
+        return $this->method;
+    }
+
+
+    // ..
+
+    /**
+     * Recursively validate the structure in an uploaded files array.
+     *
+     * @param array $uploadedFiles
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function __assertValidateUploadedFiles(array $uploadedFiles)
+    {
+        foreach ($uploadedFiles as $file) {
+            if (is_array($file)) {
+                $this->__assertValidateUploadedFiles($file);
+                continue;
+            }
+
+            if (! $file instanceof UploadedFileInterface) {
+                throw new \InvalidArgumentException('Invalid uploaded files structure');
+            }
+        }
     }
 }
