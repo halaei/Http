@@ -114,7 +114,7 @@ class HttpResponse extends AbstractHttpMessage
                 // headers end
                 break;
 
-            $this->getHeaders()->attach(HeaderFactory::factoryString($nextLine));
+            $this->getHeaders()->set(HeaderFactory::factoryString($nextLine));
         }
 
         // body:

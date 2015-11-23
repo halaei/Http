@@ -51,16 +51,21 @@ class HttpRequest extends HttpMessage
     {
         if ($uri instanceof iHttpRequest) {
             ## prepare arguments
+
+            ## request method
             ($method !== null) ?: $method = $uri->getMethod();
 
+            ## http headers
             /** @var iHeader $h */
             $httpHeaders = [];
             foreach($uri->getHeaders() as $h)
                 $httpHeaders[$h->label()] = $h->renderValueLine();
             $headers = array_merge($httpHeaders, $headers);
 
+            ## body stream
             ($bodyStream !== null) ?: $bodyStream = $uri->getBody();
 
+            ## request target uri
             $uri = new HttpUri($uri->getUri());
         }
 
