@@ -1,8 +1,11 @@
 <?php
 namespace Poirot\Http\Message;
 
+use Icicle\Http\Message\ResponseInterface;
+use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\Message\iHttpResponse;
+use Poirot\Http\Util;
 
 class HttpResponse extends AbstractHttpMessage
     implements iHttpResponse
@@ -79,6 +82,56 @@ class HttpResponse extends AbstractHttpMessage
         508 => 'Loop Detected',
         511 => 'Network Authentication Required',
     ];
+
+    /**
+     * Set Options
+     *
+     * @param string|array|iPoirotOptions $options
+     *
+     * @return $this
+     */
+    function from($options)
+    {
+        if ($options instanceof ResponseInterface)
+            $this->fromPsr($options);
+        else
+            parent::from($options);
+
+        return $this;
+    }
+
+    /**
+     * Set Options From Psr Http Message Object
+     *
+     * @param ResponseInterface $response
+     *
+     * @return $this
+     */
+    function fromPsr($response)
+    {
+        if (!$response instanceof ResponseInterface)
+            throw new \InvalidArgumentException(sprintf(
+                'Request Object must instance of ResponseInterface but (%s) given.'
+                , \Poirot\Core\flatten($response)
+            ));
+
+
+
+        $headers = [];
+        foreach($response->getHeaders() as $h => $v)
+            $headers[$h] = Util::headerJoinParams($v);
+
+        $options = [
+            'version'     => $response->getProtocolVersion(),
+            'stat_code'   => $response->getStatusCode(),
+            'stat_reason' => $response->getReasonPhrase(),
+            'headers'     => $headers,
+            'body'        => $response->getBody(),
+        ];
+
+        parent::from($options);
+        return $this;
+    }
 
     /**
      * Set Options From Http Message String

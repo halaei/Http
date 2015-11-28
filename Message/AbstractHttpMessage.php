@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Http\Message;
 
+use OAuth2\RequestInterface;
 use Poirot\Container\Interfaces\Plugins\iInvokePluginsProvider;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerAware;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerProvider;
@@ -16,7 +17,12 @@ use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Plugins\HttpPluginsManager;
+use Poirot\Http\Psr\Interfaces\MessageInterface;
 use Poirot\Stream\Interfaces\iStreamable;
+use Poirot\Stream\Psr\StreamInterface;
+use Poirot\Stream\SResource;
+use Poirot\Stream\Streamable;
+use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractHttpMessage extends AbstractOptions
     implements iHttpMessage
@@ -86,6 +92,16 @@ abstract class AbstractHttpMessage extends AbstractOptions
      * @return $this
      */
     abstract function fromString($message);
+
+    /**
+     * Set Options From Psr Http Message Object
+     *
+     * @param RequestInterface|ResponseInterface|MessageInterface $PsrMessage
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    abstract function fromPsr($PsrMessage);
 
 
     // Implement Plugins Manager:
@@ -228,12 +244,18 @@ abstract class AbstractHttpMessage extends AbstractOptions
     /**
      * Set Message Body Content
      *
-     * string|iStreamable $content
+     * !! if StreamInterface given it must contain
+     *    'resource' => resource key of meta key data
+     *
+     * @param string|iStreamable|StreamInterface $content
      *
      * @return $this
      */
     function setBody($content)
     {
+        if ($content instanceof StreamInterface)
+            $content = new Streamable(new SResource($content->getMetadata('resource')));
+
         $this->body = $content;
 
         return $this;

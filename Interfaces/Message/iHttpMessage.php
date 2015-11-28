@@ -4,6 +4,7 @@ namespace Poirot\Http\Interfaces\Message;
 use Poirot\Core\Interfaces\iMetaProvider;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Stream\Interfaces\iStreamable;
+use Psr\Http\Message\StreamInterface;
 
 interface iHttpMessage extends iMetaProvider
 {
@@ -47,7 +48,7 @@ interface iHttpMessage extends iMetaProvider
     /**
      * Set Message Body Content
      *
-     * @param string|iStreamable $content
+     * @param string|iStreamable|StreamInterface $content
      *
      * @return $this
      */

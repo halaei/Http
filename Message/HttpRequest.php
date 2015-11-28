@@ -1,9 +1,12 @@
 <?php
 namespace Poirot\Http\Message;
 
+use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\Psr\Interfaces\RequestInterface;
+use Poirot\Http\Util;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
 
@@ -28,6 +31,56 @@ class HttpRequest extends AbstractHttpMessage
     protected $method = self::METHOD_GET;
     protected $host;
     protected $target_uri;
+
+    /**
+     * Set Options
+     *
+     * @param string|array|iPoirotOptions $options
+     *
+     * @return $this
+     */
+    function from($options)
+    {
+        if ($options instanceof RequestInterface)
+            $this->fromPsr($options);
+        else
+            parent::from($options);
+
+        return $this;
+    }
+
+    /**
+     * Set Options From Psr Http Message Object
+     *
+     * @param RequestInterface $response
+     *
+     * @return $this
+     */
+    function fromPsr($response)
+    {
+        if (!$response instanceof RequestInterface)
+            throw new \InvalidArgumentException(sprintf(
+                'Request Object must instance of RequestInterface but (%s) given.'
+                , \Poirot\Core\flatten($response)
+            ));
+
+
+
+        $headers = [];
+        foreach($response->getHeaders() as $h => $v)
+            $headers[$h] = Util::headerJoinParams($v);
+
+        $options = [
+            'method'  => $response->getMethod(),
+            'uri'     => new HttpUri($response->getUri()),
+            'version' => $response->getProtocolVersion(),
+            'headers' => $headers,
+            'body'    => $response->getBody(),
+        ];
+
+        parent::from($options);
+        return $this;
+    }
 
     /**
      * Set Options From Http Message String
@@ -70,7 +123,7 @@ class HttpRequest extends AbstractHttpMessage
                 // headers end
                 break;
 
-            $this->getHeaders()->attach(HeaderFactory::factoryString($nextLine));
+            $this->getHeaders()->set(HeaderFactory::factoryString($nextLine));
         }
 
         // body:
