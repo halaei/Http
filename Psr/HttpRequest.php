@@ -7,8 +7,8 @@ use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\PathUri\Psr\HttpUri;
 use Poirot\PathUri\Psr\UriInterface;
+use Poirot\Stream\Psr\PsrStream;
 use Poirot\Stream\Psr\StreamInterface;
-use Poirot\Stream\Psr\StreamPsr;
 
 class HttpRequest extends HttpMessage
     implements RequestInterface
@@ -88,7 +88,7 @@ class HttpRequest extends HttpMessage
 
         # Body:
         (!$bodyStream) ?: $bodyStream = self::STREAM_CONTENT;
-        $this->stream = new StreamPsr($bodyStream);
+        $this->stream = new PsrStream($bodyStream);
 
         # Headers:
         foreach($headers as $l => $v)
