@@ -47,7 +47,7 @@ class Util
      *
      * @throws \InvalidArgumentException for unrecognized values
      */
-    static function normalizeFiles(array $files)
+    static function normalizeFiles(array $files, $stream = null)
     {
         $normalized = [];
         foreach ($files as $key => $value) {
@@ -57,12 +57,12 @@ class Util
             }
 
             if (is_array($value) && isset($value['tmp_name'])) {
-                $normalized[$key] = self::__createUploadedFileFromSpec($value);
+                $normalized[$key] = self::__createUploadedFileFromSpec($value, $stream);
                 continue;
             }
 
             if (is_array($value)) {
-                $normalized[$key] = self::normalizeFiles($value);
+                $normalized[$key] = self::normalizeFiles($value, $stream);
                 continue;
             }
 
@@ -84,18 +84,13 @@ class Util
      * @param array $value $_FILES struct
      * @return array|UploadedFileInterface
      */
-    protected static function __createUploadedFileFromSpec(array $value)
+    protected static function __createUploadedFileFromSpec(array $value, $stream)
     {
         if (is_array($value['tmp_name']))
-            return self::__normalizeNestedFileSpec($value);
+            return self::__normalizeNestedFileSpec($value, $stream);
 
-        return new UploadedFile(
-            $value['tmp_name'],
-            $value['size'],
-            $value['error'],
-            $value['name'],
-            $value['type']
-        );
+        ($value === null) ?: $value['default_stream_class'] = $stream;
+        return new UploadedFile($value);
     }
 
     /**
@@ -107,7 +102,7 @@ class Util
      * @param array $files
      * @return UploadedFileInterface[]
      */
-    protected static function __normalizeNestedFileSpec(array $files)
+    protected static function __normalizeNestedFileSpec(array $files, $stream)
     {
         $files = [];
         foreach (array_keys($files['tmp_name']) as $key) {
@@ -118,7 +113,7 @@ class Util
                 'name'     => $files['name'][$key],
                 'type'     => $files['type'][$key],
             ];
-            $files[$key] = self::__createUploadedFileFromSpec($spec);
+            $files[$key] = self::__createUploadedFileFromSpec($spec, $stream);
         }
 
         return $files;

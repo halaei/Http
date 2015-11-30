@@ -11,10 +11,11 @@ use Poirot\Stream\Psr\StreamPsr;
 use Poirot\Stream\SResource;
 use Poirot\Stream\WrapperClient;
 
-class UploadedFile
-    implements UploadedFileInterface
+class UploadedFile implements UploadedFileInterface
 {
     use OptionsTrait;
+
+    const DEFAULT_STREAM = '\Poirot\Stream\Psr\StreamPsr';
 
     /** @var null|string */
     protected $tmpName;
@@ -212,9 +213,10 @@ class UploadedFile
                 return $this->stream = new $streamCls(
                     ($resource instanceof iSResource) ? $resource : new SResource($resource)
                 );
-            else
+            else {
                 ## it's Streamable and must convert to Psr
                 return $this->stream = new $streamCls($resource);
+            }
         }
 
         return $this->stream = new $streamCls($resource);
@@ -305,7 +307,7 @@ class UploadedFile
     function getDefaultStreamClass()
     {
         if (!$this->defaultStreamClass)
-            $this->setDefaultStreamClass('Poirot\Stream\Streamable');
+            $this->setDefaultStreamClass(self::DEFAULT_STREAM);
 
         return $this->defaultStreamClass;
     }
