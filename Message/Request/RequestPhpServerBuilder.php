@@ -9,7 +9,7 @@ use Poirot\PathUri\HttpUri;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
-class PhpServerEnv extends AbstractOptions
+class RequestPhpServerBuilder extends AbstractOptions
 {
     /** @var PhpServer */
     protected $server;
@@ -27,7 +27,7 @@ class PhpServerEnv extends AbstractOptions
      * - build server environment upon server object
      *
      * @param PhpServer              $phpServer
-     * @param array|iOptionImplement $options Options
+     * @param array|iOptionImplement $options   Options
      */
     function __construct(/*PhpServer*/ $phpServer = null, $options = null)
     {
@@ -250,7 +250,6 @@ class PhpServerEnv extends AbstractOptions
             return $this->headers;
 
         $headers = [];
-
         foreach($this->server->getServer()->toArray() as $key => $val)
             if (strpos($key, 'HTTP_') === 0) {
                 $name = strtr(substr($key, 5), '_', ' ');
@@ -328,18 +327,18 @@ class PhpServerEnv extends AbstractOptions
 
         # multipart data
         $headers = $this->getHeaders();
-
         if ($headers->has('Content-Type')) {
             $contentType = $headers->get('Content-Type');
             $contentType = $contentType->renderValueLine();
             if (strpos($contentType, 'multipart') !== false) {
                 // it`s multipart form data
-                // TODO build body data,
-                // https://www.ietf.org/rfc/rfc2388.txt
-                // http://chxo.com/be2/20050724_93bf.html
-
-                # http://stackoverflow.com/questions/19707632/php-http-request-content-raw-data-enctype-multipart-form-data
-                # http://www.chlab.ch/blog/archives/php/manually-parse-raw-http-data-php
+                if ($this->getMethod() == 'POST') {
+                    ## create MultiPart Stream From _FILES
+                    ## ...
+                } else {
+                    ## create MultiPart Stream From raw input
+                    ## ...
+                }
             }
         }
 
