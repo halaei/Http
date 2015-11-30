@@ -1,10 +1,41 @@
 <?php
 namespace Poirot\Http\Psr;
 
+use Poirot\Http\Psr\Interfaces\MessageInterface;
+use Poirot\Http\Psr\Interfaces\RequestInterface;
+use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
 
 class Util
 {
+    /**
+     * String representation of an HTTP message.
+     *
+     * @param MessageInterface $httpMessage
+     *
+     * @return string
+     */
+    static function messageToString(MessageInterface $httpMessage)
+    {
+        if ($httpMessage instanceof RequestInterface) {
+            $msg = trim($httpMessage->getMethod() . ' '
+                    . $httpMessage->getRequestTarget())
+                . ' HTTP/' . $httpMessage->getProtocolVersion();
+            if (!$httpMessage->hasHeader('host'))
+                $msg .= "\r\nHost: " . $httpMessage->getUri()->getHost();
+        } elseif ($httpMessage instanceof ResponseInterface) {
+            $msg = 'HTTP/' . $httpMessage->getProtocolVersion() . ' '
+                . $httpMessage->getStatusCode() . ' '
+                . $httpMessage->getReasonPhrase();
+        } else
+            throw new \InvalidArgumentException('Unknown message type');
+
+        foreach ($httpMessage->getHeaders() as $name => $values)
+            $msg .= "\r\n{$name}: " . implode(', ', $values);
+
+        return "{$msg}\r\n\r\n" . $httpMessage->getBody();
+    }
+
     /**
      * Normalize uploaded files
      *
