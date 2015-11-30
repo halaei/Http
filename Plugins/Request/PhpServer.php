@@ -153,6 +153,11 @@ class PhpServer extends AbstractService
                     $server['HTTP_AUTHORIZATION'] = $apacheHeaders['authorization'];
             }
 
+            if (isset($server['CONTENT_TYPE']))
+                $server['HTTP_CONTENT_TYPE'] = $server['CONTENT_TYPE'];
+            if (isset($server['CONTENT_LENGTH']))
+                $server['HTTP_CONTENT_LENGTH'] = $server['CONTENT_LENGTH'];
+
             return $server;
         }
 
