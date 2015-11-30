@@ -337,6 +337,7 @@ class RequestPhpServerBuilder extends AbstractOptions
                     ## ...
                 } else {
                     ## create MultiPart Stream From raw input
+                    ## always it can be sent with PUT method
                     ## ...
                 }
             }
