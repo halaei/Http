@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\Http\Message;
 
-use OAuth2\RequestInterface;
 use Poirot\Container\Interfaces\Plugins\iInvokePluginsProvider;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerAware;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerProvider;
@@ -18,11 +17,12 @@ use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Plugins\HttpPluginsManager;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
+use Poirot\Http\Psr\Interfaces\RequestInterface;
+use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\SResource;
 use Poirot\Stream\Streamable;
-use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractHttpMessage extends AbstractOptions
     implements iHttpMessage
@@ -254,7 +254,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     function setBody($content)
     {
         if ($content instanceof StreamInterface)
-            $content = new Streamable(new SResource($content->getMetadata('resource')));
+            $content = new Streamable(new SResource($content));
 
         $this->body = $content;
 

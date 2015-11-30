@@ -1,10 +1,10 @@
 <?php
 namespace Poirot\Http\Message;
 
-use Icicle\Http\Message\ResponseInterface;
 use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\Message\iHttpResponse;
+use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Util;
 
 class HttpResponse extends AbstractHttpMessage
