@@ -5,6 +5,7 @@ use Poirot\Container\Service\AbstractService;
 use Poirot\Core\Entity;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Http\Plugins\iHttpPlugin;
+use Poirot\Http\Psr\Util;
 
 class PhpServer extends AbstractService
     implements iHttpPlugin
@@ -29,7 +30,6 @@ class PhpServer extends AbstractService
     function setEnv($env)
     {
         $this->env = new Entity($env);
-
         return $this;
     }
 
@@ -53,7 +53,6 @@ class PhpServer extends AbstractService
     function setQuery($get)
     {
         $this->get = new Entity($get);
-
         return $this;
     }
 
@@ -64,7 +63,7 @@ class PhpServer extends AbstractService
     function getQuery()
     {
         if (!$this->get)
-            $this->get = new Entity($_GET);
+            $this->setQuery($_GET);
 
         return $this->get;
     }
@@ -77,7 +76,6 @@ class PhpServer extends AbstractService
     function setPost($post)
     {
         $this->post = new Entity($post);
-
         return $this;
     }
 
@@ -101,7 +99,6 @@ class PhpServer extends AbstractService
     function setCookie($cookie)
     {
         $this->cookie = new Entity($cookie);
-
         return $this;
     }
 
@@ -124,8 +121,9 @@ class PhpServer extends AbstractService
      */
     function setServer($server)
     {
-        $this->server = new Entity($server);
-
+        $this->server = new Entity(
+            $this->__normalizeServer($server)
+        );
         return $this->server;
     }
 
@@ -136,82 +134,33 @@ class PhpServer extends AbstractService
     function getServer()
     {
         if (!$this->server)
-            $this->server = new Entity(
-                $this->__normalizeServer($_SERVER)
-            );
+            $this->setServer($_SERVER);
 
         return $this->server;
     }
 
-        protected function __normalizeServer(array $server)
-        {
-            if (is_callable('apache_request_headers')) {
-                $apacheHeaders = apache_request_headers();
-                if (isset($apacheHeaders['Authorization']))
-                    $server['HTTP_AUTHORIZATION'] = $apacheHeaders['Authorization'];
-                elseif (isset($apacheHeaders['authorization']))
-                    $server['HTTP_AUTHORIZATION'] = $apacheHeaders['authorization'];
-            }
-
-            if (isset($server['CONTENT_TYPE']))
-                $server['HTTP_CONTENT_TYPE'] = $server['CONTENT_TYPE'];
-            if (isset($server['CONTENT_LENGTH']))
-                $server['HTTP_CONTENT_LENGTH'] = $server['CONTENT_LENGTH'];
-
-            return $server;
-        }
-
     /**
      * Set Files
-     * @param $files
+     * @param array $files
      * @return $this
      */
     function setFiles($files)
     {
-        $this->files = new Entity($files);
-
+        $this->files = Util::normalizeFiles($files);
         return $this;
     }
 
     /**
      * Get Files
-     * @return Entity
+     * @return array[UploadedFiles]
      */
     function getFiles()
     {
         if (!$this->files)
-            $this->files = $this->__normalizeFiles();
+            $this->setFiles($_FILES);
 
         return $this->files;
     }
-
-        protected function __normalizeFiles()
-        {
-            $_F_mapFileParams = function(&$array, $paramName, $index, $value) use (&$_F_mapFileParams) {
-                if (!is_array($value))
-                    $array[$index][$paramName] = $value;
-                else {
-                    foreach ($value as $i => $v)
-                        $_F_mapFileParams($array[$index], $paramName, $i, $v);
-                }
-            };
-
-            $files = array();
-            foreach ($_FILES as $fileName => $fileParams) {
-                $files[$fileName] = array();
-                foreach ($fileParams as $param => $data) {
-                    if (!is_array($data)) {
-                        $files[$fileName][$param] = $data;
-                    } else {
-                        foreach ($data as $i => $v) {
-                            $_F_mapFileParams($files[$fileName], $param, $i, $v);
-                        }
-                    }
-                }
-            }
-
-            return new Entity($files);
-        }
 
     /**
      * Detect Base Url
@@ -321,5 +270,25 @@ class PhpServer extends AbstractService
     {
         return $this;
     }
+
+
+    // ...
+
+    protected function __normalizeServer(array $server)
+    {
+        if (is_callable('apache_request_headers')) {
+            $apacheHeaders = apache_request_headers();
+            if (isset($apacheHeaders['Authorization']))
+                $server['HTTP_AUTHORIZATION'] = $apacheHeaders['Authorization'];
+            elseif (isset($apacheHeaders['authorization']))
+                $server['HTTP_AUTHORIZATION'] = $apacheHeaders['authorization'];
+        }
+
+        if (isset($server['CONTENT_TYPE']))
+            $server['HTTP_CONTENT_TYPE'] = $server['CONTENT_TYPE'];
+        if (isset($server['CONTENT_LENGTH']))
+            $server['HTTP_CONTENT_LENGTH'] = $server['CONTENT_LENGTH'];
+
+        return $server;
+    }
 }
- 
