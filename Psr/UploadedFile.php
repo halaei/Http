@@ -293,6 +293,10 @@ class UploadedFile implements UploadedFileInterface
         if (is_object($class))
             return $this->setDefaultStreamClass(get_class($class));
 
+        if ($class !== $this->defaultStreamClass)
+            ## reset stream, it will created again if changed
+            $this->stream = null;
+
         $this->defaultStreamClass = (string) $class;
         return $this;
     }
