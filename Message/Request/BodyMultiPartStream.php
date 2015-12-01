@@ -1,9 +1,20 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
+use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Http\Header\HeaderFactory;
+use Poirot\Http\Headers;
+use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Interfaces\iHeaderCollection;
+use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
+use Poirot\Http\Psr\UploadedFile;
+use Poirot\Http\Psr\Util;
+use Poirot\Http\Util as UtilHttp;
 use Poirot\Stream\Interfaces\iSResource;
 use Poirot\Stream\Interfaces\iStreamable;
+use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Streamable\AggregateStream;
+use Poirot\Stream\Streamable\TemporaryStream;
 
 class BodyMultiPartStream implements iStreamable
 {
@@ -11,6 +22,8 @@ class BodyMultiPartStream implements iStreamable
     protected $_t__wrapped_stream;
     /** @var string */
     protected $_boundary;
+    /** @var false|TemporaryStream Last Trailing Boundary */
+    protected $_trailingBoundary;
 
     /**
      * Construct
@@ -18,24 +31,41 @@ class BodyMultiPartStream implements iStreamable
      * @param array|string $multiPart _FILES, uploadedFiles, raw body string
      * @param null|string  $boundary
      */
-    function __construct($multiPart, $boundary = null)
+    function __construct($multiPart = [], $boundary = null)
     {
-        if (!is_array($multiPart) || !is_string($multiPart))
+        if ($multiPart instanceof iDataSetConveyor)
+            $multiPart = $multiPart->toArray();
+
+        if (!is_array($multiPart) && !is_string($multiPart))
             throw new \InvalidArgumentException(sprintf(
                 'The Constructor give array of Files or Raw Body String, given: "%s".'
                 , \Poirot\Core\flatten($multiPart)
             ));
 
 
-        if (is_array($multiPart))
+        // ...
+
+        $this->_t__wrapped_stream = new AggregateStream;
+
+        if (is_array($multiPart) && !empty($multiPart))
             $this->_fromFilesArray($multiPart);
         else
             $this->_fromRawBodyString($multiPart);
 
         if ($boundary === null)
             $this->_boundary = uniqid();
+    }
 
-        $this->_t__wrapped_stream = new AggregateStream;
+    /**
+     * Build Stream By Parsing Raw Body
+     *
+     * ! parse string to array that can be used by class
+     *
+     * @param string $rawBody
+     */
+    protected function _fromRawBodyString($rawBody)
+    {
+        kd($rawBody);
     }
 
     /**
@@ -44,20 +74,121 @@ class BodyMultiPartStream implements iStreamable
      */
     protected function _fromFilesArray($files)
     {
-        $files = \Poirot\Http\Psr\Util::normalizeFiles($files);
+        if (current($files) instanceof UploadedFileInterface || isset($files['tmp_name']))
+            $files = Util::normalizeFiles($files);
 
-        kd($files);
+        foreach($files as $field => $file)
+            $this->addElement($field, $file);
     }
 
     /**
-     * Build Stream By Parsing Raw Body
+     * Append Boundary Element
      *
-     * @param string $rawBody
+     * @param string                      $fieldName Form Field Name
+     * @param array|UploadedFileInterface $element
+     * @param null|Headers|array          $headers   Extra Headers To Be Added
+     * @return $this
      */
-    protected function _fromRawBodyString($rawBody)
+    function addElement($fieldName, $element, $headers = null)
     {
-        kd($rawBody);
+        $this->_trailingBoundary = false;
+
+        if ($element instanceof UploadedFileInterface)
+            $this->_addUploadedFileElement($fieldName, $element, $headers);
+        elseif (is_array($element))
+            $this->_addArrayElement($fieldName, $element);
+        else
+            throw new \InvalidArgumentException(sprintf(
+                'Element must be defined array represent element or UploadedFileInterface. given: "%s".'
+                , \Poirot\Core\flatten($element)
+            ));
+
+        return $this;
     }
+
+    protected function _addUploadedFileElement($fieldName, UploadedFileInterface $element, $headers)
+    {
+        if (!$headers instanceof iHeaderCollection)
+            $headers = ($headers) ? new Headers($headers) : new Headers;
+
+        $headers->set(HeaderFactory::factory('Content-Type'
+            , ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
+        ));
+
+        if ($size = $element->getSize())
+            $headers->set(HeaderFactory::factory('Content-Length', (string) $size));
+
+
+        if ($element instanceof UploadedFile)
+            ## using poirot stream
+            $element->setDefaultStreamClass('\Poirot\Stream\Streamable');
+
+
+        $this->__createElement($fieldName, $element->getStream(), $element->getClientFilename(), $headers);
+    }
+
+    protected function _addArrayElement($element)
+    {
+
+    }
+
+    /**
+     * @param string                      $name     Form Field Name
+     * @param StreamInterface|iStreamable $stream
+     * @param string                      $filename File name header
+     * @param Headers|array               $headers  Boundary Headers
+     *
+     * @return array
+     */
+    protected function __createElement($name, $stream, $filename, $headers)
+    {
+        if (is_array($headers))
+            $headers = new Headers($headers);
+        elseif (!$headers instanceof Headers)
+            throw new \InvalidArgumentException(sprintf(
+                'Headers must be array or Header. given: "%s".'
+                , \Poirot\Core\flatten($headers)
+            ));
+
+        // Set a default content-disposition header if one was no provided
+        if (!$headers->has('content-disposition'))
+            $headers->set(HeaderFactory::factory('Content-Disposition'
+                , ($filename)
+                    ? sprintf('form-data; name="%s"; filename="%s"'
+                        , $name
+                        , basename($filename)
+                    )
+                    : "form-data; name=\"{$name}\""
+            ));
+
+        // Set a default content-length header if one was no provided
+        if (!$headers->has('content-length'))
+            (!$length = $stream->getSize())
+                ?: $headers->set(HeaderFactory::factory('Content-Length', (string) $length));
+
+
+        // Set a default Content-Type if one was not supplied
+        if (!$headers->has('content-type') && $filename)
+            (!$type = UtilHttp::mimeTypeFromFilename($filename))
+                ?: $headers->set(HeaderFactory::factory('Content-Type', $type));
+
+
+        ## Add Created Element As Stream
+        ## it included headers and body stream
+
+        ### headers
+        $renderHeaders = '';
+        /** @var iHeader $h */
+        foreach($headers as $h)
+            $renderHeaders .= $h->render()."\r\n";
+        $renderHeaders = "--{$this->_boundary}\r\n" . trim($renderHeaders) . "\r\n\r\n";
+
+        $this->_t__wrapped_stream->addStream((new TemporaryStream($renderHeaders))->rewind());
+        $this->_t__wrapped_stream->addStream($stream->rewind());
+        $this->_t__wrapped_stream->addStream((new TemporaryStream("\r\n"))->rewind());
+    }
+
+    // ...
 
     /**
      * Set Stream Handler Resource
@@ -142,7 +273,13 @@ class BodyMultiPartStream implements iStreamable
      */
     function read($inByte = null)
     {
-        // TODO: Implement read() method.
+        if (!$this->_trailingBoundary) {
+            ## add trailing boundary as stream if not
+            $this->_trailingBoundary = new TemporaryStream("--{$this->_boundary}--\r\n");
+            $this->_t__wrapped_stream->addStream($this->_trailingBoundary->rewind());
+        }
+
+        return $this->_t__wrapped_stream->read($inByte);
     }
 
     /**
@@ -162,7 +299,13 @@ class BodyMultiPartStream implements iStreamable
      */
     function readLine($ending = "\n", $inByte = null)
     {
-        // TODO: Implement readLine() method.
+        if (!$this->_trailingBoundary) {
+            ## add trailing boundary as stream if not
+            $this->_trailingBoundary = new TemporaryStream("--{$this->_boundary}--\r\n");
+            $this->_t__wrapped_stream->addStream($this->_trailingBoundary->rewind());
+        }
+
+        return $this->_t__wrapped_stream->readLine($ending, $inByte);
     }
 
     /**
