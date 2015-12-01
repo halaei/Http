@@ -157,6 +157,7 @@ class PhpServer extends AbstractService
     function getFiles()
     {
         if (!$this->files)
+            // TODO from body looking for multipart/form-data when using as plugin
             $this->setFiles($_FILES);
 
         return $this->files;
