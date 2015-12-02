@@ -16,6 +16,8 @@ use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Streamable\AggregateStream;
 use Poirot\Stream\Streamable\TemporaryStream;
 
+/** TODO multipart/mixed */
+
 class BodyMultiPartStream implements iStreamable
 {
     /** @var AggregateStream */
