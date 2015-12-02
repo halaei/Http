@@ -7,7 +7,6 @@ use Poirot\Http\Headers;
 use Poirot\Http\Message\HttpRequest;
 use Poirot\Http\Plugins\Request\PhpServer;
 use Poirot\PathUri\HttpUri;
-use Poirot\Stream\SResource;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
