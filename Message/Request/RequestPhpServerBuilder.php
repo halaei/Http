@@ -4,8 +4,10 @@ namespace Poirot\Http\Message\Request;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iOptionImplement;
 use Poirot\Http\Headers;
+use Poirot\Http\Message\HttpRequest;
 use Poirot\Http\Plugins\Request\PhpServer;
 use Poirot\PathUri\HttpUri;
+use Poirot\Stream\SResource;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
@@ -332,19 +334,19 @@ class RequestPhpServerBuilder extends AbstractOptions
             $contentType = $contentType->renderValueLine();
             if (strpos($contentType, 'multipart') !== false) {
                 // it`s multipart form data
-                if ($this->getMethod() == 'POST') {
+                if ($this->getMethod() == 'POST')
                     ## create MultiPart Stream From _FILES
-                    ## ...
-                } else {
+                    $rawData =  $this->server->getFiles();
+                else
                     ## create MultiPart Stream From raw input
                     ## always it can be sent with PUT method
-                    ## ...
-                }
+                    $rawData = (new HttpRequest($body->read()))->getBody();
+
+                $body = new BodyMultiPartStream($rawData);
             }
         }
 
         $this->setBody($body);
-
         return $this->getBody();
     }
 

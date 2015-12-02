@@ -106,7 +106,7 @@ class Headers
      *
      * @param string $label
      *
-     * @return $this
+     * @return Headers
      */
     function del($label)
     {

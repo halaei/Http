@@ -46,14 +46,14 @@ class BodyMultiPartStream implements iStreamable
         // ...
 
         $this->_t__wrapped_stream = new AggregateStream;
+        if ($boundary === null)
+            $this->_boundary = uniqid();
+
 
         if (is_array($multiPart) && !empty($multiPart))
             $this->_fromFilesArray($multiPart);
         else
             $this->_fromRawBodyString($multiPart);
-
-        if ($boundary === null)
-            $this->_boundary = uniqid();
     }
 
     /**
@@ -179,6 +179,10 @@ class BodyMultiPartStream implements iStreamable
         ### headers
         $renderHeaders = '';
         /** @var iHeader $h */
+        $first = $headers->get('Content-Disposition');
+        $renderHeaders .= $first->render()."\r\n";
+        ## with new instance on delete
+        $headers = $headers->del('Content-Disposition');
         foreach($headers as $h)
             $renderHeaders .= $h->render()."\r\n";
         $renderHeaders = "--{$this->_boundary}\r\n" . trim($renderHeaders) . "\r\n\r\n";
