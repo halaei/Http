@@ -16,8 +16,11 @@ use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Streamable\AggregateStream;
 use Poirot\Stream\Streamable\TemporaryStream;
 
-/** TODO multipart/mixed */
-
+/**
+ * RFC 1867 - Form-based File Upload in HTML
+ * @link http://www.faqs.org/rfcs/rfc1867.html
+ * TODO multipart/mixed
+ */
 class BodyMultiPartStream implements iStreamable
 {
     /** @var AggregateStream */
