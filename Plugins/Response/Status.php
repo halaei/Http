@@ -102,8 +102,7 @@ class Status extends AbstractService
     function isSuccess()
     {
         $code = $this->getMessageObject()->getStatCode();
-
-        return (200 <= $code && 300 > $code);
+        return (200 <= $code && $code > 300);
     }
 
 

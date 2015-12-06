@@ -143,7 +143,7 @@ class HttpResponse extends AbstractHttpMessage
      */
     function fromString($message)
     {
-        if (!preg_match_all('/.*[\n]?/', $message, $lines))
+        if (!preg_match_all('/.*[\r\n]?/', $message, $lines))
             throw new \InvalidArgumentException('Error Parsing Request Message.');
 
         $lines = $lines[0];
@@ -207,7 +207,7 @@ class HttpResponse extends AbstractHttpMessage
      */
     function getStatCode()
     {
-        return $this->statCode;
+        return (int) $this->statCode;
     }
 
     /**

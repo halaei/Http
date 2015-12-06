@@ -76,9 +76,9 @@ class Util
         // \n not preceded by \r, OR
         // \r not followed by \n, OR
         // \r\n not followed by space or horizontal tab; these are all CRLF attacks
-        if (preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $value)) {
-            return false;
-        }
+        if (preg_match("#(?:(?:(?<!\r)\n)|(?:\r(?!\n))|(?:\r\n(?![ \t])))#", $value))
+            // TODO with parsed headers \r\n not available here
+            VOID;//return false;
 
         $length = strlen($value);
         for ($i = 0; $i < $length; $i += 1) {
