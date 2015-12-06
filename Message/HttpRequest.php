@@ -290,6 +290,9 @@ class HttpRequest extends AbstractHttpMessage
         $return = '';
         $return .= $this->renderRequestLine();
         $return .= "\r\n";
+        if (!$this->getHeaders()->has('Host') && $host = $this->getHost())
+            $return .= 'Host: '.$host."\r\n";
+
         $return .= parent::toString();
 
         return $return;
