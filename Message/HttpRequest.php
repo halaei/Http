@@ -252,13 +252,15 @@ class HttpRequest extends AbstractHttpMessage
     /**
      * Return the formatted request line (first line) for this http request
      *
+     * - include line break at bottom
+     *
      * @return string
      */
     function renderRequestLine()
     {
         //TODO can implement protocol HTTP/HTTPS
 
-        return $this->getMethod() . ' ' . $this->getUri()->toString() . ' HTTP/' . $this->getVersion();
+        return $this->getMethod() . ' ' . $this->getUri()->toString() . ' HTTP/' . $this->getVersion()."\r\n";
     }
 
     /**
@@ -289,11 +291,25 @@ class HttpRequest extends AbstractHttpMessage
     {
         $return = '';
         $return .= $this->renderRequestLine();
-        $return .= "\r\n";
-        if (!$this->getHeaders()->has('Host') && $host = $this->getHost())
-            $return .= 'Host: '.$host."\r\n";
-
         $return .= parent::toString();
+
+        return $return;
+    }
+
+    /**
+     * @override Append Host as Header If not exists in headers
+     *
+     * Render Headers
+     *
+     * - include line break at bottom
+     *
+     * @return string
+     */
+    function renderHeaders()
+    {
+        $return = parent::renderHeaders();
+        if (!$this->getHeaders()->has('Host') && $host = $this->getHost())
+            $return = 'Host: '.$host."\r\n" . $return;
 
         return $return;
     }
