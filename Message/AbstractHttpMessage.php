@@ -324,10 +324,8 @@ abstract class AbstractHttpMessage extends AbstractOptions
     function flush($withHeaders = true)
     {
         if ($withHeaders) {
-            ob_start();
-            echo $this->renderHeaders();
-            ob_end_flush();
-            flush();
+            foreach($this->getHeaders() as $h)
+                header($h->render());
         }
 
         $body = $this->getBody();
