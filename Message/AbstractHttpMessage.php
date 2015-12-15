@@ -254,6 +254,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     function setBody($content)
     {
         if ($content instanceof StreamInterface)
+            // TODO wrap seekable stream for none-seekable streams
             $content = new Streamable(new SResource($content));
 
         $this->body = $content;
