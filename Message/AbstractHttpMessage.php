@@ -305,7 +305,9 @@ abstract class AbstractHttpMessage extends AbstractOptions
 
         $body = $this->getBody();
         if ($body instanceof iStreamable) {
-            while ($body->getResource()->isAlive() && !$body->getResource()->isEOF())
+            if ($body->getResource()->isSeekable())
+                $body->rewind();
+            while ($body->getResource()->isAlive() && !$body->isEOF())
                 $return .= $body->read(24400);
         } else {
             $return .= $body;
@@ -331,7 +333,9 @@ abstract class AbstractHttpMessage extends AbstractOptions
         $body = $this->getBody();
         ob_start();
         if ($body instanceof iStreamable) {
-            while ($body->getResource()->isAlive() && !$body->getResource()->isEOF())
+            if ($body->getResource()->isSeekable())
+                $body->rewind();
+            while ($body->getResource()->isAlive() && !$body->isEOF())
                 echo $body->read(24400);
                 ob_end_flush();
                 flush();
