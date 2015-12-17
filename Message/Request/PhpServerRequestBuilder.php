@@ -10,7 +10,7 @@ use Poirot\PathUri\HttpUri;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
-class RequestPhpServerBuilder extends AbstractOptions
+class PhpServerRequestBuilder extends AbstractOptions
 {
     /** @var PhpServer */
     protected $server;
