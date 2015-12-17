@@ -8,7 +8,7 @@ use Poirot\Http\Plugins\iHttpPlugin;
 
 class PhpServer extends AbstractService
     implements iHttpPlugin,
-    iCService
+    iCService ## itself can be defined as container service
 {
     use ResponsePluginTrait;
 

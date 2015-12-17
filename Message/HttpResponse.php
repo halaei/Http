@@ -154,7 +154,9 @@ class HttpResponse extends AbstractHttpMessage
         $matches = array();
         if (!preg_match($regex, $firstLine, $matches))
             throw new \InvalidArgumentException(
-                'A valid response status line was not found in the provided string'
+                'A valid response status line was not found in the provided string.'
+                . ' response:'
+                . $message
             );
 
         $this->setVersion($matches['version']);

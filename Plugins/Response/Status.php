@@ -7,7 +7,7 @@ use Poirot\Http\Plugins\iHttpPlugin;
 
 class Status extends AbstractService
     implements iHttpPlugin,
-    iCService
+    iCService ## itself can be defined as container service
 {
     use ResponsePluginTrait;
 
@@ -102,7 +102,7 @@ class Status extends AbstractService
     function isSuccess()
     {
         $code = $this->getMessageObject()->getStatCode();
-        return (200 <= $code && $code > 300);
+        return (200 <= $code && $code < 300);
     }
 
 
