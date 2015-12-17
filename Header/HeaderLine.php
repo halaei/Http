@@ -2,7 +2,7 @@
 namespace Poirot\Http\Header;
 
 use Poirot\Core\AbstractOptions;
-use Poirot\Http\Util;
+use Poirot\Http\Util\Header;
 
 /**
  * TODO Implement fromArray/toArray
@@ -24,7 +24,7 @@ class HeaderLine extends AbstractHeader
      */
     function fromString($line)
     {
-        $matches = Util::headerParseLine($line);
+        $matches = Header::parseLabelValue($line);
 
         if ($matches === false)
             throw new \InvalidArgumentException(sprintf(
@@ -60,12 +60,12 @@ class HeaderLine extends AbstractHeader
      */
     function setHeaderLine($headerLine)
     {
-        if ((is_string($headerLine)) && !Util::headerIsValidValue($headerLine))
+        if ((is_string($headerLine)) && !Header::isValidValue($headerLine))
             throw new \InvalidArgumentException(
                 "Header value ({$headerLine}) is not valid or contains some unwanted chars."
             );
         elseif (is_string($headerLine))
-            $headerLine = Util::headerParseParams($headerLine);
+            $headerLine = Header::parseParams($headerLine);
 
         if (!is_array($headerLine))
             throw new \InvalidArgumentException(
@@ -103,7 +103,7 @@ class HeaderLine extends AbstractHeader
     {
         $params = $this->getHeaderLine();
 
-        return Util::headerFilterValue(Util::headerJoinParams($params));
+        return Header::filterValue(Header::joinParams($params));
     }
 
     /**

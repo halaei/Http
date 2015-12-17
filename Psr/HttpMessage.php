@@ -5,7 +5,7 @@ use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
-use Poirot\Http\Util;
+use Poirot\Http\Header;
 use Poirot\Stream\Psr\StreamInterface;
 
 class HttpMessage implements MessageInterface
@@ -90,7 +90,7 @@ class HttpMessage implements MessageInterface
         $headers = [];
         /** @var iHeader $h */
         foreach ($this->__getHeaders() as $h)
-            $headers[$h->label()] = Util::headerParseParams($h->renderValueLine());
+            $headers[$h->label()] = Header::parseParams($h->renderValueLine());
 
         return $headers;
     }
@@ -129,7 +129,7 @@ class HttpMessage implements MessageInterface
 
         $header = $this->__getHeaders()->get($name);
 
-        return Util::headerParseParams($header->renderValueLine());
+        return Header::parseParams($header->renderValueLine());
     }
 
     /**

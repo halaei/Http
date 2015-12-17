@@ -10,7 +10,7 @@ use Poirot\Http\Mime;
 use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
 use Poirot\Http\Psr\UploadedFile;
 use Poirot\Http\Psr\Util;
-use Poirot\Http\Util as UtilHttp;
+use Poirot\Http\Header as UtilHttp;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Streamable\AggregateStream;

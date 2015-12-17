@@ -1,7 +1,7 @@
 <?php
-namespace Poirot\Http;
+namespace Poirot\Http\Util;
 
-class Util
+class Header
 {
     /**
      * Filter a header value
@@ -19,7 +19,7 @@ class Util
      * @param string $value
      * @return string
      */
-    static function headerFilterValue($value)
+    static function filterValue($value)
     {
         $value  = (string) $value;
         $length = strlen($value);
@@ -68,7 +68,7 @@ class Util
      * @param string $value
      * @return bool
      */
-    static function headerIsValidValue($value)
+    static function isValidValue($value)
     {
         $value  = (string) $value;
 
@@ -109,7 +109,7 @@ class Util
      *
      * @return false|array[string 'label', string 'value']
      */
-    static function headerParseLine($line)
+    static function parseLabelValue($line)
     {
         if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
             return false;
@@ -143,7 +143,7 @@ class Util
      * @return array
      * @static
      */
-    static function headerParseParams($header_values)
+    static function parseParams($header_values)
     {
         if (!is_array($header_values)) $header_values = [$header_values];
 
@@ -208,7 +208,7 @@ class Util
     * @return string
     * @static
     */
-    static function headerJoinParams($header_values)
+    static function joinParams($header_values)
     {
         if (!is_array($header_values) || !count($header_values)) return false;
         if (!isset($header_values[0])) $header_values = array($header_values);

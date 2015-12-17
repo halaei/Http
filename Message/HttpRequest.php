@@ -6,7 +6,7 @@ use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
-use Poirot\Http\Util;
+use Poirot\Http\Header;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
 
@@ -68,7 +68,7 @@ class HttpRequest extends AbstractHttpMessage
 
         $headers = [];
         foreach($response->getHeaders() as $h => $v)
-            $headers[$h] = Util::headerJoinParams($v);
+            $headers[$h] = Header::joinParams($v);
 
         $options = [
             'method'  => $response->getMethod(),

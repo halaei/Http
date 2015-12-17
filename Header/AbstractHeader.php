@@ -4,7 +4,7 @@ namespace Poirot\Http\Header;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\OpenOptions;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Util;
+use Poirot\Http\Util\Header;
 
 /**
  * TODO Headers must implement properly built from array and toArray method that \
@@ -90,6 +90,6 @@ abstract class AbstractHeader extends OpenOptions
             $props[$prop] = $this->__get($prop);
         }
 
-        return Util::headerFilterValue(Util::headerJoinParams($props));
+        return Header::filterValue(Header::joinParams($props));
     }
 }
