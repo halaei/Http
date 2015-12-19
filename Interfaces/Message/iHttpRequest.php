@@ -2,6 +2,7 @@
 namespace Poirot\Http\Interfaces\Message;
 
 use Poirot\PathUri\Interfaces\iHttpUri;
+use Poirot\PathUri\Interfaces\iSeqPathUri;
 
 /**
  * Provides the general representation of an HTTP request message.
@@ -35,7 +36,7 @@ interface iHttpRequest extends iHttpMessage
     /**
      * Set Uri Target
      *
-     * @param string|iHttpUri  $target
+     * @param string|iHttpUri|iSeqPathUri  $target
      * @param bool $preserveHost When this argument is set to true,
      *                           the returned request will not update
      *                           the Host header of the returned message

@@ -9,6 +9,7 @@ use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\Http\Util\Header;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
+use Poirot\PathUri\Interfaces\iSeqPathUri;
 
 class HttpRequest extends AbstractHttpMessage
     implements iHttpRequest
@@ -163,7 +164,7 @@ class HttpRequest extends AbstractHttpMessage
     /**
      * Set Uri Target
      *
-     * @param string|iHttpUri $target
+     * @param string|iHttpUri|iSeqPathUri $target
      * @param bool $preserveHost When this argument is set to true,
      *                           the returned request will not update
      *                           the Host header of the returned message
@@ -177,10 +178,12 @@ class HttpRequest extends AbstractHttpMessage
 
         if (is_string($target))
             $target = new HttpUri($target);
+        elseif($target instanceof iSeqPathUri)
+            $target = (new HttpUri)->setPath($target);
 
         if (!$target instanceof iHttpUri)
             throw new \InvalidArgumentException(sprintf(
-                'Invalid URI provided; must be null, a string, or a iHttpUri instance. "%s" given.'
+                'Invalid URI provided; must be null, a string, or a iHttpUri, iSeqPathUri instance. "%s" given.'
                 , \Poirot\Core\flatten($target)
             ));
 
