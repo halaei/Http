@@ -6,7 +6,7 @@ use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
-use Poirot\Http\Header;
+use Poirot\Http\Util\Header;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
 
