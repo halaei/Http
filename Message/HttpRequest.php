@@ -143,11 +143,10 @@ class HttpRequest extends AbstractHttpMessage
     function setMethod($method)
     {
         $method = strtoupper($method);
-        if (!defined('static::METHOD_' . $method))
-            throw new \InvalidArgumentException("Invalid HTTP method ({$method}).");
+        /*if (!defined('static::METHOD_' . $method))
+            throw new \InvalidArgumentException("Invalid HTTP method ({$method}).");*/
 
         $this->method = $method;
-
         return $this;
     }
 
