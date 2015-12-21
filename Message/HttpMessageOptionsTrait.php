@@ -12,10 +12,11 @@ use Poirot\Stream\Streamable;
 
 trait HttpMessageOptionsTrait
 {
-    # protected $version;
-    # protected $headers;
-    # protected $body;
-
+    protected $version = '1.1';
+    /** @var iHeaderCollection */
+    protected $headers;
+    /** @var string|iStreamable */
+    protected $body;
 
     /**
      * Set Version

@@ -11,7 +11,6 @@ use Poirot\Core\DataField;
 use Poirot\Core\Interfaces\iDataField;
 use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Plugins\HttpPluginsManager;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
@@ -26,25 +25,8 @@ abstract class AbstractHttpMessage extends AbstractOptions
     , iPluginManagerProvider
     , iPluginManagerAware
 {
-    use HttpMessageOptionsTrait;
-
     const Vx1_0 = '1.0';
     const Vx1_1 = '1.1';
-
-    /**
-     * @var iHeaderCollection
-     */
-    protected $headers;
-
-    /**
-     * @var string
-     */
-    protected $body;
-
-    /**
-     * @var string
-     */
-    protected $version = self::Vx1_1;
 
     /**
      * @var DataField

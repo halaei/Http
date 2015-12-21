@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
+use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Message\HttpMessageOptionsTrait;
 use Poirot\PathUri\HttpUri;
@@ -11,9 +12,9 @@ trait HttpRequestOptionsTrait
 {
     use HttpMessageOptionsTrait;
 
-    # protected $method;
-    # protected $host;
-    # protected $target_uri;
+    protected $method = 'GET';
+    protected $host;
+    protected $target_uri;
 
     /**
      * Set Request Method
@@ -77,7 +78,7 @@ trait HttpRequestOptionsTrait
             $host = $this->getUri()->getHost();
             if (!$host)
                 /** @var iHeader $host */
-                if ($host = $this->getHeaders()->get('Host'))
+                if ($this->getHeaders()->has('Host') && $host = $this->getHeaders()->get('Host'))
                     $host = $host->render();
 
             $this->setHost($host);
@@ -131,5 +132,27 @@ trait HttpRequestOptionsTrait
             $this->setUri();
 
         return $this->target_uri;
+    }
+
+    /**
+     * Set Uri Options
+     *
+     * @param iHttpUri|iDataSetConveyor|array $options
+     *
+     * @return $this
+     */
+    function setUriOptions($options)
+    {
+        if ($options instanceof iDataSetConveyor)
+            $options = $options->toArray();
+
+        if(is_array($options))
+            $this->getUri()->fromArray($options);
+        elseif ($options instanceof iHttpUri)
+            $this->getUri()->fromPathUri($options);
+        else
+            throw new \InvalidArgumentException;
+
+        return $this;
     }
 }

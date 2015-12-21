@@ -29,10 +29,6 @@ class HttpRequest extends AbstractHttpMessage
     const METHOD_PROPFIND = 'PROPFIND';
     /**#@-*/
 
-    protected $method = self::METHOD_GET;
-    protected $host;
-    protected $target_uri;
-
     /**
      * Set Options
      *

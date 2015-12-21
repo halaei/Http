@@ -13,9 +13,6 @@ class HttpResponse extends AbstractHttpMessage
 {
     use HttpResponseOptionsTrait;
 
-    protected $statCode;
-    protected $statReason;
-
     /**
      * Set Options
      *

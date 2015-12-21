@@ -8,8 +8,8 @@ trait HttpResponseOptionsTrait
 {
     use HttpMessageOptionsTrait;
 
-    # protected $statCode;
-    # protected $statReason;
+    protected $statCode;
+    protected $statReason;
 
     /**
      * Set Response Status Code
