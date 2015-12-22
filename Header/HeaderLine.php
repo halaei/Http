@@ -113,6 +113,6 @@ class HeaderLine extends AbstractHeader
      */
     function render()
     {
-        return $this->label().':'. $this->renderValueLine();
+        return $this->label().': '. $this->renderValueLine();
     }
 }
