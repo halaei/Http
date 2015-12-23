@@ -6,7 +6,7 @@ use Poirot\Container\Interfaces\iContainerBuilder;
 use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
 
-class HttpPluginsManager extends AbstractPlugins
+class HttpPluginManager extends AbstractPlugins
     implements iHttpPlugin
 {
     /**

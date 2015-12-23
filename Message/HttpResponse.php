@@ -5,6 +5,9 @@ use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\Message\iHttpResponse;
 use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
+use Poirot\Http\Plugins\HttpPluginManager;
+use Poirot\Http\Plugins\HttpRequestPluginManager;
+use Poirot\Http\Plugins\HttpResponsePluginManager;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Util\Header;
 
@@ -138,5 +141,16 @@ class HttpResponse extends AbstractHttpMessage
         $return .= parent::toString();
 
         return $return;
+    }
+
+
+    // ...
+
+    /**
+     * @return HttpPluginManager
+     */
+    protected function _newPluginManager()
+    {
+        return new HttpResponsePluginManager;
     }
 }

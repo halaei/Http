@@ -3,11 +3,19 @@ namespace Poirot\Http\Message;
 
 use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Header\HeaderFactory;
+use Poirot\Http\Interfaces\iHeaderCollection;
+use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\Request\HttpRequestOptionsTrait;
+use Poirot\Http\Plugins\HttpPluginManager;
+use Poirot\Http\Plugins\HttpRequestPluginManager;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\Http\Util\Header;
 use Poirot\PathUri\HttpUri;
+use Poirot\PathUri\Interfaces\iHttpUri;
+use Poirot\PathUri\Interfaces\iSeqPathUri;
+use Poirot\Stream\Interfaces\iStreamable;
+use Psr\Http\Message\StreamInterface;
 
 class HttpRequest extends AbstractHttpMessage
     implements iHttpRequest
@@ -192,5 +200,16 @@ class HttpRequest extends AbstractHttpMessage
             $return = 'Host: '.$host."\r\n" . $return;
 
         return $return;
+    }
+
+
+    // ...
+
+    /**
+     * @return HttpPluginManager
+     */
+    protected function _newPluginManager()
+    {
+        return new HttpRequestPluginManager;
     }
 }

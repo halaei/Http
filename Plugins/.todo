@@ -1,5 +1,0 @@
-Each plugins related to message objects can loaded by pluginManager by default
-so we can use:
-   $httpResponse()->plg()->status()->isSuccess();
-   // it will look for Status plugin even if not attached before
-   // with help of configured pluginManager

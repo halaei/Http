@@ -12,7 +12,7 @@ use Poirot\Core\Interfaces\iDataField;
 use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpMessage;
-use Poirot\Http\Plugins\HttpPluginsManager;
+use Poirot\Http\Plugins\HttpPluginManager;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
@@ -39,7 +39,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     protected $_plugins;
 
     /**
-     * @var HttpPluginsManager
+     * @var HttpPluginManager
      */
     protected $pluginManager;
 
@@ -110,17 +110,22 @@ abstract class AbstractHttpMessage extends AbstractOptions
      *       keep it clear on this state
      *
      *
-     * @return HttpPluginsManager
+     * @return HttpPluginManager
      */
     function getPluginManager()
     {
         if (!$this->pluginManager)
-            $this->setPluginManager(new HttpPluginsManager);
+            $this->setPluginManager($this->_newPluginManager());
 
         $this->pluginManager->setMessageObject($this);
 
         return $this->pluginManager;
     }
+
+    /**
+     * @return HttpPluginManager
+     */
+    abstract protected function _newPluginManager();
 
     /**
      * Set Plugins Manager
@@ -131,7 +136,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
      */
     function setPluginManager(AbstractPlugins $plugins)
     {
-        if (!$plugins instanceof HttpPluginsManager)
+        if (!$plugins instanceof HttpPluginManager)
             throw new \InvalidArgumentException(sprintf(
                 'Plugins Manager must instance of (HttpPluginsManager) given (%s).'
                 , get_class($plugins)
