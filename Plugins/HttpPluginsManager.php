@@ -31,7 +31,9 @@ class HttpPluginsManager extends AbstractPlugins
         $thisContainer = $this;
         $this->initializer()->addMethod(function() use ($thisContainer) {
             // Inject Service Container Inside
-            $this->setMessageObject($thisContainer->getMessageObject());
+            if ($this instanceof iHttpPlugin)
+                ##! initializer may run on services(iCService) object itself.
+                $this->setMessageObject($thisContainer->getMessageObject());
         }, 10000);
     }
 

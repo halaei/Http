@@ -91,7 +91,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
      *
      * @return InvokablePlugins
      */
-    function plugin()
+    function plg()
     {
         if (!$this->_plugins)
             $this->_plugins = new InvokablePlugins(
