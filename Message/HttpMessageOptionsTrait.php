@@ -56,8 +56,12 @@ trait HttpMessageOptionsTrait
      */
     function setHeaders($headers)
     {
-        if ($headers instanceof iHeaderCollection)
-            $this->headers = $headers;
+        if ($headers instanceof iHeaderCollection) {
+            $tHeaders = [];
+            foreach($headers as $h)
+                $tHeaders[] = $h;
+            $headers = $tHeaders;
+        }
 
         if (is_array($headers))
             foreach ($headers as $label => $h) {
