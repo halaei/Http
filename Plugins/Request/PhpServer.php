@@ -17,6 +17,7 @@ class PhpServer extends AbstractService
 
     protected $env;
     protected $get;
+    /** @var Entity $_POST */
     protected $post;
     protected $cookie;
     protected $server;
@@ -81,12 +82,18 @@ class PhpServer extends AbstractService
 
     /**
      * Get Post
-     * @return Entity
+     * @param null $key
+     * @param null $default
+     *
+     * @return Entity|mixed
      */
-    function getPost()
+    function getPost($key = null, $default = null)
     {
         if (!$this->post)
             $this->setPost($_POST);
+
+        if ($key !== null)
+            return $this->post->get($key, $default);
 
         return $this->post;
     }
