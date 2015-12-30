@@ -9,6 +9,7 @@ use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\Request\HttpRequestOptionsTrait;
 use Poirot\Http\Plugins\HttpPluginManager;
 use Poirot\Http\Plugins\HttpRequestPluginManager;
+use Poirot\Http\Plugins\Request\PluginsRequestInvokable;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\Http\Util\Header;
 use Poirot\PathUri\HttpUri;
@@ -211,5 +212,19 @@ class HttpRequest extends AbstractHttpMessage
     protected function _newPluginManager()
     {
         return new HttpRequestPluginManager;
+    }
+
+    /**
+     * @override ide completion
+     * @return PluginsRequestInvokable
+     */
+    function plg()
+    {
+        if (!$this->_plugins)
+            $this->_plugins = new PluginsRequestInvokable(
+                $this->getPluginManager()
+            );
+
+        return $this->_plugins;
     }
 }

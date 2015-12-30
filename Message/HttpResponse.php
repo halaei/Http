@@ -8,6 +8,7 @@ use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
 use Poirot\Http\Plugins\HttpPluginManager;
 use Poirot\Http\Plugins\HttpRequestPluginManager;
 use Poirot\Http\Plugins\HttpResponsePluginManager;
+use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Util\Header;
 
@@ -152,5 +153,19 @@ class HttpResponse extends AbstractHttpMessage
     protected function _newPluginManager()
     {
         return new HttpResponsePluginManager;
+    }
+
+    /**
+     * @override ide completion
+     * @return PluginsResponseInvokable
+     */
+    function plg()
+    {
+        if (!$this->_plugins)
+            $this->_plugins = new PluginsResponseInvokable(
+                $this->getPluginManager()
+            );
+
+        return $this->_plugins;
     }
 }

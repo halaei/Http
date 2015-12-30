@@ -5,7 +5,7 @@ use Poirot\Container\Interfaces\Plugins\iInvokePluginsProvider;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerAware;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerProvider;
 use Poirot\Container\Plugins\AbstractPlugins;
-use Poirot\Container\Plugins\InvokablePlugins;
+use Poirot\Container\Plugins\PluginsInvokable;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\DataField;
 use Poirot\Core\Interfaces\iDataField;
@@ -34,7 +34,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     protected $_meta;
 
     /**
-     * @var InvokablePlugins
+     * @var PluginsInvokable
      */
     protected $_plugins;
 
@@ -89,12 +89,12 @@ abstract class AbstractHttpMessage extends AbstractOptions
     /**
      * Plugin Manager
      *
-     * @return InvokablePlugins
+     * @return PluginsInvokable
      */
     function plg()
     {
         if (!$this->_plugins)
-            $this->_plugins = new InvokablePlugins(
+            $this->_plugins = new PluginsInvokable(
                 $this->getPluginManager()
             );
 
