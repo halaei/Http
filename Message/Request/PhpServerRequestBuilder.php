@@ -123,7 +123,7 @@ class PhpServerRequestBuilder extends AbstractOptions
         $host = $this->__attainUriHost();
         if ($host) {
             $uri->setHost($host->host);
-            $uri->setPort($host->port);
+            (!$host->port) ?: $uri->setPort($host->port);
         }
 
         # uri path
