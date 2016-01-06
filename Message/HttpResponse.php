@@ -144,6 +144,19 @@ class HttpResponse extends AbstractHttpMessage
         return $return;
     }
 
+    /**
+     * Flush String Representation To Output
+     *
+     * @param bool $withHeaders Include Headers
+     *
+     * @return void
+     */
+    function flush($withHeaders = true)
+    {
+        http_response_code($this->getStatCode());
+
+        parent::flush($withHeaders);
+    }
 
     // ...
 
