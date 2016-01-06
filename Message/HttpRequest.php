@@ -11,7 +11,7 @@ use Poirot\Http\Plugins\HttpPluginManager;
 use Poirot\Http\Plugins\HttpRequestPluginManager;
 use Poirot\Http\Plugins\Request\PluginsRequestInvokable;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
-use Poirot\Http\Util\Header;
+use Poirot\Http\Util\UHeader;
 use Poirot\PathUri\HttpUri;
 use Poirot\PathUri\Interfaces\iHttpUri;
 use Poirot\PathUri\Interfaces\iSeqPathUri;
@@ -74,7 +74,7 @@ class HttpRequest extends AbstractHttpMessage
 
         $headers = [];
         foreach($response->getHeaders() as $h => $v)
-            $headers[$h] = Header::joinParams($v);
+            $headers[$h] = UHeader::joinParams($v);
 
         $options = [
             'method'  => $response->getMethod(),

@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Util;
 
-class Header
+class UHeader
 {
     /**
      * Filter a header value

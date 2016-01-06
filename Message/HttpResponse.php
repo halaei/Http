@@ -10,7 +10,7 @@ use Poirot\Http\Plugins\HttpRequestPluginManager;
 use Poirot\Http\Plugins\HttpResponsePluginManager;
 use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
-use Poirot\Http\Util\Header;
+use Poirot\Http\Util\UHeader;
 use Poirot\Http\Util\Response;
 
 class HttpResponse extends AbstractHttpMessage
@@ -54,7 +54,7 @@ class HttpResponse extends AbstractHttpMessage
 
         $headers = [];
         foreach($response->getHeaders() as $h => $v)
-            $headers[$h] = Header::joinParams($v);
+            $headers[$h] = UHeader::joinParams($v);
 
         $options = [
             'version'     => $response->getProtocolVersion(),
