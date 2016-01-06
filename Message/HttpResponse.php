@@ -6,12 +6,11 @@ use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\Message\iHttpResponse;
 use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
 use Poirot\Http\Plugins\HttpPluginManager;
-use Poirot\Http\Plugins\HttpRequestPluginManager;
 use Poirot\Http\Plugins\HttpResponsePluginManager;
 use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Util\UHeader;
-use Poirot\Http\Util\Response;
+use Poirot\Http\Util\UResponse;
 
 class HttpResponse extends AbstractHttpMessage
     implements iHttpResponse
@@ -154,7 +153,7 @@ class HttpResponse extends AbstractHttpMessage
      */
     function flush($withHeaders = true)
     {
-        Response::httpResponseCode($this->getStatCode());
+        UResponse::httpResponseCode($this->getStatCode());
 
         parent::flush($withHeaders);
     }

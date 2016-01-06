@@ -2,7 +2,7 @@
 namespace Poirot\Http\Message\Response;
 
 use Poirot\Http\Message\HttpMessageOptionsTrait;
-use Poirot\Http\Util\Response;
+use Poirot\Http\Util\UResponse;
 
 trait HttpResponseOptionsTrait
 {
@@ -68,7 +68,7 @@ trait HttpResponseOptionsTrait
     {
         if (!$this->statReason)
             ($code = $this->getStatCode() === null) ?: (
-                (!$reason = Response::getStatReasonFromCode($code)) ?: (
+                (!$reason = UResponse::getStatReasonFromCode($code)) ?: (
                     $this->setStatReason($reason)
                 )
             );

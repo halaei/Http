@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Util;
 
-class Response 
+class UResponse
 {
     /**
      * Map of standard HTTP status code/reason phrases

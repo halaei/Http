@@ -6,7 +6,7 @@ use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
-use Poirot\Http\Mime;
+use Poirot\Http\UMime;
 use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
 use Poirot\Http\Psr\UploadedFile;
 use Poirot\Http\Psr\Util;
@@ -177,7 +177,7 @@ class BodyMultiPartStream implements iStreamable
 
         // Set a default Content-Type if one was not supplied
         if (!$headers->has('content-type') && $filename)
-            (!$type = Mime::getFromFilename($filename))
+            (!$type = UMime::getFromFilename($filename))
                 ?: $headers->set(HeaderFactory::factory('Content-Type', $type));
 
 

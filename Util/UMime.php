@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http;
 
-class Mime
+class UMime
 {
     /**
      * Determines the mimetype of a file by looking at its extension.
