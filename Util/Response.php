@@ -84,5 +84,32 @@ class Response
     {
         return isset(static::$phrases[$statusCode]) ? static::$phrases[$statusCode] : null;
     }
+
+    /**
+     * Get or Set the HTTP response code
+     *
+     * @param int $statusCode
+     *
+     * @return int
+     */
+    static function httpResponseCode($statusCode = null)
+    {
+        if (function_exists('http_response_code'))
+            return http_response_code($statusCode);
+
+
+        // ...
+
+        static $_c_code;
+        if ($_c_code == null)
+            $_c_code = 200;
+
+        if ($statusCode !== null) {
+            $protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+            header($protocol . ' ' . $_c_code . ' ' . self::getStatReasonFromCode($_c_code));
+            $_c_code = $statusCode;
+        }
+
+        return $_c_code;
+    }
 }
- 

@@ -11,6 +11,7 @@ use Poirot\Http\Plugins\HttpResponsePluginManager;
 use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Util\Header;
+use Poirot\Http\Util\Response;
 
 class HttpResponse extends AbstractHttpMessage
     implements iHttpResponse
@@ -153,7 +154,7 @@ class HttpResponse extends AbstractHttpMessage
      */
     function flush($withHeaders = true)
     {
-        http_response_code($this->getStatCode());
+        Response::httpResponseCode($this->getStatCode());
 
         parent::flush($withHeaders);
     }
