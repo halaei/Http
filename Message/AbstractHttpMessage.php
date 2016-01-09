@@ -215,6 +215,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     function flush($withHeaders = true)
     {
         if ($withHeaders) {
+            /** @var iHeader $h */
             foreach($this->getHeaders() as $h)
                 header($h->render());
         }
