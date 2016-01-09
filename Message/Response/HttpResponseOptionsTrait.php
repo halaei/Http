@@ -66,13 +66,12 @@ trait HttpResponseOptionsTrait
      */
     function getStatReason()
     {
-        if (!$this->statReason)
-            ($code = $this->getStatCode() === null) ?: (
-                (!$reason = UResponse::getStatReasonFromCode($code)) ?: (
-                    $this->setStatReason($reason)
-                )
-            );
+        if ($this->statReason)
+            return $this->statReason;
 
-        return $this->statReason;
+        ($reason = UResponse::getStatReasonFromCode($this->getStatCode()))
+            ?: $reason = 'Unknown';
+
+        return $reason;
     }
 }
