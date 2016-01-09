@@ -25,7 +25,6 @@ class HeaderLine extends AbstractHeader
     function fromString($line)
     {
         $matches = UHeader::parseLabelValue($line);
-
         if ($matches === false)
             throw new \InvalidArgumentException(sprintf(
                 'Invalid Header (%s).'
@@ -102,7 +101,6 @@ class HeaderLine extends AbstractHeader
     function renderValueLine()
     {
         $params = $this->getHeaderLine();
-
         return UHeader::filterValue(UHeader::joinParams($params));
     }
 

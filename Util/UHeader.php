@@ -118,6 +118,7 @@ class UHeader
     }
 
     /**
+     * TODO test more
      * This function is useful for parsing header fields that
      * follow this syntax (BNF as from the HTTP/1.1 specification, but we relax
      * the requirement for tokens).
@@ -190,6 +191,7 @@ class UHeader
     }
 
     /**
+     * TODO test more
     * This will do the opposite of the conversion done by headerParseParams().
     * It takes a list of anonymous arrays as arguments (or a list of
     * key/value pairs) and produces a single header value. Attribute values
@@ -213,9 +215,9 @@ class UHeader
         if (!is_array($header_values) || !count($header_values)) return false;
         if (!isset($header_values[0])) $header_values = array($header_values);
 
-        $result = array();
+        $result = [];
         foreach ($header_values as $header) {
-            $attr = array();
+            $attr = [];
             foreach ($header as $key => $val) {
                 if (isset($val)) {
                     if (preg_match('/^\w+$/', $val)) {
