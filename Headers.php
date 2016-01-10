@@ -50,7 +50,7 @@ class Headers
      */
     function set(iHeader $header)
     {
-        $search = ['label' => strtolower($header->label())];
+        $search = ['label' => strtolower($header->getLabel())];
 
         foreach($this->ObjectCollection->search($search) as $h)
             ## previously values must overwrite

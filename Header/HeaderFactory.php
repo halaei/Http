@@ -3,6 +3,13 @@ namespace Poirot\Http\Header;
 
 use Poirot\Http\Util\UHeader;
 
+/*
+HeaderFactory::factoryString('WWW-Authenticate: Basic realm="admin_panel"');
+HeaderFactory::factory('WWW-Authenticate', 'Basic realm="admin_panel"');
+// options of specific header as plugin
+HeaderFactory::factory('WWW-Authenticate', ['header_line' => 'Basic realm="admin_panel"']);
+*/
+
 class HeaderFactory
 {
     /** @var HeaderPluginsManager */
@@ -49,8 +56,8 @@ class HeaderFactory
             ## avoid to parse again header value
             $header->from($label.': '. $value);
         else {
-            $header->setLabel($label);
             $header->from($value);
+            $header->setLabel($label);
         }
 
         return $header;

@@ -10,7 +10,7 @@ interface iHeader extends iPoirotOptions
      *
      * @return string
      */
-    function label();
+    function getLabel();
 
     /**
      * Build Header From Header String Representation

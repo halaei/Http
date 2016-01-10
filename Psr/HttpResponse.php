@@ -111,7 +111,7 @@ class Response extends HttpMessage
             /** @var iHeader $h */
             $httpHeaders = [];
             foreach($body->getHeaders() as $h)
-                $httpHeaders[$h->label()] = $h->renderValueLine();
+                $httpHeaders[$h->getLabel()] = $h->renderValueLine();
             $headers = array_merge($httpHeaders, $headers);
 
             ## status code

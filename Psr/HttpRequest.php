@@ -74,7 +74,7 @@ class HttpRequest extends HttpMessage
             /** @var iHeader $h */
             $httpHeaders = [];
             foreach($uri->getHeaders() as $h)
-                $httpHeaders[$h->label()] = $h->renderValueLine();
+                $httpHeaders[$h->getLabel()] = $h->renderValueLine();
             $headers = array_merge($httpHeaders, $headers);
 
             ## body stream
@@ -302,7 +302,7 @@ class HttpRequest extends HttpMessage
         $hdrArray = [];
         /** @var iHeader $h */
         foreach ($headers as $h)
-            $hdrArray[$h->label()] = $h->toArray();
+            $hdrArray[$h->getLabel()] = $h->toArray();
 
         return $hdrArray;
     }

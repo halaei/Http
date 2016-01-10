@@ -4,12 +4,6 @@ namespace Poirot\Http\Header;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\OpenOptions;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Util\UHeader;
-
-/**
- * TODO Headers must implement properly built from array and toArray method that \
- *      represent data from within header key
- */
 
 abstract class AbstractHeader extends OpenOptions
     implements iHeader
@@ -21,17 +15,9 @@ abstract class AbstractHeader extends OpenOptions
      *
      * @return string
      */
-    function label()
+    function getLabel()
     {
-        $label = $this->label;
-
-        if (! preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $label))
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid header name "%s".'
-                , is_null($label) ? 'null' : $label
-            ));
-
-        return $label;
+        return $this->label;
     }
 
 
@@ -44,16 +30,6 @@ abstract class AbstractHeader extends OpenOptions
      * @return $this
      */
     abstract function fromString($line);
-
-    /**
-     * Represent Header As String
-     *
-     * - filter values just before output
-     *
-     * @return string
-     */
-    abstract function render();
-
 
     /**
      * Set Options
@@ -73,23 +49,25 @@ abstract class AbstractHeader extends OpenOptions
     }
 
     /**
+     * Represent Header As String
+     *
+     * - filter values just before output
+     *
+     * @return string
+     */
+    function render()
+    {
+        return $this->getLabel().': '.$this->renderValueLine();
+    }
+
+    /**
+     * TODO join props and build header value
+     *
      * Get Field Value As String
      *
      * - it always override by implemented classes
      *
-     * @return string
+     * @return string UHeader::filterValue
      */
-    function renderValueLine()
-    {
-        $props = [];
-        // TODO implement toArray
-        foreach($this->props()->readable as $prop) {
-            if (in_array($prop, ['header_line']))
-                continue;
-
-            $props[$prop] = $this->__get($prop);
-        }
-
-        return UHeader::filterValue(UHeader::joinParams($props));
-    }
+    abstract function renderValueLine();
 }

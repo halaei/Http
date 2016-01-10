@@ -90,7 +90,7 @@ class HttpMessage implements MessageInterface
         $headers = [];
         /** @var iHeader $h */
         foreach ($this->__getHeaders() as $h)
-            $headers[$h->label()] = Header::parseParams($h->renderValueLine());
+            $headers[$h->getLabel()] = Header::parseParams($h->renderValueLine());
 
         return $headers;
     }
