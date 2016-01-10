@@ -54,7 +54,7 @@ class UHeader
             $string .= $value[$i];
         }
 
-        return $string;
+        return trim($string);
     }
 
     /**
