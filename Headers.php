@@ -39,9 +39,6 @@ class Headers
     /**
      * Set Header
      *
-     * - setting the header will overwrite any
-     *   previously set header value.
-     *
      * ! headers label are case-insensitive
      *
      * @param iHeader $header
@@ -52,9 +49,9 @@ class Headers
     {
         $search = ['label' => strtolower($header->getLabel())];
 
-        foreach($this->ObjectCollection->search($search) as $h)
+        /*foreach($this->ObjectCollection->search($search) as $h)
             ## previously values must overwrite
-            $this->ObjectCollection->detach($h);
+            $this->ObjectCollection->detach($h);*/
 
         $this->ObjectCollection->attach($header, $search);
 

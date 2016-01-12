@@ -8,6 +8,11 @@ use Poirot\Http\Interfaces\iHeader;
 abstract class AbstractHeader extends OpenOptions
     implements iHeader
 {
+    protected $_t_options__internal = [
+        ## this method will ignore as option in prop
+        'getLabel',
+    ];
+
     protected $label;
 
     /**
@@ -61,13 +66,30 @@ abstract class AbstractHeader extends OpenOptions
     }
 
     /**
-     * TODO join props and build header value
-     *
      * Get Field Value As String
      *
-     * - it always override by implemented classes
+     * ['label'=>'Set-Cookie', 'SID'=>'31d4d96e407aad42', 'Path'=>'/', 'HttpSecure' => null]
+     * Set-Cookie: SID=31d4d96e407aad42; Path="/"; HttpSecure
      *
      * @return string UHeader::filterValue
      */
-    abstract function renderValueLine();
+    function renderValueLine()
+    {
+        $headerLine = [];
+        foreach($this->props()->readable as $key) {
+            $value = $this->__get($key);
+            if (!is_scalar($value))
+                // TODO
+                VOID;
+
+            if (($value!==''&&$value!==null) && !preg_match('/^\w+$/', $value)) {
+                $value = preg_replace('/(["\\\\])/', "\\\\$1", $value);
+                $value = "\"$value\"";
+            }
+
+            $headerLine[] = (($value) ? $key.'='.$value : $key);
+        }
+
+        return implode('; ', $headerLine);
+    }
 }
