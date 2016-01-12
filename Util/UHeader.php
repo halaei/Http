@@ -119,6 +119,8 @@ class UHeader
 
     /**
      * TODO test more
+     * TODO Basic r4rewrwerr3r= with join result in Basic; r4rewrwerr3r=; that is wrong
+     *
      * This function is useful for parsing header fields that
      * follow this syntax (BNF as from the HTTP/1.1 specification, but we relax
      * the requirement for tokens).
@@ -192,24 +194,26 @@ class UHeader
 
     /**
      * TODO test more
-    * This will do the opposite of the conversion done by headerParseParams().
-    * It takes a list of anonymous arrays as arguments (or a list of
-    * key/value pairs) and produces a single header value. Attribute values
-    * are quoted if needed.
-    *
-    * Example:
-    *
-    * headerJoinParams(array(array("text/plain" => null, "charset" => "iso-8859/1")));
-    * headerJoinParams(array("text/plain" => null, "charset" => "iso-8859/1"));
-    *
-    * will both return the string:
-    *
-    * text/plain; charset="iso-8859/1"
-    *
-    * @param array $header_values
-    * @return string
-    * @static
-    */
+     * TODO Basic r4rewrwerr3r= with join result in Basic; r4rewrwerr3r=; that is wrong
+     *
+     * This will do the opposite of the conversion done by headerParseParams().
+     * It takes a list of anonymous arrays as arguments (or a list of
+     * key/value pairs) and produces a single header value. Attribute values
+     * are quoted if needed.
+     *
+     * Example:
+     *
+     * headerJoinParams(array(array("text/plain" => null, "charset" => "iso-8859/1")));
+     * headerJoinParams(array("text/plain" => null, "charset" => "iso-8859/1"));
+     *
+     * will both return the string:
+     *
+     * text/plain; charset="iso-8859/1"
+     *
+     * @param array $header_values
+     * @return string
+     * @static
+     */
     static function joinParams($header_values)
     {
         if (!is_array($header_values) || !count($header_values)) return false;
