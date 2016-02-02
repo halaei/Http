@@ -133,7 +133,7 @@ class HttpRequest extends AbstractHttpMessage
         }
 
         // body:
-        $this->setBody(rtrim(implode("\r\n", $lines)), "\r\n");
+        $this->setBody(rtrim(implode("\r\n", $lines), "\r\n"));
 
         return $this;
     }
