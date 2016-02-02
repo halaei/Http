@@ -37,8 +37,6 @@ interface iHeaderCollection //unknown error extends \Traversable
     /**
      * Delete a Header With Label Name
      *
-     * - return an new instance on removed header of header object
-     *
      * @param string $label
      *
      * @return $this

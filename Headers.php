@@ -99,8 +99,6 @@ class Headers
     /**
      * Delete a Header With Label Name
      *
-     * - return an new instance on removed header of header object
-     *
      * @param string $label
      *
      * @return Headers
@@ -112,11 +110,10 @@ class Headers
 
         // ..
 
-        $new    = clone $this;
         $header = $this->get($label);
-        $new->ObjectCollection->detach($header);
+        $this->ObjectCollection->detach($header);
 
-        return $new;
+        return $this;
     }
 
 
