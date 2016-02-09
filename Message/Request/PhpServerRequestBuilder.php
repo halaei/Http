@@ -23,6 +23,7 @@ class PhpServerRequestBuilder extends AbstractOptions
     protected $version;
 
     /**
+     * // TODO some header is invalid
      * Construct
      *
      * - build server environment upon server object
