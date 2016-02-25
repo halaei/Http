@@ -15,7 +15,7 @@ use Poirot\PathUri\Interfaces\iSeqPathUri;
  * @see iHMRServer
  *
  */
-interface iHttpRequest extends iHttpMessage
+interface iHttpRequest extends ipHttpMessage
 {
     /**
      * Set Request Method

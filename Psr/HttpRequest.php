@@ -7,8 +7,8 @@ use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\PathUri\Psr\HttpUri;
 use Poirot\PathUri\Psr\UriInterface;
-use Poirot\Stream\Psr\PsrStream;
 use Poirot\Stream\Psr\StreamInterface;
+use Poirot\Stream\Psr\StreamPsr;
 
 class HttpRequest extends HttpMessage
     implements RequestInterface
@@ -103,7 +103,7 @@ class HttpRequest extends HttpMessage
 
         # Body:
         (!$bodyStream) ?: $bodyStream = self::STREAM_CONTENT;
-        $this->stream = new PsrStream($bodyStream);
+        $this->stream = new StreamPsr($bodyStream);
 
         # Headers:
         foreach($headers as $l => $v)
@@ -163,7 +163,7 @@ class HttpRequest extends HttpMessage
         if (!is_string($requestTarget) && ! $requestTarget instanceof UriInterface)
             throw new \InvalidArgumentException(sprintf(
                 'Request Target Must Instanceof UriInterface or string. given: (%s)'
-                , \Poirot\Core\flatten($requestTarget)
+                , \Poirot\Std\flatten($requestTarget)
             ));
 
         if (is_string($requestTarget))

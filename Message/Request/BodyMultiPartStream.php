@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
-use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Std\Interfaces\Struct\iDataStruct;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
@@ -41,13 +41,13 @@ class BodyMultiPartStream implements iStreamable
      */
     function __construct($multiPart = [], $boundary = null)
     {
-        if ($multiPart instanceof iDataSetConveyor)
-            $multiPart = $multiPart->toArray();
+        if ($multiPart instanceof iDataStruct)
+            $multiPart = \Poirot\Std\iterator_to_array($multiPart);
 
         if (!is_array($multiPart) && !is_string($multiPart))
             throw new \InvalidArgumentException(sprintf(
                 'The Constructor give array of Files or Raw Body String, given: "%s".'
-                , \Poirot\Core\flatten($multiPart)
+                , \Poirot\Std\flatten($multiPart)
             ));
 
 
@@ -108,7 +108,7 @@ class BodyMultiPartStream implements iStreamable
         else
             throw new \InvalidArgumentException(sprintf(
                 'Element must be defined array represent element or UploadedFileInterface. given: "%s".'
-                , \Poirot\Core\flatten($element)
+                , \Poirot\Std\flatten($element)
             ));
 
         return $this;
@@ -155,7 +155,7 @@ class BodyMultiPartStream implements iStreamable
         elseif (!$headers instanceof Headers)
             throw new \InvalidArgumentException(sprintf(
                 'Headers must be array or Header. given: "%s".'
-                , \Poirot\Core\flatten($headers)
+                , \Poirot\Std\flatten($headers)
             ));
 
         // Set a default content-disposition header if one was no provided

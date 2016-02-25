@@ -1,16 +1,16 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
-use Poirot\Core\AbstractOptions;
-use Poirot\Core\Interfaces\iOptionImplement;
 use Poirot\Http\Headers;
 use Poirot\Http\Message\HttpRequest;
 use Poirot\Http\Plugins\Request\PhpServer;
 use Poirot\PathUri\HttpUri;
+use Poirot\Std\Interfaces\Struct\iOptionsData;
+use Poirot\Std\Struct\AbstractOptionsData;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
-class PhpServerRequestBuilder extends AbstractOptions
+class PhpServerRequestBuilder extends AbstractOptionsData
 {
     /** @var PhpServer */
     protected $server;
@@ -29,7 +29,7 @@ class PhpServerRequestBuilder extends AbstractOptions
      * - build server environment upon server object
      *
      * @param PhpServer              $phpServer
-     * @param array|iOptionImplement $options   Options
+     * @param array|iOptionsData $options   Options
      */
     function __construct(/*PhpServer*/ $phpServer = null, $options = null)
     {
@@ -39,7 +39,7 @@ class PhpServerRequestBuilder extends AbstractOptions
         if ($phpServer !== null && !$phpServer instanceof PhpServer)
             throw new \InvalidArgumentException(sprintf(
                 'Php Server Object must instance of PhpServer. given: (%s).'
-                , \Poirot\Core\flatten($phpServer)
+                , \Poirot\Std\flatten($phpServer)
             ));
 
         $this->server = $phpServer;
@@ -234,7 +234,7 @@ class PhpServerRequestBuilder extends AbstractOptions
         if (!$headers instanceof Headers)
             throw new \InvalidArgumentException(sprintf(
                 'Headers must be array or instance of (Headers), given: %s.'
-                , is_object($headers) ? get_class($headers) : \Poirot\Core\flatten($headers)
+                , is_object($headers) ? get_class($headers) : \Poirot\Std\flatten($headers)
             ));
 
         $this->headers = $headers;
@@ -252,6 +252,7 @@ class PhpServerRequestBuilder extends AbstractOptions
             return $this->headers;
 
         $headers = [];
+        // TODO implement to new dataStruct as generator
         foreach($this->server->getServer()->toArray() as $key => $val)
             if (strpos($key, 'HTTP_') === 0) {
                 $name = strtr(substr($key, 5), '_', ' ');

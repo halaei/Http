@@ -5,7 +5,7 @@ use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
-use Poirot\Http\Header;
+use Poirot\Http\Util\UHeader;
 use Poirot\Stream\Psr\StreamInterface;
 
 class HttpMessage implements MessageInterface
@@ -90,7 +90,7 @@ class HttpMessage implements MessageInterface
         $headers = [];
         /** @var iHeader $h */
         foreach ($this->__getHeaders() as $h)
-            $headers[$h->getLabel()] = Header::parseParams($h->renderValueLine());
+            $headers[$h->getLabel()] = UHeader::parseParams($h->renderValueLine());
 
         return $headers;
     }
@@ -129,7 +129,7 @@ class HttpMessage implements MessageInterface
 
         $header = $this->__getHeaders()->get($name);
 
-        return Header::parseParams($header->renderValueLine());
+        return UHeader::parseParams($header->renderValueLine());
     }
 
     /**
@@ -207,7 +207,7 @@ class HttpMessage implements MessageInterface
         if (! is_array($value))
             throw new \InvalidArgumentException(sprintf(
                 'Invalid header value; must be a string or array. given: (%s).'
-                , \Poirot\Core\flatten($value)
+                , \Poirot\Std\flatten($value)
             ));
 
         if (!$this->__getHeaders()->has($name))

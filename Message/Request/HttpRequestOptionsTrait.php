@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
-use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Std\Interfaces\Struct\iDataStruct;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Message\HttpMessageOptionsTrait;
 use Poirot\PathUri\HttpUri;
@@ -110,7 +110,7 @@ trait HttpRequestOptionsTrait
         if (!$target instanceof iHttpUri)
             throw new \InvalidArgumentException(sprintf(
                 'Invalid URI provided; must be null, a string, or a iHttpUri, iSeqPathUri instance. "%s" given.'
-                , \Poirot\Core\flatten($target)
+                , \Poirot\Std\flatten($target)
             ));
 
         $this->target_uri = $target;
@@ -137,13 +137,13 @@ trait HttpRequestOptionsTrait
     /**
      * Set Uri Options
      *
-     * @param iHttpUri|iDataSetConveyor|array $options
+     * @param iHttpUri|iDataStruct|array $options
      *
      * @return $this
      */
     function setUriOptions($options)
     {
-        if ($options instanceof iDataSetConveyor)
+        if ($options instanceof iDataStruct)
             $options = $options->toArray();
 
         if(is_array($options))

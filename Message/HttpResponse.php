@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\Http\Message;
 
-use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\Message\iHttpResponse;
 use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
@@ -11,6 +10,7 @@ use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Util\UHeader;
 use Poirot\Http\Util\UResponse;
+use Poirot\Std\Interfaces\Struct\iOptionsData;
 
 class HttpResponse extends AbstractHttpMessage
     implements iHttpResponse
@@ -20,7 +20,7 @@ class HttpResponse extends AbstractHttpMessage
     /**
      * Set Options
      *
-     * @param string|array|iPoirotOptions $options
+     * @param string|array|iOptionsData $options
      *
      * @return $this
      */
@@ -46,7 +46,7 @@ class HttpResponse extends AbstractHttpMessage
         if (!$response instanceof ResponseInterface)
             throw new \InvalidArgumentException(sprintf(
                 'Request Object must instance of ResponseInterface but (%s) given.'
-                , \Poirot\Core\flatten($response)
+                , \Poirot\Std\flatten($response)
             ));
 
 

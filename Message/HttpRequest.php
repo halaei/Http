@@ -1,10 +1,7 @@
 <?php
 namespace Poirot\Http\Message;
 
-use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Header\HeaderFactory;
-use Poirot\Http\Interfaces\iHeaderCollection;
-use Poirot\Http\Interfaces\Message\iHttpMessage;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\Request\HttpRequestOptionsTrait;
 use Poirot\Http\Plugins\HttpPluginManager;
@@ -13,9 +10,7 @@ use Poirot\Http\Plugins\Request\PluginsRequestInvokable;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\Http\Util\UHeader;
 use Poirot\PathUri\HttpUri;
-use Poirot\PathUri\Interfaces\iHttpUri;
-use Poirot\PathUri\Interfaces\iSeqPathUri;
-use Poirot\Stream\Interfaces\iStreamable;
+use Poirot\Std\Interfaces\Struct\iOptionsData;
 use Psr\Http\Message\StreamInterface;
 
 class HttpRequest extends AbstractHttpMessage
@@ -41,7 +36,7 @@ class HttpRequest extends AbstractHttpMessage
     /**
      * Set Options
      *
-     * @param string|array|iPoirotOptions $options
+     * @param string|array|iOptionsData $options
      *
      * @return $this
      */
@@ -67,7 +62,7 @@ class HttpRequest extends AbstractHttpMessage
         if (!$response instanceof RequestInterface)
             throw new \InvalidArgumentException(sprintf(
                 'Request Object must instance of RequestInterface but (%s) given.'
-                , \Poirot\Core\flatten($response)
+                , \Poirot\Std\flatten($response)
             ));
 
 

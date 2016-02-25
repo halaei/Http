@@ -1,10 +1,10 @@
 <?php
 namespace Poirot\Http;
 
-use Poirot\Core\ObjectCollection;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
+use Poirot\Std\Struct\ObjectCollection;
 use Traversable;
 
 class Headers
@@ -53,7 +53,7 @@ class Headers
             ## previously values must overwrite
             $this->ObjectCollection->detach($h);*/
 
-        $this->ObjectCollection->attach($header, $search);
+        $this->ObjectCollection->insert($header, $search);
 
         return $this;
     }
@@ -70,7 +70,7 @@ class Headers
      */
     function get($label)
     {
-        $r = $this->ObjectCollection->search(['label' => strtolower($label)]);
+        $r = $this->ObjectCollection->find(['label' => strtolower($label)]);
         $r = current($r);
 
         if (!$r instanceof iHeader)
@@ -90,7 +90,7 @@ class Headers
      */
     function has($label)
     {
-        $r = $this->ObjectCollection->search(['label' => strtolower($label)]);
+        $r = $this->ObjectCollection->find(['label' => strtolower($label)]);
         $r = current($r);
 
         return (boolean) $r;
@@ -111,7 +111,7 @@ class Headers
         // ..
 
         $header = $this->get($label);
-        $this->ObjectCollection->detach($header);
+        $this->ObjectCollection->del($header);
 
         return $this;
     }

@@ -1,9 +1,8 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Core\AbstractOptions;
-use Poirot\Core\Traits\OptionsTrait;
 use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
+use Poirot\Std\Struct\AbstractOptionsData;
 use Poirot\Stream\Interfaces\iSResource;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
@@ -11,10 +10,9 @@ use Poirot\Stream\Psr\StreamPsr;
 use Poirot\Stream\SResource;
 use Poirot\Stream\WrapperClient;
 
-class UploadedFile implements UploadedFileInterface
+class UploadedFile extends AbstractOptionsData
+    implements UploadedFileInterface
 {
-    use OptionsTrait;
-
     const DEFAULT_STREAM = '\Poirot\Stream\Psr\StreamPsr';
 
     /** @var null|string */
@@ -171,7 +169,7 @@ class UploadedFile implements UploadedFileInterface
             throw new \InvalidArgumentException(
                 'Stream must instance of iSResource, StreamInterface, iStreamable or php resource. '
                 .' given: "%s"'
-                , \Poirot\Core\flatten($resource)
+                , \Poirot\Std\flatten($resource)
             );
 
 

@@ -4,13 +4,13 @@ namespace Poirot\Http\Plugins;
 use Poirot\Container\Exception\ContainerInvalidPluginException;
 use Poirot\Container\Interfaces\iContainerBuilder;
 use Poirot\Container\Plugins\AbstractPlugins;
-use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Http\Interfaces\Message\ipHttpMessage;
 
 class HttpPluginManager extends AbstractPlugins
     implements iHttpPlugin
 {
     /**
-     * @var iHttpMessage
+     * @var ipHttpMessage
      */
     protected $_mess_object;
 
@@ -42,11 +42,11 @@ class HttpPluginManager extends AbstractPlugins
      *
      * note: so services can have access to http message instance
      *
-     * @param iHttpMessage $httpMessage
+     * @param ipHttpMessage $httpMessage
      *
      * @return $this
      */
-    function setMessageObject(iHttpMessage $httpMessage)
+    function setMessageObject(ipHttpMessage $httpMessage)
     {
         $this->_mess_object = $httpMessage;
 
@@ -56,7 +56,7 @@ class HttpPluginManager extends AbstractPlugins
     /**
      * Get Http Message
      *
-     * @return iHttpMessage
+     * @return ipHttpMessage
      */
     function getMessageObject()
     {

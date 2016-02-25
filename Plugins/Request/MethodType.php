@@ -4,7 +4,7 @@ namespace Poirot\Http\Plugins\Request;
 use Poirot\Container\Interfaces\iCService;
 use Poirot\Container\Service\AbstractService;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Http\Interfaces\Message\ipHttpMessage;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\HttpRequest;
 use Poirot\Http\Plugins\iHttpPlugin;
@@ -16,7 +16,7 @@ class MethodType extends AbstractService
     /** @var string Service Name */
     protected $name = 'MethodType';
 
-    /** @var iHttpMessage */
+    /** @var ipHttpMessage */
     protected $messageObject;
 
     /**
@@ -166,11 +166,11 @@ class MethodType extends AbstractService
      *
      * note: so services can have access to http message instance
      *
-     * @param iHttpMessage $httpMessage
+     * @param ipHttpMessage $httpMessage
      *
      * @return $this
      */
-    function setMessageObject(iHttpMessage $httpMessage)
+    function setMessageObject(ipHttpMessage $httpMessage)
     {
         if (!$httpMessage instanceof iHttpRequest)
             throw new \InvalidArgumentException(sprintf(
@@ -186,7 +186,7 @@ class MethodType extends AbstractService
     /**
      * Get Http Message
      *
-     * @return iHttpMessage
+     * @return ipHttpMessage
      */
     function getMessageObject()
     {

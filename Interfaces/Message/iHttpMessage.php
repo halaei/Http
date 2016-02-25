@@ -1,12 +1,12 @@
 <?php
 namespace Poirot\Http\Interfaces\Message;
 
-use Poirot\Core\Interfaces\iMetaProvider;
+use Poirot\Std\Interfaces\ipMetaProvider;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Stream\Interfaces\iStreamable;
 use Psr\Http\Message\StreamInterface;
 
-interface iHttpMessage extends iMetaProvider
+interface ipHttpMessage extends ipMetaProvider
 {
     /**
      * Set Version

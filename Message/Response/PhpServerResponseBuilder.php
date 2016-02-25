@@ -1,14 +1,14 @@
 <?php
 namespace Poirot\Http\Message\Response;
 
-use Poirot\Core\AbstractOptions;
 use Poirot\Http\Header\HeaderFactory;
 use Poirot\Http\Headers;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
+use Poirot\Std\Struct\AbstractOptionsData;
 use Poirot\Stream\Streamable;
 
-class PhpServerResponseBuilder extends AbstractOptions
+class PhpServerResponseBuilder extends AbstractOptionsData
 {
     protected $headers;
 
@@ -50,7 +50,7 @@ class PhpServerResponseBuilder extends AbstractOptions
         if (!$headers instanceof iHeaderCollection)
             throw new \InvalidArgumentException(sprintf(
                 'Headers must be instance of iHeaderCollection or array, given: "%s".'
-                , \Poirot\Core\flatten($headers)
+                , \Poirot\Std\flatten($headers)
             ));
 
         $this->headers = $headers;

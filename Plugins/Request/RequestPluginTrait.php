@@ -1,12 +1,12 @@
 <?php
 namespace Poirot\Http\Plugins\Request;
 
-use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Http\Interfaces\Message\ipHttpMessage;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 
 trait RequestPluginTrait
 {
-    /** @var iHttpMessage */
+    /** @var ipHttpMessage */
     protected $messageObject;
 
 
@@ -17,11 +17,11 @@ trait RequestPluginTrait
      *
      * note: so services can have access to http message instance
      *
-     * @param iHttpMessage $httpMessage
+     * @param ipHttpMessage $httpMessage
      *
      * @return $this
      */
-    function setMessageObject(iHttpMessage $httpMessage)
+    function setMessageObject(ipHttpMessage $httpMessage)
     {
         if (!$httpMessage instanceof iHttpRequest)
             throw new \InvalidArgumentException(sprintf(

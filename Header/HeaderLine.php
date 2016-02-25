@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\Http\Header;
 
-use Poirot\Core\AbstractOptions;
 use Poirot\Http\Util\UHeader;
 
 class HeaderLine extends AbstractHeader

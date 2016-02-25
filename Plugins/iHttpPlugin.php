@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Plugins;
 
-use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Http\Interfaces\Message\ipHttpMessage;
 
 interface iHttpPlugin
 {
@@ -10,16 +10,16 @@ interface iHttpPlugin
      *
      * note: so services can have access to http message instance
      *
-     * @param iHttpMessage $httpMessage
+     * @param ipHttpMessage $httpMessage
      *
      * @return $this
      */
-    function setMessageObject(iHttpMessage $httpMessage);
+    function setMessageObject(ipHttpMessage $httpMessage);
 
     /**
      * Get Http Message
      *
-     * @return iHttpMessage
+     * @return ipHttpMessage
      */
     function getMessageObject();
 }

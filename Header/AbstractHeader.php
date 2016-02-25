@@ -1,11 +1,10 @@
 <?php
 namespace Poirot\Http\Header;
 
-use Poirot\Core\AbstractOptions;
-use Poirot\Core\OpenOptions;
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Std\Struct\OpenOptionsData;
 
-abstract class AbstractHeader extends OpenOptions
+abstract class AbstractHeader extends OpenOptionsData
     implements iHeader
 {
     protected $_t_options__internal = [
@@ -76,6 +75,7 @@ abstract class AbstractHeader extends OpenOptions
     function renderValueLine()
     {
         $headerLine = [];
+        // TODO implement to new dataStruct as generator
         foreach($this->props()->readable as $key) {
             $value = $this->__get($key);
             if (!is_scalar($value))

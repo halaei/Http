@@ -31,7 +31,6 @@ trait HttpResponseOptionsTrait
             ));
 
         $this->statCode = $status;
-
         return $this;
     }
 
@@ -55,7 +54,6 @@ trait HttpResponseOptionsTrait
     function setStatReason($reason)
     {
         $this->statReason = (string) $reason;
-
         return $this;
     }
 

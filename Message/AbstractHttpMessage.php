@@ -6,21 +6,21 @@ use Poirot\Container\Interfaces\Plugins\iPluginManagerAware;
 use Poirot\Container\Interfaces\Plugins\iPluginManagerProvider;
 use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Container\Plugins\PluginsInvokable;
-use Poirot\Core\AbstractOptions;
-use Poirot\Core\DataField;
-use Poirot\Core\Interfaces\iDataField;
-use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\Message\iHttpMessage;
+use Poirot\Http\Interfaces\Message\ipHttpMessage;
 use Poirot\Http\Plugins\HttpPluginManager;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
+use Poirot\Std\Interfaces\Struct\iMeanData;
+use Poirot\Std\Interfaces\Struct\iOptionsData;
+use Poirot\Std\Struct\AbstractOptionsData;
+use Poirot\Std\Struct\MeanData;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable;
 
-abstract class AbstractHttpMessage extends AbstractOptions
-    implements iHttpMessage
+abstract class AbstractHttpMessage extends AbstractOptionsData
+    implements ipHttpMessage
     , iInvokePluginsProvider
     , iPluginManagerProvider
     , iPluginManagerAware
@@ -29,7 +29,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     const Vx1_1 = '1.1';
 
     /**
-     * @var DataField
+     * @var MeanData
      */
     protected $_meta;
 
@@ -49,7 +49,7 @@ abstract class AbstractHttpMessage extends AbstractOptions
     /**
      * Set Options
      *
-     * @param string|array|iPoirotOptions $options
+     * @param string|array|iOptionsData $options
      *
      * @return $this
      */
@@ -150,12 +150,12 @@ abstract class AbstractHttpMessage extends AbstractOptions
     // Implement Http Message Features:
 
     /**
-     * @return iDataField
+     * @return iMeanData
      */
     function meta()
     {
         if (!$this->_meta)
-            $this->_meta = new DataField;
+            $this->_meta = new MeanData;
 
         return $this->_meta;
     }

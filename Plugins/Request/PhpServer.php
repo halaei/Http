@@ -2,10 +2,11 @@
 namespace Poirot\Http\Plugins\Request;
 
 use Poirot\Container\Service\AbstractService;
-use Poirot\Core\Entity;
-use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Std\Interfaces\Struct\iDataStruct;
 use Poirot\Http\Plugins\iHttpPlugin;
 use Poirot\Http\Psr\Util;
+use Poirot\Std\Interfaces\Struct\iEntityData;
+use Poirot\Std\Struct\EntityData;
 
 class PhpServer extends AbstractService
     implements iHttpPlugin
@@ -17,7 +18,7 @@ class PhpServer extends AbstractService
 
     protected $env;
     protected $get;
-    /** @var Entity $_POST */
+    /** @var iEntityData $_POST */
     protected $post;
     protected $cookie;
     protected $server;
@@ -25,18 +26,18 @@ class PhpServer extends AbstractService
 
     /**
      * Set Env
-     * @param array|iDataSetConveyor $env
+     * @param array|iDataStruct $env
      * @return $this
      */
     function setEnv($env)
     {
-        $this->env = new Entity($env);
+        $this->env = new EntityData($env);
         return $this;
     }
 
     /**
      * Get Env
-     * @return Entity
+     * @return EntityData
      */
     function getEnv()
     {
@@ -48,18 +49,18 @@ class PhpServer extends AbstractService
 
     /**
      * Set Query Get
-     * @param array|iDataSetConveyor $get
+     * @param array|iDataStruct $get
      * @return $this
      */
     function setQuery($get)
     {
-        $this->get = new Entity($get);
+        $this->get = new EntityData($get);
         return $this;
     }
 
     /**
      * Get Query
-     * @return Entity
+     * @return EntityData
      */
     function getQuery()
     {
@@ -71,12 +72,12 @@ class PhpServer extends AbstractService
 
     /**
      * Set Post
-     * @param array|iDataSetConveyor $post
+     * @param array|iDataStruct $post
      * @return $this
      */
     function setPost($post)
     {
-        $this->post = new Entity($post);
+        $this->post = new EntityData($post);
         return $this;
     }
 
@@ -85,7 +86,7 @@ class PhpServer extends AbstractService
      * @param null $key
      * @param null $default
      *
-     * @return Entity|mixed
+     * @return EntityData|mixed
      */
     function getPost($key = null, $default = null)
     {
@@ -100,18 +101,18 @@ class PhpServer extends AbstractService
 
     /**
      * Set Cookies
-     * @param array|iDataSetConveyor $cookie
+     * @param array|iDataStruct $cookie
      * @return $this
      */
     function setCookie($cookie)
     {
-        $this->cookie = new Entity($cookie);
+        $this->cookie = new EntityData($cookie);
         return $this;
     }
 
     /**
      * Get Cookie
-     * @return Entity
+     * @return EntityData
      */
     function getCookie()
     {
@@ -123,12 +124,12 @@ class PhpServer extends AbstractService
 
     /**
      * Set Server
-     * @param array|iDataSetConveyor $server
+     * @param array|iDataStruct $server
      * @return $this
      */
     function setServer($server)
     {
-        $this->server = new Entity(
+        $this->server = new EntityData(
             $this->__normalizeServer($server)
         );
         return $this->server;
@@ -136,7 +137,7 @@ class PhpServer extends AbstractService
 
     /**
      * Get Server
-     * @return Entity
+     * @return EntityData
      */
     function getServer()
     {
