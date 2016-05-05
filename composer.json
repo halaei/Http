@@ -10,10 +10,10 @@
         }
     ],
     "require": {
-        "poirot/std": "dev-master",
-        "poirot/container": "dev-master",
-        "poirot/stream": "dev-master",
-        "poirot/pathuri": "dev-master"
+        "poirot/std": "dev-devel",
+        "poirot/ioc": "dev-devel",
+        "poirot/stream": "dev-devel",
+        "poirot/pathuri": "dev-devel"
     },
     "target-dir": "Poirot/Http",
     "autoload"  : {
@@ -21,4 +21,14 @@
             "Poirot\\Http": "."
         }
     }
+    "repositories": [
+      {
+        "type": "git",
+        "url": "https://github.com/phPoirot/Std.git"
+      },
+      {
+        "type": "git",
+        "url": "https://github.com/phPoirot/IoC.git"
+      }
+    ]
 }
