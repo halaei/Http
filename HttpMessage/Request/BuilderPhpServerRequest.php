@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
-use Poirot\Http\Headers;
+use Poirot\Http\CollectionHeader;
 use Poirot\Http\Message\HttpRequest;
 use Poirot\Http\Plugins\Request\PhpServer;
 use Poirot\PathUri\HttpUri;
@@ -10,7 +10,7 @@ use Poirot\Std\Struct\AbstractOptionsData;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\WrapperClient;
 
-class PhpServerRequestBuilder extends AbstractOptionsData
+class BuilderPhpServerRequest extends AbstractOptionsData
 {
     /** @var PhpServer */
     protected $server;
@@ -222,16 +222,16 @@ class PhpServerRequestBuilder extends AbstractOptionsData
     /**
      * Set Headers
      *
-     * @param array|Headers $headers
+     * @param array|CollectionHeader $headers
      *
      * @return $this
      */
     function setHeaders($headers)
     {
         if (is_array($headers))
-            $headers = new Headers($headers);
+            $headers = new CollectionHeader($headers);
 
-        if (!$headers instanceof Headers)
+        if (!$headers instanceof CollectionHeader)
             throw new \InvalidArgumentException(sprintf(
                 'Headers must be array or instance of (Headers), given: %s.'
                 , is_object($headers) ? get_class($headers) : \Poirot\Std\flatten($headers)
@@ -244,7 +244,7 @@ class PhpServerRequestBuilder extends AbstractOptionsData
     /**
      * Get Headers
      *
-     * @return Headers
+     * @return CollectionHeader
      */
     function getHeaders()
     {
@@ -343,7 +343,7 @@ class PhpServerRequestBuilder extends AbstractOptionsData
                     ## always it can be sent with PUT method
                     $rawData = (new HttpRequest($body->read()))->getBody();
 
-                $body = new BodyMultiPartStream($rawData);
+                $body = new StreamBodyMultiPart($rawData);
             }
         }
 

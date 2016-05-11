@@ -2,13 +2,10 @@
 namespace Poirot\Http;
 
 use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Http\Plugins\HttpPluginManager;
-use Poirot\Http\Plugins\HttpRequestPluginManager;
-use Poirot\Http\Plugins\Request\PluginsRequestInvokable;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 
 class HttpRequest 
-    extends aMessageHttp
+    extends aHttpMessage
     implements iHttpRequest
 {
     protected $method = 'GET';
@@ -246,7 +243,7 @@ class HttpRequest
     // ...
 
     /**
-     * @return HttpPluginManager
+     * @return HttpPlugins
      */
     protected function doNewDefaultPluginManager()
     {

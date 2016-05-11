@@ -1,10 +1,10 @@
 <?php
 namespace Poirot\Http;
 
+use Poirot\Http\HttpMessage\PluginsHttp;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\Interfaces\iHttpMessage;
-use Poirot\Http\Plugins\HttpPluginManager;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Interfaces\Struct\iDataMean;
@@ -14,7 +14,7 @@ use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface as PsrStreamInterface;
 use Poirot\Stream\Streamable;
 
-abstract class aMessageHttp
+abstract class aHttpMessage
     extends ConfigurableSetter
     implements iHttpMessage
 {
@@ -31,14 +31,14 @@ abstract class aMessageHttp
     protected $body;
     
     protected $_plugins;
-    /** @var HttpPluginManager */
+    /** @var PluginsHttp */
     protected $pluginManager;
     
 
 
     /**
      * Retrieve New Plugin Manager Instance
-     * @return HttpPluginManager
+     * @return PluginsHttp
      */
     abstract protected function doNewDefaultPluginManager();
     
@@ -253,7 +253,7 @@ abstract class aMessageHttp
     function getHeaders()
     {
         if (!$this->headers)
-            $this->headers = new Headers();
+            $this->headers = new CollectionHeader();
 
         return $this->headers;
     }
@@ -313,7 +313,7 @@ abstract class aMessageHttp
      *       keep it clear on this state
      *
      *
-     * @return HttpPluginManager
+     * @return PluginsHttp
      */
     function getPluginManager()
     {
@@ -327,11 +327,11 @@ abstract class aMessageHttp
     /**
      * Set Plugins Manager
      *
-     * @param HttpPluginManager $plugins
+     * @param PluginsHttp $plugins
      *
      * @return $this
      */
-    function setPluginManager(HttpPluginManager $plugins)
+    function setPluginManager(PluginsHttp $plugins)
     {
         $this->pluginManager = $plugins;
         return $this;

@@ -1,14 +1,14 @@
 <?php
 namespace Poirot\Http\Message\Response;
 
-use Poirot\Http\Header\HeaderFactory;
-use Poirot\Http\Headers;
+use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Std\Struct\AbstractOptionsData;
 use Poirot\Stream\Streamable;
 
-class PhpServerResponseBuilder extends AbstractOptionsData
+class BuilderPhpServerResponse extends AbstractOptionsData
 {
     protected $headers;
 
@@ -18,7 +18,7 @@ class PhpServerResponseBuilder extends AbstractOptionsData
     public function getHeaders()
     {
         if (!$this->headers) {
-            $this->headers = new Headers;
+            $this->headers = new CollectionHeader;
             $this->setHeaders(headers_list());
         }
 
@@ -36,9 +36,9 @@ class PhpServerResponseBuilder extends AbstractOptionsData
                 if (!$h instanceof iHeader) {
                     (is_int($l))
                         ? ### ['Header-Label: value header']
-                        $h = HeaderFactory::factoryString($h)
+                        $h = factoryHttpHeader::factoryString($h)
                         : ### ['Header-Label' => 'value header']
-                        $h = HeaderFactory::factory($l, $h);
+                        $h = factoryHttpHeader::factory($l, $h);
                 }
 
                 $this->getHeaders()->set($h);

@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Http\Header\HeaderFactory;
+use Poirot\Http\Header\factoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
@@ -107,7 +107,7 @@ class HttpRequest extends HttpMessage
 
         # Headers:
         foreach($headers as $l => $v)
-            $this->__getHeaders()->set(HeaderFactory::factory($l, $v));
+            $this->__getHeaders()->set(factoryHttpHeader::factory($l, $v));
 
     }
 
@@ -273,7 +273,7 @@ class HttpRequest extends HttpMessage
         $host = $uri->getHost();
         ($uri->getPort() === null) ?: $host .= ':' . $uri->getPort();
 
-        $this->__getHeaders()->set(HeaderFactory::factory('Host', $host));
+        $this->__getHeaders()->set(factoryHttpHeader::factory('Host', $host));
 
         return $new;
     }
@@ -296,7 +296,7 @@ class HttpRequest extends HttpMessage
                 ($port = $this->uri->getPort()) ? ':'.$this->uri->getPort() : ''
             );
 
-            $this->headers->set(HeaderFactory::factory('Host', $host));
+            $this->headers->set(factoryHttpHeader::factory('Host', $host));
         }
 
         $hdrArray = [];
@@ -320,7 +320,7 @@ class HttpRequest extends HttpMessage
                     ($port = $this->uri->getPort()) ? ':'.$this->uri->getPort() : ''
                 );
 
-                $this->headers->set(HeaderFactory::factory('Host', $host));
+                $this->headers->set(factoryHttpHeader::factory('Host', $host));
             }
         }
 

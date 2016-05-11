@@ -3,7 +3,7 @@ namespace Poirot\Http\Header;
 
 use Poirot\Http\Util\UHeader;
 
-class BaseHeader extends AbstractHeader
+class HeaderBase extends aHeaderHttp
 {
     /**
      * Set Header Label

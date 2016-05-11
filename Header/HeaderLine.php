@@ -3,7 +3,7 @@ namespace Poirot\Http\Header;
 
 use Poirot\Http\Util\UHeader;
 
-class HeaderLine extends AbstractHeader
+class HeaderLine extends aHeaderHttp
 {
     protected $label;
 

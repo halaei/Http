@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Http\Plugins\Response;
+namespace Poirot\Http\HttpMessage\Plugins\Response;
 
 use Poirot\Http\Interfaces\Message\ipHttpMessage;
 use Poirot\Http\Interfaces\Message\iHttpResponse;

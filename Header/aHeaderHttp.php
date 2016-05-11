@@ -4,7 +4,8 @@ namespace Poirot\Http\Header;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Std\Struct\OpenOptionsData;
 
-abstract class AbstractHeader extends OpenOptionsData
+abstract class aHeaderHttp 
+    extends OpenOptionsData
     implements iHeader
 {
     protected $_t_options__internal = [

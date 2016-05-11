@@ -2,8 +2,8 @@
 namespace Poirot\Http\Message\Request;
 
 use Poirot\Std\Interfaces\Struct\iDataStruct;
-use Poirot\Http\Header\HeaderFactory;
-use Poirot\Http\Headers;
+use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Http\UMime;
@@ -22,7 +22,7 @@ use Poirot\Stream\Streamable\TemporaryStream;
  * @link http://www.faqs.org/rfcs/rfc1867.html
  * TODO multipart/mixed
  */
-class BodyMultiPartStream implements iStreamable
+class StreamBodyMultiPart implements iStreamable
 {
     use StreamWrapTrait;
 
@@ -94,7 +94,7 @@ class BodyMultiPartStream implements iStreamable
      *
      * @param string                      $fieldName Form Field Name
      * @param array|UploadedFileInterface $element
-     * @param null|Headers|array          $headers   Extra Headers To Be Added
+     * @param null|CollectionHeader|array          $headers   Extra Headers To Be Added
      * @return $this
      */
     function addElement($fieldName, $element, $headers = null)
@@ -117,14 +117,14 @@ class BodyMultiPartStream implements iStreamable
     protected function _addUploadedFileElement($fieldName, UploadedFileInterface $element, $headers)
     {
         if (!$headers instanceof iHeaderCollection)
-            $headers = ($headers) ? new Headers($headers) : new Headers;
+            $headers = ($headers) ? new CollectionHeader($headers) : new CollectionHeader;
 
-        $headers->set(HeaderFactory::factory('Content-Type'
+        $headers->set(factoryHttpHeader::factory('Content-Type'
             , ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
         ));
 
         if ($size = $element->getSize())
-            $headers->set(HeaderFactory::factory('Content-Length', (string) $size));
+            $headers->set(factoryHttpHeader::factory('Content-Length', (string) $size));
 
 
         if ($element instanceof UploadedFile)
@@ -144,15 +144,15 @@ class BodyMultiPartStream implements iStreamable
      * @param string                      $name     Form Field Name
      * @param StreamInterface|iStreamable $stream
      * @param string                      $filename File name header
-     * @param Headers|array               $headers  Boundary Headers
+     * @param CollectionHeader|array               $headers  Boundary Headers
      *
      * @return array
      */
     protected function __createElement($name, $stream, $filename, $headers)
     {
         if (is_array($headers))
-            $headers = new Headers($headers);
-        elseif (!$headers instanceof Headers)
+            $headers = new CollectionHeader($headers);
+        elseif (!$headers instanceof CollectionHeader)
             throw new \InvalidArgumentException(sprintf(
                 'Headers must be array or Header. given: "%s".'
                 , \Poirot\Std\flatten($headers)
@@ -160,7 +160,7 @@ class BodyMultiPartStream implements iStreamable
 
         // Set a default content-disposition header if one was no provided
         if (!$headers->has('content-disposition'))
-            $headers->set(HeaderFactory::factory('Content-Disposition'
+            $headers->set(factoryHttpHeader::factory('Content-Disposition'
                 , ($filename)
                     ? sprintf('form-data; name="%s"; filename="%s"'
                         , $name
@@ -172,13 +172,13 @@ class BodyMultiPartStream implements iStreamable
         // Set a default content-length header if one was no provided
         if (!$headers->has('content-length'))
             (!$length = $stream->getSize())
-                ?: $headers->set(HeaderFactory::factory('Content-Length', (string) $length));
+                ?: $headers->set(factoryHttpHeader::factory('Content-Length', (string) $length));
 
 
         // Set a default Content-Type if one was not supplied
         if (!$headers->has('content-type') && $filename)
             (!$type = UMime::getFromFilename($filename))
-                ?: $headers->set(HeaderFactory::factory('Content-Type', $type));
+                ?: $headers->set(factoryHttpHeader::factory('Content-Type', $type));
 
 
         ## Add Created Element As Stream

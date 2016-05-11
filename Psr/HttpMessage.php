@@ -1,11 +1,10 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Http\Header\HeaderFactory;
-use Poirot\Http\Headers;
+use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
-use Poirot\Http\Util\UHeader;
 use Poirot\Stream\Psr\StreamInterface;
 
 class HttpMessage implements MessageInterface
@@ -15,7 +14,7 @@ class HttpMessage implements MessageInterface
 
     /** @var string */
     protected $version = self::Vx1_1;
-    /** @var Headers */
+    /** @var CollectionHeader */
     protected $headers;
     /** @var StreamInterface */
     protected $stream;
@@ -176,7 +175,7 @@ class HttpMessage implements MessageInterface
      */
     function withHeader($name, $value)
     {
-        $header = HeaderFactory::factory($name, $value);
+        $header = factoryHttpHeader::factory($name, $value);
 
         $new = clone $this;
         $new->__getHeaders()->set($header);
@@ -293,7 +292,7 @@ class HttpMessage implements MessageInterface
     protected function __getHeaders()
     {
         if (!$this->headers)
-            $this->headers = new Headers;
+            $this->headers = new CollectionHeader;
 
         return $this->headers;
     }

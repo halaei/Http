@@ -1,12 +1,12 @@
 <?php
-namespace Poirot\Http\Plugins\Response;
+namespace Poirot\Http\HttpMessage\Plugins\Response;
 
 use Poirot\Container\Interfaces\iCService;
 use Poirot\Container\Service\AbstractService;
-use Poirot\Http\Plugins\iHttpPlugin;
+use Poirot\Http\Plugins\iAddOnHttpMessage;
 
 class Status extends AbstractService
-    implements iHttpPlugin,
+    implements iAddOnHttpMessage,
     iCService ## itself can be defined as container service
 {
     use ResponsePluginTrait;

@@ -1,10 +1,11 @@
 <?php
-namespace Poirot\Http\Plugins;
+namespace Poirot\Http\HttpMessage;
 
-class HttpResponsePluginManager extends HttpPluginManager
+class PluginsHttpResponse 
+    extends PluginsHttp
 {
-    protected $loader_resources = [
+    protected $loader_resources = array(
         'phpserver' => 'Poirot\Http\Plugins\Response\PhpServer',
         'status'    => 'Poirot\Http\Plugins\Response\Status',
-    ];
+    );
 }

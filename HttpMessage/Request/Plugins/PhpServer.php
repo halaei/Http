@@ -1,15 +1,15 @@
 <?php
-namespace Poirot\Http\Plugins\Request;
+namespace Poirot\Http\HttpMessage\Plugins\Request;
 
 use Poirot\Container\Service\AbstractService;
 use Poirot\Std\Interfaces\Struct\iDataStruct;
-use Poirot\Http\Plugins\iHttpPlugin;
+use Poirot\Http\Plugins\iAddOnHttpMessage;
 use Poirot\Http\Psr\Util;
 use Poirot\Std\Interfaces\Struct\iEntityData;
 use Poirot\Std\Struct\EntityData;
 
 class PhpServer extends AbstractService
-    implements iHttpPlugin
+    implements iAddOnHttpMessage
 {
     use RequestPluginTrait;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Http\Plugins\Request;
+namespace Poirot\Http\HttpMessage\Plugins\Request;
 
 use Poirot\Container\Plugins\PluginsInvokable;
 

@@ -10,9 +10,9 @@ HeaderFactory::factory('WWW-Authenticate', 'Basic realm="admin_panel"');
 HeaderFactory::factory('WWW-Authenticate', ['header_line' => 'Basic realm="admin_panel"']);
 */
 
-class HeaderFactory
+class factoryHttpHeader
 {
-    /** @var HeaderPluginsManager */
+    /** @var PluginsHttpHeader */
     static protected $pluginManager;
 
     /**
@@ -66,12 +66,12 @@ class HeaderFactory
     /**
      * Headers Plugin Manager
      *
-     * @return HeaderPluginsManager
+     * @return PluginsHttpHeader
      */
     static function getPluginManager()
     {
         if (!self::$pluginManager)
-            self::$pluginManager = new HeaderPluginsManager;
+            self::$pluginManager = new PluginsHttpHeader;
 
         return self::$pluginManager;
     }
@@ -79,9 +79,9 @@ class HeaderFactory
     /**
      * Set Headers Plugin Manager
      *
-     * @param HeaderPluginsManager $pluginsManager
+     * @param PluginsHttpHeader $pluginsManager
      */
-    static function setPluginManager(HeaderPluginsManager $pluginsManager)
+    static function setPluginManager(PluginsHttpHeader $pluginsManager)
     {
         self::$pluginManager = $pluginsManager;
     }

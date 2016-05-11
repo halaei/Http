@@ -1,10 +1,10 @@
 <?php
 namespace Poirot\Http;
 
-use Poirot\Http\Header\HeaderFactory;
+use Poirot\Http\Header\factoryHttpHeader;
 use Poirot\Http\Interfaces\iHttpResponse;
 use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
-use Poirot\Http\Plugins\HttpPluginManager;
+use Poirot\Http\Plugins\HttpPlugins;
 use Poirot\Http\Plugins\HttpResponsePluginManager;
 use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
@@ -12,7 +12,7 @@ use Poirot\Http\Util\UHeader;
 use Poirot\Http\Util\UResponse;
 
 class HttpResponse
-    extends aMessageHttp
+    extends aHttpMessage
     implements iHttpResponse
 {
     use HttpResponseOptionsTrait;
@@ -86,7 +86,7 @@ class HttpResponse
                 // headers end
                 break;
 
-            $this->getHeaders()->set(HeaderFactory::factoryString($nextLine));
+            $this->getHeaders()->set(factoryHttpHeader::factoryString($nextLine));
         }
 
         // body:
@@ -144,7 +144,7 @@ class HttpResponse
     // ...
 
     /**
-     * @return HttpPluginManager
+     * @return HttpPlugins
      */
     protected function doNewDefaultPluginManager()
     {

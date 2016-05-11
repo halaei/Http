@@ -5,7 +5,7 @@ use Poirot\Container\Exception\ContainerInvalidPluginException;
 use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Http\Interfaces\iHeader;
 
-class HeaderPluginsManager extends AbstractPlugins
+class PluginsHttpHeader extends AbstractPlugins
 {
     /**
      * Validate Plugin Instance Object

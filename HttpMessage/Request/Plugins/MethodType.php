@@ -1,22 +1,22 @@
 <?php
-namespace Poirot\Http\Plugins\Request;
+namespace Poirot\Http\HttpMessage\Plugins\Request;
 
-use Poirot\Container\Interfaces\iCService;
-use Poirot\Container\Service\AbstractService;
+use Poirot\Http\HttpMessage\Interfaces\iPluginHttp;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\Message\ipHttpMessage;
+use Poirot\Http\Interfaces\iHttpMessage;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Http\Message\HttpRequest;
-use Poirot\Http\Plugins\iHttpPlugin;
+use Poirot\Ioc\Container\Interfaces\iContainerService;
+use Poirot\Ioc\Container\Service\aServiceContainer;
 
-class MethodType extends AbstractService
-    implements iHttpPlugin,
-    iCService
+class MethodType 
+    extends aServiceContainer
+    implements iPluginHttp
+    , iContainerService
 {
     /** @var string Service Name */
     protected $name = 'MethodType';
 
-    /** @var ipHttpMessage */
+    /** @var iHttpMessage */
     protected $messageObject;
 
     /**

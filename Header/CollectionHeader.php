@@ -1,13 +1,13 @@
 <?php
 namespace Poirot\Http;
 
-use Poirot\Http\Header\HeaderFactory;
+use Poirot\Http\Header\factoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaderCollection;
 use Poirot\Std\Struct\ObjectCollection;
 use Traversable;
 
-class Headers
+class CollectionHeader
     implements iHeaderCollection
     , \IteratorAggregate # implement \Traversable
 {
@@ -30,7 +30,7 @@ class Headers
         foreach ($headers as $label => $h) {
             if (!$h instanceof iHeader)
                 // Header-Label: value header
-                $h = HeaderFactory::factory($label, $h);
+                $h = factoryHttpHeader::factory($label, $h);
 
             $this->set($h);
         }
@@ -101,7 +101,7 @@ class Headers
      *
      * @param string $label
      *
-     * @return Headers
+     * @return CollectionHeader
      */
     function del($label)
     {

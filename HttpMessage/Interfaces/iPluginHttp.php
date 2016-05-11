@@ -1,25 +1,25 @@
 <?php
-namespace Poirot\Http\Plugins;
+namespace Poirot\Http\HttpMessage\Interfaces;
 
-use Poirot\Http\Interfaces\Message\ipHttpMessage;
+use Poirot\Http\Interfaces\iHttpMessage;
 
-interface iHttpPlugin
+interface iPluginHttp
 {
     /**
      * Set Http Message Object (Request|Response)
      *
      * note: so services can have access to http message instance
      *
-     * @param ipHttpMessage $httpMessage
+     * @param iHttpMessage $httpMessage
      *
      * @return $this
      */
-    function setMessageObject(ipHttpMessage $httpMessage);
+    function setMessageObject(iHttpMessage $httpMessage);
 
     /**
      * Get Http Message
      *
-     * @return ipHttpMessage
+     * @return iHttpMessage
      */
     function getMessageObject();
 }
