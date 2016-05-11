@@ -1,12 +1,11 @@
 <?php
-namespace Poirot\Http\Interfaces\Message;
+namespace Poirot\Http\Interfaces;
 
-use Poirot\Std\Interfaces\ipMetaProvider;
-use Poirot\Http\Interfaces\iHeaderCollection;
-use Poirot\Stream\Interfaces\iStreamable;
-use Psr\Http\Message\StreamInterface;
+use Poirot\Std\Interfaces\Pact\ipMetaProvider;
+use Poirot\Stream\Psr\StreamInterface as PsrStreamInterface;
 
-interface ipHttpMessage extends ipMetaProvider
+interface iHttpMessage 
+    extends ipMetaProvider
 {
     /**
      * Set Version
@@ -48,7 +47,7 @@ interface ipHttpMessage extends ipMetaProvider
     /**
      * Set Message Body Content
      *
-     * @param string|iStreamable|StreamInterface $content
+     * @param string|PsrStreamInterface $content
      *
      * @return $this
      */
@@ -57,7 +56,7 @@ interface ipHttpMessage extends ipMetaProvider
     /**
      * Get Message Body Content
      *
-     * @return string|iStreamable
+     * @return string|PsrStreamInterface
      */
     function getBody();
 
@@ -78,7 +77,7 @@ interface ipHttpMessage extends ipMetaProvider
      *
      * @return string
      */
-    function toString();
+    function render();
 
     /**
      * Flush String Representation To Output

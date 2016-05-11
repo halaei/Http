@@ -1,8 +1,8 @@
 <?php
-namespace Poirot\Http\Message;
+namespace Poirot\Http;
 
 use Poirot\Http\Header\HeaderFactory;
-use Poirot\Http\Interfaces\Message\iHttpResponse;
+use Poirot\Http\Interfaces\iHttpResponse;
 use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
 use Poirot\Http\Plugins\HttpPluginManager;
 use Poirot\Http\Plugins\HttpResponsePluginManager;
@@ -10,30 +10,13 @@ use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
 use Poirot\Http\Util\UHeader;
 use Poirot\Http\Util\UResponse;
-use Poirot\Std\Interfaces\Struct\iOptionsData;
 
-class HttpResponse extends AbstractHttpMessage
+class HttpResponse
+    extends aMessageHttp
     implements iHttpResponse
 {
     use HttpResponseOptionsTrait;
-
-    /**
-     * Set Options
-     *
-     * @param string|array|iOptionsData $options
-     *
-     * @return $this
-     */
-    function from($options)
-    {
-        if ($options instanceof ResponseInterface)
-            $this->fromPsr($options);
-        else
-            parent::from($options);
-
-        return $this;
-    }
-
+    
     /**
      * Set Options From Psr Http Message Object
      *

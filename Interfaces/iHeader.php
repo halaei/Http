@@ -1,9 +1,10 @@
 <?php
 namespace Poirot\Http\Interfaces;
 
-use Poirot\Std\Interfaces\Struct\iOptionsData;
+use Poirot\Std\Interfaces\Struct\iDataOptions;
 
-interface iHeader extends iOptionsData
+interface iHeader 
+    extends iDataOptions
 {
     /**
      * Get Header Label

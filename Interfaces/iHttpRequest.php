@@ -1,8 +1,7 @@
 <?php
 namespace Poirot\Http\Interfaces\Message;
 
-use Poirot\PathUri\Interfaces\iHttpUri;
-use Poirot\PathUri\Interfaces\iSeqPathUri;
+use Poirot\Http\Interfaces\iHttpMessage;
 
 /**
  * Provides the general representation of an HTTP request message.
@@ -15,8 +14,24 @@ use Poirot\PathUri\Interfaces\iSeqPathUri;
  * @see iHMRServer
  *
  */
-interface iHttpRequest extends ipHttpMessage
+interface iHttpRequest 
+    extends iHttpMessage
 {
+    /**#@+
+     * @const string METHOD constant names
+     */
+    const METHOD_OPTIONS  = 'OPTIONS';
+    const METHOD_GET      = 'GET';
+    const METHOD_HEAD     = 'HEAD';
+    const METHOD_POST     = 'POST';
+    const METHOD_PUT      = 'PUT';
+    const METHOD_DELETE   = 'DELETE';
+    const METHOD_TRACE    = 'TRACE';
+    const METHOD_CONNECT  = 'CONNECT';
+    const METHOD_PATCH    = 'PATCH';
+    const METHOD_PROPFIND = 'PROPFIND';
+    /**#@-*/
+    
     /**
      * Set Request Method
      *
@@ -36,10 +51,10 @@ interface iHttpRequest extends ipHttpMessage
     /**
      * Set Uri Target
      *
-     * @param string|iHttpUri|iSeqPathUri  $target
-     * @param bool $preserveHost When this argument is set to true,
-     *                           the returned request will not update
-     *                           the Host header of the returned message
+     * @param string $target
+     * @param bool   $preserveHost When this argument is set to true,
+     *                             the returned request will not update
+     *                             the Host header of the returned message
      *
      * @return $this
      */
@@ -50,7 +65,7 @@ interface iHttpRequest extends ipHttpMessage
      *
      * - return "/" if no one composed
      *
-     * @return iHttpUri
+     * @return string
      */
     function getUri();
 

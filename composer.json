@@ -20,6 +20,9 @@
         "psr-0": {
             "Poirot\\Http": "."
         }
+        , "files": [
+            "_functions.php"
+        ]
     }
     , "repositories": [
       {

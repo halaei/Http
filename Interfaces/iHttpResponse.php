@@ -1,7 +1,8 @@
 <?php
-namespace Poirot\Http\Interfaces\Message;
+namespace Poirot\Http\Interfaces;
 
-interface iHttpResponse extends ipHttpMessage
+interface iHttpResponse 
+    extends iHttpMessage
 {
     /**
      * Set Response Status Code
@@ -10,14 +11,14 @@ interface iHttpResponse extends ipHttpMessage
      *
      * @return $this
      */
-    function setStatCode($status);
+    function setStatusCode($status);
 
     /**
      * Get Response Status Code
      *
      * @return int
      */
-    function getStatCode();
+    function getStatusCode();
 
     /**
      * Set Status Code Reason
@@ -26,14 +27,14 @@ interface iHttpResponse extends ipHttpMessage
      *
      * @return $this
      */
-    function setStatReason($reason);
+    function setStatusReason($reason);
 
     /**
      * Get Status Code Reason
      *
      * @return string
      */
-    function getStatReason();
+    function getStatusReason();
 
     /**
      * Render the status line header

@@ -1,20 +1,108 @@
 <?php
-namespace Poirot\Http\Message\Request;
+namespace Poirot\Http;
 
-use Poirot\Std\Interfaces\Struct\iDataStruct;
-use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Message\HttpMessageOptionsTrait;
-use Poirot\PathUri\HttpUri;
-use Poirot\PathUri\Interfaces\iHttpUri;
-use Poirot\PathUri\Interfaces\iSeqPathUri;
+use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\Plugins\HttpPluginManager;
+use Poirot\Http\Plugins\HttpRequestPluginManager;
+use Poirot\Http\Plugins\Request\PluginsRequestInvokable;
+use Poirot\Http\Psr\Interfaces\RequestInterface;
 
-trait HttpRequestOptionsTrait
+class HttpRequest 
+    extends aMessageHttp
+    implements iHttpRequest
 {
-    use HttpMessageOptionsTrait;
-
     protected $method = 'GET';
     protected $host;
     protected $target_uri;
+    
+    
+    /**
+     * Parse path string to parts in associateArray
+     * @param string $message
+     * @return mixed
+     */
+    protected function doParseFromString($message)
+    {
+        return \Poirot\Http\parseRequestFromString($message);
+    }
+        
+    /**
+     * Set Options From Psr Http Message Object
+     *
+     * @param RequestInterface $psrRequest
+     *
+     * @return $this
+     */
+    protected function doParseFromPsr($psrRequest)
+    {
+        return \Poirot\Http\parseRequestFromPsr($psrRequest);
+    }
+
+    
+    /**
+     * Return the formatted request line (first line) for this http request
+     *
+     * - include line break at bottom
+     *
+     * @return string
+     */
+    function renderRequestLine()
+    {
+        //TODO can implement protocol HTTP/HTTPS
+        return $this->getMethod() . ' ' . $this->getUri() . ' HTTP/' . $this->getVersion()."\r\n";
+    }
+
+    /**
+     * Flush String Representation To Output
+     *
+     * @param bool $withHeaders Include Headers
+     *
+     * @return void
+     */
+    function flush($withHeaders = true)
+    {
+        if ($withHeaders) {
+            ob_start();
+            echo $this->renderRequestLine();
+            ob_end_flush();
+            flush();
+        }
+
+        parent::flush($withHeaders);
+    }
+
+    /**
+     * Render Http Message To String
+     *
+     * @return string
+     */
+    function render()
+    {
+        $return = '';
+        $return .= $this->renderRequestLine();
+        $return .= parent::toString();
+        return $return;
+    }
+
+    /**
+     * @override Append Host as Header If not exists in headers
+     *
+     * Render Headers
+     *
+     * - include line break at bottom
+     *
+     * @return string
+     */
+    function renderHeaders()
+    {
+        $return = parent::renderHeaders();
+        if (!$this->getHeaders()->has('Host') && $host = $this->getHost())
+            $return = 'Host: '.$host."\r\n" . $return;
+        return $return;
+    }
+
+    
+    // Options:
 
     /**
      * Set Request Method
@@ -57,7 +145,6 @@ trait HttpRequestOptionsTrait
     function setHost($host)
     {
         $this->host = strtolower($host);
-
         return $this;
     }
 
@@ -114,7 +201,6 @@ trait HttpRequestOptionsTrait
             ));
 
         $this->target_uri = $target;
-
         return $this;
     }
 
@@ -123,7 +209,7 @@ trait HttpRequestOptionsTrait
      *
      * - return "/" if no one composed
      *
-     * @return iHttpUri
+     * @return string
      */
     function getUri()
     {
@@ -154,5 +240,30 @@ trait HttpRequestOptionsTrait
             throw new \InvalidArgumentException;
 
         return $this;
+    }
+    
+
+    // ...
+
+    /**
+     * @return HttpPluginManager
+     */
+    protected function _newPluginManager()
+    {
+        return new HttpRequestPluginManager;
+    }
+
+    /**
+     * @override ide completion
+     * @return PluginsRequestInvokable
+     */
+    function plg()
+    {
+        if (!$this->_plugins)
+            $this->_plugins = new PluginsRequestInvokable(
+                $this->getPluginManager()
+            );
+
+        return $this->_plugins;
     }
 }

@@ -9,7 +9,10 @@ the Set-Cookie header field because the %x2C (",") character is used
 by Set-Cookie in a way that conflicts with such folding.
 */
 
-interface iHeaderCollection //unknown error extends \Traversable
+use Poirot\Std\Interfaces\Struct\iCollection;
+
+interface iHeaderCollection 
+    extends iCollection
 {
     /**
      * Set Header
@@ -19,9 +22,10 @@ interface iHeaderCollection //unknown error extends \Traversable
      * @param iHeader $header
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
-    function set(iHeader $header);
-
+    function insert($header);
+    
     /**
      * Get Header With Label
      *
