@@ -29,11 +29,20 @@ abstract class aMessageHttp
     protected $headers;
     /** @var string|iStreamable */
     protected $body;
-
+    
+    protected $_plugins;
     /** @var HttpPluginManager */
     protected $pluginManager;
+    
 
 
+    /**
+     * Retrieve New Plugin Manager Instance
+     * @return HttpPluginManager
+     */
+    abstract protected function doNewDefaultPluginManager();
+    
+    
     // Implement Configurable:
     
     /**
@@ -259,6 +268,7 @@ abstract class aMessageHttp
     function setBody($content)
     {
         if (!$content instanceof PsrStreamInterface)
+            ## Instead Of StreamInterface must convert to string
             $content = (string) $content;
 
         $this->body = $content;
@@ -308,32 +318,21 @@ abstract class aMessageHttp
     function getPluginManager()
     {
         if (!$this->pluginManager)
-            $this->setPluginManager($this->_newPluginManager());
-
+            $this->setPluginManager($this->doNewDefaultPluginManager());
+        
         $this->pluginManager->setMessageObject($this);
         return $this->pluginManager;
     }
-
-    /**
-     * @return HttpPluginManager
-     */
-    abstract protected function _newPluginManager();
-
+    
     /**
      * Set Plugins Manager
      *
-     * @param AbstractPlugins $plugins
+     * @param HttpPluginManager $plugins
      *
      * @return $this
      */
-    function setPluginManager(AbstractPlugins $plugins)
+    function setPluginManager(HttpPluginManager $plugins)
     {
-        if (!$plugins instanceof HttpPluginManager)
-            throw new \InvalidArgumentException(sprintf(
-                'Plugins Manager must instance of (HttpPluginsManager) given (%s).'
-                , get_class($plugins)
-            ));
-
         $this->pluginManager = $plugins;
         return $this;
     }

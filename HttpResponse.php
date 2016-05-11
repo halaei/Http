@@ -146,7 +146,7 @@ class HttpResponse
     /**
      * @return HttpPluginManager
      */
-    protected function _newPluginManager()
+    protected function doNewDefaultPluginManager()
     {
         return new HttpResponsePluginManager;
     }
