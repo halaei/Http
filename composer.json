@@ -10,10 +10,11 @@
         }
     ],
     "require": {
-        "poirot/std": "dev-devel",
-        "poirot/ioc": "dev-devel",
-        "poirot/stream": "dev-devel",
-        "poirot/pathuri": "dev-devel"
+        "poirot/std": "dev-devel"
+    },
+    "suggest": {
+      "poirot/ioc": "dev-devel",
+      "poirot/stream": "dev-devel"
     },
     "target-dir": "Poirot/Http",
     "autoload"  : {
