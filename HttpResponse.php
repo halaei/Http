@@ -1,100 +1,43 @@
 <?php
 namespace Poirot\Http;
 
-use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHttpResponse;
-use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
-use Poirot\Http\Plugins\HttpPlugins;
-use Poirot\Http\Plugins\HttpResponsePluginManager;
-use Poirot\Http\Plugins\Response\PluginsResponseInvokable;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
-use Poirot\Http\Util\UHeader;
-use Poirot\Http\Util\UResponse;
 
 class HttpResponse
     extends aHttpMessage
     implements iHttpResponse
 {
-    use HttpResponseOptionsTrait;
+    protected $statCode;
+    protected $statReason;
+
     
+    /**
+     * Parse path string to parts in associateArray
+     *
+     * !! The classes that extend this must
+     *    implement parse methods
+     *
+     * @param string $message
+     * @return mixed
+     */
+    protected function doParseFromString($message)
+    {
+        return \Poirot\Http\parseResponseFromString($message);
+    }
+
     /**
      * Set Options From Psr Http Message Object
      *
-     * @param ResponseInterface $response
+     * @param ResponseInterface $psrResponse
      *
      * @return $this
      */
-    function fromPsr($response)
+    protected function doParseFromPsr($psrResponse)
     {
-        if (!$response instanceof ResponseInterface)
-            throw new \InvalidArgumentException(sprintf(
-                'Request Object must instance of ResponseInterface but (%s) given.'
-                , \Poirot\Std\flatten($response)
-            ));
-
-
-
-        $headers = [];
-        foreach($response->getHeaders() as $h => $v)
-            $headers[$h] = UHeader::joinParams($v);
-
-        $options = [
-            'version'     => $response->getProtocolVersion(),
-            'stat_code'   => $response->getStatusCode(),
-            'stat_reason' => $response->getReasonPhrase(),
-            'headers'     => $headers,
-            'body'        => $response->getBody(),
-        ];
-
-        parent::from($options);
-        return $this;
+        return \Poirot\Http\parseResponseFromPsr($psrResponse);
     }
-
-    /**
-     * Set Options From Http Message String
-     *
-     * @param string $message Message String
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    function fromString($message)
-    {
-        if (!preg_match_all('/.*[\r\n]?/', $message, $lines))
-            throw new \InvalidArgumentException('Error Parsing Request Message.');
-
-        $lines = $lines[0];
-
-        $firstLine = array_shift($lines);
-
-        $regex   = '/^HTTP\/(?P<version>1\.[01]) (?P<status>\d{3})(?:[ ]+(?P<reason>.*))?$/';
-        $matches = array();
-        if (!preg_match($regex, $firstLine, $matches))
-            throw new \InvalidArgumentException(
-                'A valid response status line was not found in the provided string.'
-                . ' response:'
-                . $message
-            );
-
-        $this->setVersion($matches['version']);
-        $this->setStatCode($matches['status']);
-        $this->setStatReason((isset($matches['reason']) ? $matches['reason'] : ''));
-
-        // headers:
-        while ($nextLine = array_shift($lines)) {
-            if (trim($nextLine) == '')
-                // headers end
-                break;
-
-            $this->getHeaders()->set(FactoryHttpHeader::factoryString($nextLine));
-        }
-
-        // body:
-        $this->setBody(rtrim(implode("\r\n", $lines), "\r\n"));
-
-        return $this;
-    }
-
+    
     /**
      * Render the status line header
      *
@@ -105,8 +48,8 @@ class HttpResponse
         $status = sprintf(
             'HTTP/%s %d %s',
             $this->getVersion(),
-            $this->getStatCode(),
-            $this->getStatReason()
+            $this->getStatusCode(),
+            $this->getStatusReason()
         );
 
         return trim($status);
@@ -117,12 +60,12 @@ class HttpResponse
      *
      * @return string
      */
-    function toString()
+    function render()
     {
         $return = '';
         $return .= $this->renderStatusLine();
         $return .= "\r\n";
-        $return .= parent::toString();
+        $return .= parent::render();
 
         return $return;
     }
@@ -136,32 +79,72 @@ class HttpResponse
      */
     function flush($withHeaders = true)
     {
-        UResponse::httpResponseCode($this->getStatCode());
-
+        \Poirot\Http\Response\httpResponseCode($this->getStatusCode());
         parent::flush($withHeaders);
     }
 
-    // ...
-
+    
+    // Options:
+    
     /**
-     * @return HttpPlugins
+     * Set Response Status Code
+     *
+     * @param int $status
+     *
+     * @return $this
      */
-    protected function doNewDefaultPluginManager()
+    function setStatusCode($status)
     {
-        return new HttpResponsePluginManager;
+        if (! is_numeric($status)
+            || is_float($status)
+            || $status < 100
+            || $status >= 600
+        )
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid status code "%s"; must be an integer between 100 and 599, inclusive',
+                (is_scalar($status) ? $status : gettype($status))
+            ));
+
+        $this->statCode = $status;
+        return $this;
     }
 
     /**
-     * @override ide completion
-     * @return PluginsResponseInvokable
+     * Get Response Status Code
+     *
+     * @return int
      */
-    function plg()
+    function getStatusCode()
     {
-        if (!$this->_plugins)
-            $this->_plugins = new PluginsResponseInvokable(
-                $this->getPluginManager()
-            );
+        return (int) $this->statCode;
+    }
 
-        return $this->_plugins;
+    /**
+     * Set Status Code Reason
+     *
+     * @param string $reason
+     *
+     * @return $this
+     */
+    function setStatusReason($reason)
+    {
+        $this->statReason = (string) $reason;
+        return $this;
+    }
+
+    /**
+     * Get Status Code Reason
+     *
+     * @return string
+     */
+    function getStatusReason()
+    {
+        if ($this->statReason)
+            return $this->statReason;
+
+        ($reason = \Poirot\Http\Response\getStatReasonFromCode($this->getStatusCode()))
+            ?: $reason = 'Unknown';
+
+        return $reason;
     }
 }
