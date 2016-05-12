@@ -1,6 +1,8 @@
 <?php
 namespace Poirot\Http;
 
+use Psr\Http\Message\MessageInterface;
+
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Interfaces\Struct\iDataMean;
 use Poirot\Std\Struct\aDataOptions;
@@ -15,7 +17,6 @@ use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\Interfaces\iHttpMessage;
-use Poirot\Http\Psr\Interfaces\MessageInterface;
 
 
 abstract class aHttpMessage
@@ -223,14 +224,16 @@ abstract class aHttpMessage
             $headers = $tHeaders;
         }
 
-        if (is_array($headers))
-            foreach ($headers as $label => $h) {
-                if (!$h instanceof iHeader)
-                    // Header-Label: value header
-                    $h = FactoryHttpHeader::of( array($label, $h) );
+        if (!is_array($headers))
+            throw new \InvalidArgumentException;
 
-                $this->getHeaders()->insert($h);
-            }
+        foreach ($headers as $label => $h) {
+            if (!$h instanceof iHeader)
+                // Header-Label: value header
+                $h = FactoryHttpHeader::of( array($label, $h) );
+
+            $this->getHeaders()->insert($h);
+        }
 
         return $this;
     }

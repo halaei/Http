@@ -1,25 +1,28 @@
 <?php
 namespace Poirot\Http\Psr;
 
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\StreamInterface;
+
 use Poirot\Http\Header\aHeaderHttp;
 use Poirot\Http\Header\CollectionHeader;
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Psr\Interfaces\MessageInterface;
-use Poirot\Stream\Psr\StreamInterface;
+
 
 class HttpMessage implements MessageInterface
 {
-    const Vx1_0 = '1.0';
-    const Vx1_1 = '1.1';
+    const V1_0 = '1.0';
+    const V1_1 = '1.1';
 
     /** @var string */
-    protected $version = self::Vx1_1;
+    protected $version = self::V1_1;
     /** @var CollectionHeader */
     protected $headers;
     /** @var StreamInterface */
     protected $stream;
 
+    
     /**
      * Retrieves the HTTP protocol version as a string.
      *

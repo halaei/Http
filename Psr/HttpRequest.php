@@ -1,13 +1,13 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Stream\Psr\StreamInterface;
-use Poirot\Stream\Psr\StreamPsr;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Http\Psr\Interfaces\RequestInterface;
 
 
 class HttpRequest extends HttpMessage
@@ -62,7 +62,7 @@ class HttpRequest extends HttpMessage
      *
      * @throws \InvalidArgumentException
      */
-    function __construct($uri = null, $method = null, $bodyStream = null, array $headers = [])
+    function __construct($uri = null, $method = null, $bodyStream = null, array $headers = array())
     {
         if ($uri instanceof iHttpRequest) {
             ## prepare arguments
@@ -98,7 +98,7 @@ class HttpRequest extends HttpMessage
         $this->uri = $uri;
 
         # Method:
-        $this->__assertValidMethod($method);
+        $this->_assertValidMethod($method);
         $this->method = $method;
 
         # Body:
@@ -107,7 +107,7 @@ class HttpRequest extends HttpMessage
 
         # Headers:
         foreach($headers as $l => $v)
-            $this->_getHeaders()->set(FactoryHttpHeader::of( array($l, $v)) );
+            $this->_getHeaders()->insert(FactoryHttpHeader::of( array($l, $v)) );
 
     }
 
@@ -273,7 +273,7 @@ class HttpRequest extends HttpMessage
         $host = $uri->getHost();
         ($uri->getPort() === null) ?: $host .= ':' . $uri->getPort();
 
-        $this->_getHeaders()->set(FactoryHttpHeader::of( array('Host', $host)) );
+        $this->_getHeaders()->insert(FactoryHttpHeader::of( array('Host', $host)) );
 
         return $new;
     }
@@ -296,7 +296,7 @@ class HttpRequest extends HttpMessage
                 ($port = $this->uri->getPort()) ? ':'.$this->uri->getPort() : ''
             );
 
-            $this->headers->set(FactoryHttpHeader::of( array('Host', $host)) );
+            $this->headers->insert(FactoryHttpHeader::of( array('Host', $host)) );
         }
 
         $hdrArray = [];
@@ -320,12 +320,12 @@ class HttpRequest extends HttpMessage
                     ($port = $this->uri->getPort()) ? ':'.$this->uri->getPort() : ''
                 );
 
-                $this->headers->set(FactoryHttpHeader::of( array('Host', $host)) );
+                $this->headers->insert(FactoryHttpHeader::of( array('Host', $host)) );
             }
         }
 
         if (!$this->headers->has($header))
-            return [];
+            return array();
 
         $header = $this->headers->get($header);
         return $header->toArray();
@@ -338,7 +338,7 @@ class HttpRequest extends HttpMessage
      *
      * @return true
      */
-    private function __assertValidMethod($method)
+    private function _assertValidMethod($method)
     {
         if (null === $method)
             return true;

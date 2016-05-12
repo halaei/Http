@@ -1,9 +1,10 @@
 <?php
 namespace Poirot\Http;
 
+use Psr\Http\Message\RequestInterface;
+
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Http\Psr\Interfaces\RequestInterface;
+use Poirot\Http\Interfaces\iHttpRequest;
 
 class HttpRequest 
     extends aHttpMessage
@@ -51,8 +52,9 @@ class HttpRequest
     }
 
     /**
+     * // TODO what the mean of flushing request?
      * Flush String Representation To Output
-     *
+     * 
      * @param bool $withHeaders Include Headers
      *
      * @return void
@@ -60,10 +62,8 @@ class HttpRequest
     function flush($withHeaders = true)
     {
         if ($withHeaders) {
-            ob_start();
-            echo $this->renderRequestLine();
-            ob_end_flush();
-            flush();
+            // TODO what with status line?
+            header($this->renderRequestLine());
         }
 
         parent::flush($withHeaders);

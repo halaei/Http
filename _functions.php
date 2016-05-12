@@ -2,8 +2,8 @@
 namespace Poirot\Http 
 {
     use Poirot\Http\Interfaces\Message\iHttpRequest;
-    use Poirot\Http\Psr\Interfaces\RequestInterface;
-    use Poirot\Http\Psr\Interfaces\ResponseInterface;
+    use Psr\Http\Message\RequestInterface;
+    use Psr\Http\Message\ResponseInterface;
 
     /**
      * Parse Http Request Message To It's Parts
@@ -148,11 +148,10 @@ namespace Poirot\Http
 
 namespace Poirot\Http\Psr 
 {
-
-    use Poirot\Http\Psr\Interfaces\MessageInterface;
-    use Poirot\Http\Psr\Interfaces\RequestInterface;
-    use Poirot\Http\Psr\Interfaces\ResponseInterface;
-    use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
+    use Psr\Http\Message\MessageInterface;
+    use Psr\Http\Message\RequestInterface;
+    use Psr\Http\Message\ResponseInterface;
+    use Psr\Http\Message\UploadedFileInterface;
 
     /**
      * String representation of an HTTP message.
@@ -448,6 +447,27 @@ namespace Poirot\Http\Header
             return false;
 
         return array( $matches['label'] => $matches['value'] );
+    }
+    
+    function parseHeaderLines($headers)
+    {
+        if (!preg_match_all('/.*[\n]?/', $headers, $lines))
+            throw new \InvalidArgumentException('Error Parsing Request Message.');
+
+        $headers = array();
+        foreach ($lines[0] as $l) {
+            // Todo parse lines have empty string at the end
+            if (empty($l)) continue;
+            if (( $h = parseLabelValue($l) ) === false)
+                throw new \Exception(sprintf(
+                    'Malformed Header; (%s).'
+                    , $h
+                ));
+
+            $headers[key($h)] = current($h);
+        }
+        
+        return $headers;
     }
 
     /**

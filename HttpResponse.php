@@ -1,8 +1,9 @@
 <?php
 namespace Poirot\Http;
 
+use Psr\Http\Message\ResponseInterface;
+
 use Poirot\Http\Interfaces\iHttpResponse;
-use Poirot\Http\Psr\Interfaces\ResponseInterface;
 
 class HttpResponse
     extends aHttpMessage

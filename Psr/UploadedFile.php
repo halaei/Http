@@ -1,16 +1,15 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
-use Poirot\Std\Struct\AbstractOptionsData;
-use Poirot\Stream\Interfaces\iSResource;
+use Psr\Http\Message\UploadedFileInterface;
+
+use Poirot\Std\Struct\aDataOptions;
+
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Psr\StreamPsr;
-use Poirot\Stream\SResource;
-use Poirot\Stream\WrapperClient;
 
-class UploadedFile extends AbstractOptionsData
+class UploadedFile extends aDataOptions
     implements UploadedFileInterface
 {
     const DEFAULT_STREAM = '\Poirot\Stream\Psr\StreamPsr';
@@ -57,7 +56,7 @@ class UploadedFile extends AbstractOptionsData
      */
     function __construct(array $fileValues)
     {
-        $this->from($fileValues);
+        $this->import($fileValues);
     }
 
 
@@ -337,7 +336,7 @@ class UploadedFile extends AbstractOptionsData
             );
 
         if (strpos(PHP_SAPI, 'cli') === 0 || !$this->getTmpName())
-            $this->__moveUploadedStreamFile($targetPath);
+            $this->_moveUploadedStreamFile($targetPath);
         elseif (move_uploaded_file($this->getTmpName(), $targetPath) === false)
             throw new \RuntimeException('Error occurred while moving uploaded file');
 
@@ -349,7 +348,7 @@ class UploadedFile extends AbstractOptionsData
      *
      * @param string $path
      */
-    protected function __moveUploadedStreamFile($path)
+    protected function _moveUploadedStreamFile($path)
     {
         $handle = fopen($path, 'wb+');
         if ($handle === false)

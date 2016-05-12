@@ -1,7 +1,5 @@
 <?php
-namespace Poirot\Http\Interfaces\Message;
-
-use Poirot\Http\Interfaces\iHttpMessage;
+namespace Poirot\Http\Interfaces;
 
 /**
  * Provides the general representation of an HTTP request message.

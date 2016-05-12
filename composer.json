@@ -15,6 +15,7 @@
     },
     "suggest": {
       "poirot/ioc": "dev-devel"
+      , "poirot/stream": "dev-devel"
     },
     "target-dir": "Poirot/Http",
     "autoload"  : {

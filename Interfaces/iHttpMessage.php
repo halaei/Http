@@ -1,8 +1,9 @@
 <?php
 namespace Poirot\Http\Interfaces;
 
+use Psr\Http\Message\StreamInterface;
+
 use Poirot\Std\Interfaces\Pact\ipMetaProvider;
-use Poirot\Stream\Psr\StreamInterface as PsrStreamInterface;
 
 interface iHttpMessage 
     extends ipMetaProvider
@@ -47,7 +48,7 @@ interface iHttpMessage
     /**
      * Set Message Body Content
      *
-     * @param string|PsrStreamInterface $content
+     * @param string|StreamInterface $content
      *
      * @return $this
      */
@@ -56,7 +57,7 @@ interface iHttpMessage
     /**
      * Get Message Body Content
      *
-     * @return string|PsrStreamInterface
+     * @return string|StreamInterface
      */
     function getBody();
 

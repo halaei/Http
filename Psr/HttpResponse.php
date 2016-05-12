@@ -1,11 +1,10 @@
 <?php
 namespace Poirot\Http\Psr;
 
+use Psr\Http\Message\ResponseInterface;
+
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\Message\iHttpResponse;
-use Poirot\Http\Psr\Interfaces\ResponseInterface;
-use Poirot\Stream\Interfaces\iSResource;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Psr\StreamPsr;
@@ -135,7 +134,7 @@ class Response extends HttpMessage
                 . 'or a Psr\Http\Message\StreamInterface implementation'
             );
 
-        ($status === null) ? $status = 200 : $this->__assertValidateStatus($status);
+        ($status === null) ? $status = 200 : $this->_assertValidateStatus($status);
 
 
         $this->stream     = ($body instanceof StreamInterface) ? $body : new StreamPsr($body, 'wb+');
@@ -143,7 +142,7 @@ class Response extends HttpMessage
 
         # Headers:
         foreach($headers as $l => $v)
-            $this->_getHeaders()->set(FactoryHttpHeader::of( array($l, $v)) );
+            $this->_getHeaders()->insert( FactoryHttpHeader::of(array($l, $v)) );
     }
 
     /**
@@ -172,7 +171,7 @@ class Response extends HttpMessage
      */
     function withStatus($code, $reasonPhrase = '')
     {
-        $this->__assertValidateStatus($code);
+        $this->_assertValidateStatus($code);
 
         $new = clone $this;
         $new->statusCode   = (int) $code;
@@ -186,7 +185,7 @@ class Response extends HttpMessage
      * @param int|string $code
      * @throws \InvalidArgumentException on an invalid status code.
      */
-    protected function __assertValidateStatus($code)
+    protected function _assertValidateStatus($code)
     {
         if (! is_numeric($code)
             || is_float($code)

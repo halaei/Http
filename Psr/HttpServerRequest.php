@@ -1,8 +1,9 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Http\Psr\Interfaces\ServerRequestInterface;
-use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
+
 use Poirot\Stream\Psr\StreamInterface;
 
 class HttpServerRequest extends HttpRequest
@@ -41,7 +42,7 @@ class HttpServerRequest extends HttpRequest
         $body = null,
         array $headers = []
     ) {
-        $this->__assertValidateUploadedFiles($uploadedFiles);
+        $this->_assertValidateUploadedFiles($uploadedFiles);
 
         $this->serverParams  = $serverParams;
         $this->uploadedFiles = $uploadedFiles;
@@ -99,7 +100,6 @@ class HttpServerRequest extends HttpRequest
     {
         $new = clone $this;
         $new->cookieParams = $cookies;
-
         return $new;
     }
 
@@ -185,7 +185,7 @@ class HttpServerRequest extends HttpRequest
      */
     function withUploadedFiles(array $uploadedFiles)
     {
-        $this->__assertValidateUploadedFiles($uploadedFiles);
+        $this->_assertValidateUploadedFiles($uploadedFiles);
 
         $new = clone $this;
         $new->uploadedFiles = $uploadedFiles;
@@ -358,11 +358,11 @@ class HttpServerRequest extends HttpRequest
      *
      * @throws \InvalidArgumentException
      */
-    protected function __assertValidateUploadedFiles(array $uploadedFiles)
+    protected function _assertValidateUploadedFiles(array $uploadedFiles)
     {
         foreach ($uploadedFiles as $file) {
             if (is_array($file)) {
-                $this->__assertValidateUploadedFiles($file);
+                $this->_assertValidateUploadedFiles($file);
                 continue;
             }
 

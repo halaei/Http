@@ -1,21 +1,13 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
-use Poirot\Std\Interfaces\Struct\iDataStruct;
 use Poirot\Http\Header\FactoryHttpHeader;
-use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
-use Poirot\Http\UMime;
-use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
 use Poirot\Http\Psr\UploadedFile;
-use Poirot\Http\Psr\Util;
 use Poirot\Http\Header as UtilHttp;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
-use Poirot\Stream\Streamable\AggregateStream;
-use Poirot\Stream\Streamable\StreamWrapTrait;
-use Poirot\Stream\Streamable\TemporaryStream;
 
 /**
  * RFC 1867 - Form-based File Upload in HTML

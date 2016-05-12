@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Interfaces\Respec;
 
-use Poirot\Http\Interfaces\Message\iHttpResponse;
+use Poirot\Http\Interfaces\iHttpResponse;
 
 interface iResponseProvider
 {

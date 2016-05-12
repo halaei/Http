@@ -1,16 +1,14 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
-use Poirot\Http\CollectionHeader;
-use Poirot\Http\Message\HttpRequest;
-use Poirot\Http\Plugins\Request\PhpServer;
-use Poirot\PathUri\HttpUri;
-use Poirot\Std\Interfaces\Struct\iOptionsData;
-use Poirot\Std\Struct\AbstractOptionsData;
-use Poirot\Stream\Streamable;
-use Poirot\Stream\WrapperClient;
+use Poirot\Std\Struct\aDataOptions;
 
-class BuilderPhpServerRequest extends AbstractOptionsData
+use Poirot\Stream\Streamable;
+
+use Poirot\Http\HttpMessage\Plugins\Request\PhpServer;
+
+class BuilderRequestByServerGlobal 
+    extends aDataOptions
 {
     /** @var PhpServer */
     protected $server;
@@ -83,7 +81,7 @@ class BuilderPhpServerRequest extends AbstractOptionsData
     /**
      * Set Request Uri
      *
-     * @param string|HttpUri $uri
+     * @param string $uri
      *
      * @return $this
      */
