@@ -86,6 +86,12 @@ namespace Poirot\Http
 
 namespace Poirot\Http\Psr 
 {
+
+    use Poirot\Http\Psr\Interfaces\MessageInterface;
+    use Poirot\Http\Psr\Interfaces\RequestInterface;
+    use Poirot\Http\Psr\Interfaces\ResponseInterface;
+    use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
+
     /**
      * String representation of an HTTP message.
      *
@@ -135,12 +141,12 @@ namespace Poirot\Http\Psr
             }
 
             if (is_array($value) && isset($value['tmp_name'])) {
-                $normalized[$key] = self::__createUploadedFileFromSpec($value, $stream);
+                $normalized[$key] = __createUploadedFileFromSpec($value, $stream);
                 continue;
             }
 
             if (is_array($value)) {
-                $normalized[$key] = self::normalizeFiles($value, $stream);
+                $normalized[$key] = normalizeFiles($value, $stream);
                 continue;
             }
 
@@ -165,7 +171,7 @@ namespace Poirot\Http\Psr
     function __createUploadedFileFromSpec(array $value, $stream)
     {
         if (is_array($value['tmp_name']))
-            return self::__normalizeNestedFileSpec($value, $stream);
+            return __normalizeNestedFileSpec($value, $stream);
     
         ($value === null) ?: $value['default_stream_class'] = $stream;
         return new UploadedFile($value);
@@ -191,7 +197,7 @@ namespace Poirot\Http\Psr
                 'name'     => $files['name'][$key],
                 'type'     => $files['type'][$key],
             ];
-            $files[$key] = self::__createUploadedFileFromSpec($spec, $stream);
+            $files[$key] = __createUploadedFileFromSpec($spec, $stream);
         }
     
         return $files;

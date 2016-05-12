@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http;
 
-use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHttpResponse;
 use Poirot\Http\Message\Response\HttpResponseOptionsTrait;
 use Poirot\Http\Plugins\HttpPlugins;
@@ -86,7 +86,7 @@ class HttpResponse
                 // headers end
                 break;
 
-            $this->getHeaders()->set(factoryHttpHeader::factoryString($nextLine));
+            $this->getHeaders()->set(FactoryHttpHeader::factoryString($nextLine));
         }
 
         // body:

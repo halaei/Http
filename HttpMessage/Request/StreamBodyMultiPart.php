@@ -2,7 +2,7 @@
 namespace Poirot\Http\Message\Request;
 
 use Poirot\Std\Interfaces\Struct\iDataStruct;
-use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
@@ -119,12 +119,17 @@ class StreamBodyMultiPart implements iStreamable
         if (!$headers instanceof iHeaders)
             $headers = ($headers) ? new CollectionHeader($headers) : new CollectionHeader;
 
-        $headers->set(factoryHttpHeader::of('Content-Type'
-            , ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
+        $headers->set(
+            FactoryHttpHeader::of(array(
+                'Content-Type'
+                , ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
+            )
         ));
 
         if ($size = $element->getSize())
-            $headers->set(factoryHttpHeader::of('Content-Length', (string) $size));
+            $headers->set(
+                FactoryHttpHeader::of( array('Content-Length', (string) $size) )
+            );
 
 
         if ($element instanceof UploadedFile)
@@ -160,25 +165,32 @@ class StreamBodyMultiPart implements iStreamable
 
         // Set a default content-disposition header if one was no provided
         if (!$headers->has('content-disposition'))
-            $headers->set(factoryHttpHeader::of('Content-Disposition'
-                , ($filename)
-                    ? sprintf('form-data; name="%s"; filename="%s"'
-                        , $name
-                        , basename($filename)
-                    )
-                    : "form-data; name=\"{$name}\""
+            $headers->set(
+                FactoryHttpHeader::of(array(
+                    'Content-Disposition'
+                    , ($filename)
+                        ? sprintf('form-data; name="%s"; filename="%s"'
+                            , $name
+                            , basename($filename)
+                        )
+                        : "form-data; name=\"{$name}\""
+                )
             ));
 
         // Set a default content-length header if one was no provided
         if (!$headers->has('content-length'))
             (!$length = $stream->getSize())
-                ?: $headers->set(factoryHttpHeader::of('Content-Length', (string) $length));
+                ?: $headers->set(
+                    FactoryHttpHeader::of(array(
+                        'Content-Length', (string) $length
+                    )
+                ));
 
 
         // Set a default Content-Type if one was not supplied
         if (!$headers->has('content-type') && $filename)
             (!$type = UMime::getFromFilename($filename))
-                ?: $headers->set(factoryHttpHeader::of('Content-Type', $type));
+                ?: $headers->set(FactoryHttpHeader::of( array('Content-Type', $type)) );
 
 
         ## Add Created Element As Stream

@@ -29,25 +29,9 @@ abstract class aHeaderHttp
      * @throws \InvalidArgumentException
      * @return $this
      */
-    abstract function fromString($line);
+    abstract function importFromString($line);
 
-    /**
-     * Set Options
-     *
-     * @param string|array|iHeader $options
-     *
-     * @return $this
-     */
-    function import($options)
-    {
-        if (is_string($options))
-            $this->fromString($options);
-        else
-            parent::import($options);
-
-        return $this;
-    }
-
+    
     /**
      * Represent Header As String
      *

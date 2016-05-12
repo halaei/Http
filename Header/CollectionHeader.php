@@ -30,12 +30,12 @@ class CollectionHeader
         foreach ($headers as $label => $h) {
             if (!$h instanceof iHeader)
                 // Header-Label: value header
-                $h = factoryHttpHeader::of($label, $h);
+                $h = FactoryHttpHeader::of( array($label, $h) );
 
             $this->insert($h);
         }
     }
-
+    
     /**
      * Set Header
      *

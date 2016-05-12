@@ -15,7 +15,7 @@ class HeaderLine
      * @throws \InvalidArgumentException
      * @return $this
      */
-    function fromString($line)
+    function importFromString($line)
     {
         $matches = \Poirot\Http\Header\parseLabelValue($line);
         if ($matches === false)

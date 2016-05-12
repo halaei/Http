@@ -22,7 +22,7 @@ interface iHeader
      * @throws \InvalidArgumentException
      * @return $this
      */
-    function fromString($line);
+    function importFromString($line);
 
     /**
      * Get Field Value As String

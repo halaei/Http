@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
@@ -175,7 +175,7 @@ class HttpMessage implements MessageInterface
      */
     function withHeader($name, $value)
     {
-        $header = factoryHttpHeader::of($name, $value);
+        $header = FactoryHttpHeader::of( array($name, $value) );
 
         $new = clone $this;
         $new->__getHeaders()->set($header);

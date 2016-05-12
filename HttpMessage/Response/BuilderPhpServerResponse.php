@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Message\Response;
 
-use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
@@ -36,9 +36,9 @@ class BuilderPhpServerResponse extends AbstractOptionsData
                 if (!$h instanceof iHeader) {
                     (is_int($l))
                         ? ### ['Header-Label: value header']
-                        $h = factoryHttpHeader::factoryString($h)
+                        $h = FactoryHttpHeader::factoryString($h)
                         : ### ['Header-Label' => 'value header']
-                        $h = factoryHttpHeader::of($l, $h);
+                        $h = FactoryHttpHeader::of( array($l, $h) );
                 }
 
                 $this->getHeaders()->set($h);

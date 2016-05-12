@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Psr;
 
-use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpResponse;
 use Poirot\Http\Psr\Interfaces\ResponseInterface;
@@ -143,7 +143,7 @@ class Response extends HttpMessage
 
         # Headers:
         foreach($headers as $l => $v)
-            $this->__getHeaders()->set(factoryHttpHeader::of($l, $v));
+            $this->__getHeaders()->set(FactoryHttpHeader::of( array($l, $v)) );
     }
 
     /**

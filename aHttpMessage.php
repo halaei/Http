@@ -11,7 +11,7 @@ use Poirot\Stream\Psr\StreamInterface as PsrStreamInterface;
 use Poirot\Stream\Streamable;
 
 use Poirot\Http\Header\CollectionHeader;
-use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\Interfaces\iHttpMessage;
@@ -229,7 +229,7 @@ abstract class aHttpMessage
             foreach ($headers as $label => $h) {
                 if (!$h instanceof iHeader)
                     // Header-Label: value header
-                    $h = factoryHttpHeader::of($label, $h);
+                    $h = FactoryHttpHeader::of( array($label, $h) );
 
                 $this->getHeaders()->insert($h);
             }
