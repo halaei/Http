@@ -8,7 +8,8 @@ interface iHeader
 {
     /**
      * Get Header Label
-     *
+     * @ignored not consider as data options
+     * 
      * @return string
      */
     function getLabel();
@@ -24,6 +25,13 @@ interface iHeader
     function fromString($line);
 
     /**
+     * Get Field Value As String
+     *
+     * @return string
+     */
+    function renderValueLine();
+    
+    /**
      * Represent Header As String
      *
      * label: value_string
@@ -31,11 +39,4 @@ interface iHeader
      * @return string
      */
     function render();
-
-    /**
-     * Get Field Value As String
-     *
-     * @return string
-     */
-    function renderValueLine();
 }

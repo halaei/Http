@@ -13,6 +13,7 @@ interface iPluginHttp
      * @param iHttpMessage $httpMessage
      *
      * @return $this
+     * @throws \InvalidArgumentException Not responsible for Request or Response
      */
     function setMessageObject(iHttpMessage $httpMessage);
 
@@ -22,4 +23,8 @@ interface iPluginHttp
      * @return iHttpMessage
      */
     function getMessageObject();
+    
+    
+    // Helper Methods:
+    // ...
 }

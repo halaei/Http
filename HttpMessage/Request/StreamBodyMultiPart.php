@@ -5,7 +5,7 @@ use Poirot\Std\Interfaces\Struct\iDataStruct;
 use Poirot\Http\Header\factoryHttpHeader;
 use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\iHeaderCollection;
+use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\UMime;
 use Poirot\Http\Psr\Interfaces\UploadedFileInterface;
 use Poirot\Http\Psr\UploadedFile;
@@ -116,15 +116,15 @@ class StreamBodyMultiPart implements iStreamable
 
     protected function _addUploadedFileElement($fieldName, UploadedFileInterface $element, $headers)
     {
-        if (!$headers instanceof iHeaderCollection)
+        if (!$headers instanceof iHeaders)
             $headers = ($headers) ? new CollectionHeader($headers) : new CollectionHeader;
 
-        $headers->set(factoryHttpHeader::factory('Content-Type'
+        $headers->set(factoryHttpHeader::of('Content-Type'
             , ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
         ));
 
         if ($size = $element->getSize())
-            $headers->set(factoryHttpHeader::factory('Content-Length', (string) $size));
+            $headers->set(factoryHttpHeader::of('Content-Length', (string) $size));
 
 
         if ($element instanceof UploadedFile)
@@ -160,7 +160,7 @@ class StreamBodyMultiPart implements iStreamable
 
         // Set a default content-disposition header if one was no provided
         if (!$headers->has('content-disposition'))
-            $headers->set(factoryHttpHeader::factory('Content-Disposition'
+            $headers->set(factoryHttpHeader::of('Content-Disposition'
                 , ($filename)
                     ? sprintf('form-data; name="%s"; filename="%s"'
                         , $name
@@ -172,13 +172,13 @@ class StreamBodyMultiPart implements iStreamable
         // Set a default content-length header if one was no provided
         if (!$headers->has('content-length'))
             (!$length = $stream->getSize())
-                ?: $headers->set(factoryHttpHeader::factory('Content-Length', (string) $length));
+                ?: $headers->set(factoryHttpHeader::of('Content-Length', (string) $length));
 
 
         // Set a default Content-Type if one was not supplied
         if (!$headers->has('content-type') && $filename)
             (!$type = UMime::getFromFilename($filename))
-                ?: $headers->set(factoryHttpHeader::factory('Content-Type', $type));
+                ?: $headers->set(factoryHttpHeader::of('Content-Type', $type));
 
 
         ## Add Created Element As Stream

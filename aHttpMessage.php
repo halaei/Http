@@ -1,18 +1,22 @@
 <?php
 namespace Poirot\Http;
 
-use Poirot\Http\HttpMessage\PluginsHttp;
-use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\iHeaderCollection;
-use Poirot\Http\Interfaces\iHttpMessage;
-use Poirot\Http\Psr\Interfaces\MessageInterface;
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Interfaces\Struct\iDataMean;
 use Poirot\Std\Struct\aDataOptions;
 use Poirot\Std\Struct\DataMean;
+
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface as PsrStreamInterface;
 use Poirot\Stream\Streamable;
+
+use Poirot\Http\Header\CollectionHeader;
+use Poirot\Http\Header\factoryHttpHeader;
+use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Interfaces\iHeaders;
+use Poirot\Http\Interfaces\iHttpMessage;
+use Poirot\Http\Psr\Interfaces\MessageInterface;
+
 
 abstract class aHttpMessage
     extends ConfigurableSetter
@@ -25,23 +29,11 @@ abstract class aHttpMessage
     protected $meta;
 
     protected $version = '1.1';
-    /** @var iHeaderCollection */
+    /** @var iHeaders */
     protected $headers;
     /** @var string|iStreamable */
     protected $body;
-    
-    protected $_plugins;
-    /** @var PluginsHttp */
-    protected $pluginManager;
-    
 
-
-    /**
-     * Retrieve New Plugin Manager Instance
-     * @return PluginsHttp
-     */
-    abstract protected function doNewDefaultPluginManager();
-    
     
     // Implement Configurable:
     
@@ -220,13 +212,13 @@ abstract class aHttpMessage
      *
      * ! headers may contains multiple values, such as cookie
      *
-     * @param array|iHeaderCollection $headers
+     * @param array|iHeaders $headers
      *
      * @return $this
      */
     function setHeaders($headers)
     {
-        if ($headers instanceof iHeaderCollection) {
+        if ($headers instanceof iHeaders) {
             $tHeaders = array();
             foreach($headers as $h)
                 $tHeaders[] = $h;
@@ -237,9 +229,9 @@ abstract class aHttpMessage
             foreach ($headers as $label => $h) {
                 if (!$h instanceof iHeader)
                     // Header-Label: value header
-                    $h = HeaderFactory::factory($label, $h);
+                    $h = factoryHttpHeader::of($label, $h);
 
-                $this->getHeaders()->set($h);
+                $this->getHeaders()->insert($h);
             }
 
         return $this;
@@ -248,7 +240,7 @@ abstract class aHttpMessage
     /**
      * Get Headers collection
      *
-     * @return iHeaderCollection
+     * @return iHeaders
      */
     function getHeaders()
     {
@@ -283,57 +275,5 @@ abstract class aHttpMessage
     function getBody()
     {
         return $this->body;
-    }
-
-    
-
-    // Implement Plugins Manager:
-
-    /**
-     * Plugin Manager
-     *
-     * @return PluginsInvokable
-     */
-    function plg()
-    {
-        if (!$this->_plugins)
-            $this->_plugins = new PluginsInvokable(
-                $this->getPluginManager()
-            );
-
-        return $this->_plugins;
-    }
-
-    /**
-     * Get Plugins Manager
-     *
-     * note: it's recommended that create http message as
-     *       factory service on application level and build
-     *       pluginManager with required config builder and
-     *       keep it clear on this state
-     *
-     *
-     * @return PluginsHttp
-     */
-    function getPluginManager()
-    {
-        if (!$this->pluginManager)
-            $this->setPluginManager($this->doNewDefaultPluginManager());
-        
-        $this->pluginManager->setMessageObject($this);
-        return $this->pluginManager;
-    }
-    
-    /**
-     * Set Plugins Manager
-     *
-     * @param PluginsHttp $plugins
-     *
-     * @return $this
-     */
-    function setPluginManager(PluginsHttp $plugins)
-    {
-        $this->pluginManager = $plugins;
-        return $this;
     }
 }

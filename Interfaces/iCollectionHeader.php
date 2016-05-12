@@ -11,7 +11,7 @@ by Set-Cookie in a way that conflicts with such folding.
 
 use Poirot\Std\Interfaces\Struct\iCollection;
 
-interface iHeaderCollection 
+interface iHeaders 
     extends iCollection
 {
     /**
@@ -33,8 +33,8 @@ interface iHeaderCollection
      *
      * @param string $label Header Label
      *
+     * @return \Traversable[iHeader]
      * @throws \Exception header not found
-     * @return iHeader
      */
     function get($label);
 

@@ -1,25 +1,26 @@
 <?php
 namespace Poirot\Http\Header;
 
-use Poirot\Container\Exception\ContainerInvalidPluginException;
-use Poirot\Container\Plugins\AbstractPlugins;
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Ioc\Container\aContainerCapped;
+use Poirot\Ioc\Container\Exception\exContainerInvalidServiceType;
 
-class PluginsHttpHeader extends AbstractPlugins
+class PluginsHttpHeader 
+    extends aContainerCapped
 {
     /**
      * Validate Plugin Instance Object
      *
      * @param mixed $pluginInstance
      *
-     * @throws ContainerInvalidPluginException
+     * @throws exContainerInvalidServiceType
      * @return void
      */
-    function validatePlugin($pluginInstance)
+    function validateService($pluginInstance)
     {
         if (!$pluginInstance instanceof iHeader)
-            throw new ContainerInvalidPluginException(
-                'Invalid Plugin Provided Instance.'
+            throw new exContainerInvalidServiceType(
+                'Invalid Plugin Of Header Instance Provided.'
             );
     }
 }

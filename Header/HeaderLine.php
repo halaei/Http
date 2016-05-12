@@ -1,12 +1,10 @@
 <?php
 namespace Poirot\Http\Header;
 
-use Poirot\Http\Util\UHeader;
-
-class HeaderLine extends aHeaderHttp
+class HeaderLine 
+    extends aHeaderHttp
 {
     protected $label;
-
     protected $headerLine;
 
     /**
@@ -19,7 +17,7 @@ class HeaderLine extends aHeaderHttp
      */
     function fromString($line)
     {
-        $matches = UHeader::parseLabelValue($line);
+        $matches = \Poirot\Http\Header\parseLabelValue($line);
         if ($matches === false)
             throw new \InvalidArgumentException(sprintf(
                 'Invalid Header (%s).'
@@ -63,7 +61,7 @@ class HeaderLine extends aHeaderHttp
     {
         $headerLine = (string) $headerLine;
 
-        if (!UHeader::isValidValue($headerLine))
+        if (!\Poirot\Http\Header\isValidValue($headerLine))
             throw new \InvalidArgumentException(
                 "Header value ({$headerLine}) is not valid or contains some unwanted chars."
             );
@@ -89,6 +87,6 @@ class HeaderLine extends aHeaderHttp
      */
     function renderValueLine()
     {
-        return UHeader::filterValue($this->getHeaderLine());
+        return \Poirot\Http\Header\filterValue($this->getHeaderLine());
     }
 }

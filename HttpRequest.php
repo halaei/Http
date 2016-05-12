@@ -238,29 +238,4 @@ class HttpRequest
 
         return $this;
     }
-    
-
-    // ...
-
-    /**
-     * @return HttpPlugins
-     */
-    protected function doNewDefaultPluginManager()
-    {
-        return new HttpRequestPluginManager;
-    }
-
-    /**
-     * @override ide completion
-     * @return PluginsRequestInvokable
-     */
-    function plg()
-    {
-        if (!$this->_plugins)
-            $this->_plugins = new PluginsRequestInvokable(
-                $this->getPluginManager()
-            );
-
-        return $this->_plugins;
-    }
 }

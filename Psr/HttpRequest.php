@@ -107,7 +107,7 @@ class HttpRequest extends HttpMessage
 
         # Headers:
         foreach($headers as $l => $v)
-            $this->__getHeaders()->set(factoryHttpHeader::factory($l, $v));
+            $this->__getHeaders()->set(factoryHttpHeader::of($l, $v));
 
     }
 
@@ -273,7 +273,7 @@ class HttpRequest extends HttpMessage
         $host = $uri->getHost();
         ($uri->getPort() === null) ?: $host .= ':' . $uri->getPort();
 
-        $this->__getHeaders()->set(factoryHttpHeader::factory('Host', $host));
+        $this->__getHeaders()->set(factoryHttpHeader::of('Host', $host));
 
         return $new;
     }
@@ -296,7 +296,7 @@ class HttpRequest extends HttpMessage
                 ($port = $this->uri->getPort()) ? ':'.$this->uri->getPort() : ''
             );
 
-            $this->headers->set(factoryHttpHeader::factory('Host', $host));
+            $this->headers->set(factoryHttpHeader::of('Host', $host));
         }
 
         $hdrArray = [];
@@ -320,7 +320,7 @@ class HttpRequest extends HttpMessage
                     ($port = $this->uri->getPort()) ? ':'.$this->uri->getPort() : ''
                 );
 
-                $this->headers->set(factoryHttpHeader::factory('Host', $host));
+                $this->headers->set(factoryHttpHeader::of('Host', $host));
             }
         }
 

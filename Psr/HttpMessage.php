@@ -175,7 +175,7 @@ class HttpMessage implements MessageInterface
      */
     function withHeader($name, $value)
     {
-        $header = factoryHttpHeader::factory($name, $value);
+        $header = factoryHttpHeader::of($name, $value);
 
         $new = clone $this;
         $new->__getHeaders()->set($header);

@@ -1,17 +1,17 @@
 <?php
-namespace Poirot\Http;
+namespace Poirot\Http\Header;
 
-use Poirot\Http\Header\factoryHttpHeader;
-use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\iHeaderCollection;
-use Poirot\Std\Struct\ObjectCollection;
+use Poirot\Std\Struct\CollectionObject;
 use Traversable;
 
+use Poirot\Http\Interfaces\iHeader;
+use Poirot\Http\Interfaces\iHeaders;
+
 class CollectionHeader
-    implements iHeaderCollection
+    implements iHeaders
     , \IteratorAggregate # implement \Traversable
 {
-    /** @var ObjectCollection */
+    /** @var CollectionObject */
     protected $ObjectCollection;
 
     /**
@@ -23,16 +23,16 @@ class CollectionHeader
      *
      * @param array $headers
      */
-    function __construct(array $headers = [])
+    function __construct(array $headers = array())
     {
-        $this->ObjectCollection = new ObjectCollection;
+        $this->ObjectCollection = new CollectionObject;
 
         foreach ($headers as $label => $h) {
             if (!$h instanceof iHeader)
                 // Header-Label: value header
-                $h = factoryHttpHeader::factory($label, $h);
+                $h = factoryHttpHeader::of($label, $h);
 
-            $this->set($h);
+            $this->insert($h);
         }
     }
 
@@ -44,17 +44,17 @@ class CollectionHeader
      * @param iHeader $header
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
-    function set(iHeader $header)
+    function insert($header)
     {
-        $search = ['label' => strtolower($header->getLabel())];
-
-        /*foreach($this->ObjectCollection->search($search) as $h)
-            ## previously values must overwrite
-            $this->ObjectCollection->detach($h);*/
-
-        $this->ObjectCollection->insert($header, $search);
-
+        if (!$header instanceof iHeader)
+            throw new \InvalidArgumentException(sprintf(
+                'Header must instance of iHeader; given: (%s).'
+                , \Poirot\Std\flatten($header)
+            ));
+        
+        $this->ObjectCollection->insert($header);
         return $this;
     }
 
@@ -65,17 +65,12 @@ class CollectionHeader
      *
      * @param string $label Header Label
      *
+     * @return \Traversable[iHeader]
      * @throws \Exception header not found
-     * @return iHeader
      */
     function get($label)
     {
-        $r = $this->ObjectCollection->find(['label' => strtolower($label)]);
-        $r = current($r);
-
-        if (!$r instanceof iHeader)
-            throw new \Exception("Header ({$label}) not found.");
-
+        $r = $this->ObjectCollection->find( array('label' => strtolower($label)) );
         return $r;
     }
 
@@ -90,10 +85,11 @@ class CollectionHeader
      */
     function has($label)
     {
-        $r = $this->ObjectCollection->find(['label' => strtolower($label)]);
-        $r = current($r);
+        $r = $this->ObjectCollection->find( array('label' => strtolower($label)) );
+        foreach ($r as $v)
+            return true;
 
-        return (boolean) $r;
+        return false;
     }
 
     /**
@@ -112,11 +108,20 @@ class CollectionHeader
 
         $header = $this->get($label);
         $this->ObjectCollection->del($header);
-
         return $this;
     }
 
+    /**
+     * Remove All Entities Item
+     *
+     * @return $this
+     */
+    function clean()
+    {
+        $this->ObjectCollection->clean();
+    }
 
+    
     // Implement Traversable
 
     /**
@@ -131,6 +136,21 @@ class CollectionHeader
         return $this->ObjectCollection;
     }
 
+    /**
+     * Count elements of an object
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     * </p>
+     * <p>
+     * The return value is cast to an integer.
+     * @since 5.1.0
+     */
+    public function count()
+    {
+        return $this->ObjectCollection->count();
+    }
+
+    // ..
 
     function __clone()
     {

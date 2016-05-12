@@ -1,9 +1,8 @@
 <?php
 namespace Poirot\Http\Header;
 
-use Poirot\Http\Util\UHeader;
-
-class HeaderBase extends aHeaderHttp
+class HeaderBase 
+    extends aHeaderHttp
 {
     /**
      * Set Header Label
@@ -36,7 +35,7 @@ class HeaderBase extends aHeaderHttp
      */
     function fromString($line)
     {
-        $matches = UHeader::parseLabelValue($line);
+        $matches = \Poirot\Http\Header\parseLabelValue($line);
         if ($matches === false)
             throw new \InvalidArgumentException(sprintf(
                 'Invalid Header (%s).'
@@ -45,7 +44,7 @@ class HeaderBase extends aHeaderHttp
 
         $this->setLabel(key($matches));
         // TODO
-        UHeader::parseParams(current($matches));
+        \Poirot\Http\Header\parseParams(current($matches));
 
         return $this;
     }

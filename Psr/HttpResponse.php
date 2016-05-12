@@ -143,7 +143,7 @@ class Response extends HttpMessage
 
         # Headers:
         foreach($headers as $l => $v)
-            $this->__getHeaders()->set(factoryHttpHeader::factory($l, $v));
+            $this->__getHeaders()->set(factoryHttpHeader::of($l, $v));
     }
 
     /**

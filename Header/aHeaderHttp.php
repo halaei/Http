@@ -2,30 +2,25 @@
 namespace Poirot\Http\Header;
 
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Std\Struct\OpenOptionsData;
+use Poirot\Std\Struct\DataOptionsOpen;
 
 abstract class aHeaderHttp 
-    extends OpenOptionsData
+    extends DataOptionsOpen
     implements iHeader
 {
-    protected $_t_options__internal = [
-        ## this method will ignore as option in prop
-        'getLabel',
-    ];
-
     protected $label;
 
     /**
      * Get Header Label
-     *
+     * @ignored
+     * 
      * @return string
      */
     function getLabel()
     {
         return $this->label;
     }
-
-
+    
     /**
      * Build Header From Header String Representation
      *
@@ -43,12 +38,12 @@ abstract class aHeaderHttp
      *
      * @return $this
      */
-    function from($options)
+    function import($options)
     {
         if (is_string($options))
             $this->fromString($options);
         else
-            parent::from($options);
+            parent::import($options);
 
         return $this;
     }
@@ -71,14 +66,12 @@ abstract class aHeaderHttp
      * ['label'=>'Set-Cookie', 'SID'=>'31d4d96e407aad42', 'Path'=>'/', 'HttpSecure' => null]
      * Set-Cookie: SID=31d4d96e407aad42; Path="/"; HttpSecure
      *
-     * @return string UHeader::filterValue
+     * @return string
      */
     function renderValueLine()
     {
-        $headerLine = [];
-        // TODO implement to new dataStruct as generator
-        foreach($this->props()->readable as $key) {
-            $value = $this->__get($key);
+        $headerLine = array();
+        foreach($this as $key => $value) {
             if (!is_scalar($value))
                 // TODO
                 VOID;
@@ -91,6 +84,7 @@ abstract class aHeaderHttp
             $headerLine[] = (($value) ? $key.'='.$value : $key);
         }
 
+        // filterValue()
         return implode('; ', $headerLine);
     }
 }

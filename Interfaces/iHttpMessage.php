@@ -31,7 +31,7 @@ interface iHttpMessage
      *
      * ! headers may contains multiple values, such as cookie
      *
-     * @param array|iHeaderCollection $headers
+     * @param array|iHeaders $headers
      *
      * @return $this
      */
@@ -40,7 +40,7 @@ interface iHttpMessage
     /**
      * Get Headers collection
      *
-     * @return iHeaderCollection
+     * @return iHeaders
      */
     function getHeaders();
 

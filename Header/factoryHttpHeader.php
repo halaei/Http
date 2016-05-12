@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\Http\Header;
 
-use Poirot\Http\Util\UHeader;
-
 /*
 HeaderFactory::factoryString('WWW-Authenticate: Basic realm="admin_panel"');
 HeaderFactory::factory('WWW-Authenticate', 'Basic realm="admin_panel"');
@@ -10,43 +8,39 @@ HeaderFactory::factory('WWW-Authenticate', 'Basic realm="admin_panel"');
 HeaderFactory::factory('WWW-Authenticate', ['header_line' => 'Basic realm="admin_panel"']);
 */
 
+use Poirot\Std\Interfaces\Pact\ipFactory;
+
 class factoryHttpHeader
+    implements ipFactory
 {
     /** @var PluginsHttpHeader */
     static protected $pluginManager;
 
     /**
-     * Factory Header Object From String
+     * Factory With Valuable Parameter
      *
-     * Header-Label: value, values;
+     * @param mixed $valuable
      *
-     * @param string $headerLine
-     *
-     * @return HeaderLine
+     * @throws \Exception
+     * @return mixed
      */
-    static function factoryString($headerLine)
+    static function of($valuable)
     {
+        // string:
+
         ## extract label and value from header
-        $parsed = UHeader::parseLabelValue( (string) $headerLine);
+        $parsed = \Poirot\Http\Header\parseLabelValue( (string) $headerLine);
         if ($parsed === false)
             throw new \InvalidArgumentException(sprintf(
                 'Invalid Header (%s)'
                 , $headerLine
             ));
 
-        return self::factory(key($parsed), current($parsed));
-    }
-
-    /**
-     * Factory Header Object
-     *
-     * @param string $label
-     * @param mixed  $value
-     *
-     * @return HeaderLine
-     */
-    static function factory($label, $value)
-    {
+        return self::of(key($parsed), current($parsed));
+        
+        
+        // array:
+        
         if (self::getPluginManager()->has($label))
             $header = self::getPluginManager()->get($label);
         else
@@ -62,7 +56,10 @@ class factoryHttpHeader
 
         return $header;
     }
-
+    
+    
+    // ..
+    
     /**
      * Headers Plugin Manager
      *
