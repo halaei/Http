@@ -49,15 +49,13 @@ abstract class aHttpMessage
     abstract protected function doParseFromString($message);
 
     /**
-     * Parse path string to parts in associateArray
-     * 
-     * !! The classes that extend this abstract must
-     *    implement parse methods
-     * 
-     * @param string $message
-     * @return mixed
+     * Set Options From Psr Http Message Object
+     *
+     * @param MessageInterface $psrMessage
+     *
+     * @return $this
      */
-    abstract protected function doParseFromPsr($message);
+    abstract protected function doParseFromPsr($psrMessage);
     
     /**
      * @override Parse String and Psr Message
@@ -131,7 +129,7 @@ abstract class aHttpMessage
      *
      * @return string
      */
-    function toString()
+    function render()
     {
         $return = $this->renderHeaders();
 

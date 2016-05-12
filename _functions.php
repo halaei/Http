@@ -3,6 +3,7 @@ namespace Poirot\Http
 {
     use Poirot\Http\Interfaces\Message\iHttpRequest;
     use Poirot\Http\Psr\Interfaces\RequestInterface;
+    use Poirot\Http\Psr\Interfaces\ResponseInterface;
 
     /**
      * Parse Http Request Message To It's Parts
@@ -45,7 +46,8 @@ namespace Poirot\Http
                 ## headers end
                 break;
 
-            $Return['headers'][] = $nextLine;
+            $ph = \Poirot\Http\Header\parseLabelValue($nextLine);
+            $Return['headers'][key($ph)] = current($ph);
         }
 
         // body:
@@ -61,13 +63,6 @@ namespace Poirot\Http
      */
     function parseRequestFromPsr(RequestInterface $psrRequest)
     {
-        if (!$psrRequest instanceof RequestInterface)
-            throw new \InvalidArgumentException(sprintf(
-                'Request Object must instance of RequestInterface but (%s) given.'
-                , \Poirot\Std\flatten($psrRequest)
-            ));
-
-
         $headers = array();
         foreach($psrRequest->getHeaders() as $h => $v)
             $headers[$h] = $v;
@@ -78,6 +73,73 @@ namespace Poirot\Http
             'version' => $psrRequest->getProtocolVersion(),
             'headers' => $headers,
             'body'    => $psrRequest->getBody(),
+        );
+
+        return $Return;
+    }
+
+    /**
+     * Parse Http Response Message To It's Parts
+     * @param string $message
+     * @return array
+     */
+    function parseResponseFromString($message)
+    {
+        if (!preg_match_all('/.*[\r\n]?/', $message, $lines))
+            throw new \InvalidArgumentException('Error Parsing Response Message.');
+
+        $Return = array();
+        
+        $lines = $lines[0];
+
+        $regex     = '/^HTTP\/(?P<version>1\.[01]) (?P<status>\d{3})(?:[ ]+(?P<reason>.*))?$/';
+        $firstLine = array_shift($lines);
+        $matches   = array();
+        if (!preg_match($regex, $firstLine, $matches))
+            throw new \InvalidArgumentException(
+                'A valid response status line was not found in the provided string.'
+                . ' response:'
+                . $message
+            );
+
+        $Return['version']       = $matches['version'];
+        $Return['status_code']   = $matches['status'];
+        $Return['status_reason'] = ( (isset($matches['reason']) ? $matches['reason'] : '') );
+
+        // headers:
+        $Return['headers'] = array();
+        while ($nextLine = array_shift($lines)) {
+            if (trim($nextLine) == '')
+                // headers end
+                break;
+
+            $ph = \Poirot\Http\Header\parseLabelValue($nextLine);
+            $Return['headers'][key($ph)] = current($ph);
+        }
+
+        // body:
+        $Return['body'] = (rtrim(implode("\r\n", $lines), "\r\n"));
+
+        return $this;
+    }
+
+    /**
+     * Parse Psr Http Message To It's Parts
+     * @param ResponseInterface $psrResponse
+     * @return array
+     */
+    function parseResponseFromPsr(ResponseInterface $psrResponse)
+    {
+        $headers = array();
+        foreach($psrResponse->getHeaders() as $h => $v)
+            $headers[$h] = \Poirot\Http\Header\joinParams($v);
+
+        $Return = array(
+            'version'     => $psrResponse->getProtocolVersion(),
+            'stat_code'   => $psrResponse->getStatusCode(),
+            'stat_reason' => $psrResponse->getReasonPhrase(),
+            'headers'     => $headers,
+            'body'        => $psrResponse->getBody(),
         );
 
         return $Return;
@@ -133,7 +195,7 @@ namespace Poirot\Http\Psr
      */
     function normalizeFiles(array $files, $stream = null)
     {
-        $normalized = [];
+        $normalized = array();
         foreach ($files as $key => $value) {
             if ($value instanceof UploadedFileInterface) {
                 $normalized[$key] = $value;
@@ -188,15 +250,15 @@ namespace Poirot\Http\Psr
      */
     function __normalizeNestedFileSpec(array $files, $stream)
     {
-        $files = [];
+        $files = array();
         foreach (array_keys($files['tmp_name']) as $key) {
-            $spec = [
+            $spec = array(
                 'tmp_name' => $files['tmp_name'][$key],
                 'size'     => $files['size'][$key],
                 'error'    => $files['error'][$key],
                 'name'     => $files['name'][$key],
                 'type'     => $files['type'][$key],
-            ];
+            );
             $files[$key] = __createUploadedFileFromSpec($spec, $stream);
         }
     
@@ -208,12 +270,13 @@ namespace Poirot\Http\Cookie
 {
     function parseCookie($header)
     {
-        $cookies = [];
+        $cookies = array();
 
         $cookie = new cookie();
 
         $parts = explode("=",$header);
         for ($i=0; $i< count($parts); $i++) {
+            $key = null;
             $part = $parts[$i];
             if ($i==0) {
                 $key = $part;
@@ -384,7 +447,7 @@ namespace Poirot\Http\Header
         if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
             return false;
 
-        return [ $matches['label'] => $matches['value'] ];
+        return array( $matches['label'] => $matches['value'] );
     }
 
     /**
@@ -420,9 +483,9 @@ namespace Poirot\Http\Header
     {
         if (!is_array($header_values)) $header_values = [$header_values];
 
-        $result = [];
+        $result = array();
         foreach ($header_values as $header) {
-            $cur = [];
+            $cur = array();
             while ($header) {
                 $key = '';
                 $val = null;
@@ -489,9 +552,9 @@ namespace Poirot\Http\Header
         if (!is_array($header_values) || !count($header_values)) return false;
         if (!isset($header_values[0])) $header_values = array($header_values);
 
-        $result = [];
+        $result = array();
         foreach ($header_values as $header) {
-            $attr = [];
+            $attr = array();
             foreach ($header as $key => $val) {
                 if (isset($val)) {
                     if (preg_match('/^\w+$/', $val)) {
@@ -590,6 +653,7 @@ namespace Poirot\Http\Response
      */
     function getStatReasonFromCode($statusCode)
     {
+        global $phrases;
         return isset($phrases[$statusCode]) ? $phrases[$statusCode] : null;
     }
 

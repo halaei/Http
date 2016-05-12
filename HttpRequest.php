@@ -78,7 +78,7 @@ class HttpRequest
     {
         $return = '';
         $return .= $this->renderRequestLine();
-        $return .= parent::toString();
+        $return .= parent::render();
         return $return;
     }
 
@@ -196,7 +196,7 @@ class HttpRequest
                 , $target
             ));
         
-        $this->target_uri = $target;
+        $this->target_uri = (string) $target;
         return $this;
     }
 
