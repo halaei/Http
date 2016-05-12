@@ -1,14 +1,12 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
+use Poirot\Http\HttpMessage\Request\Plugin\PhpServer;
 use Poirot\Std\Struct\aDataOptions;
 
 use Poirot\Stream\Streamable;
 
-use Poirot\Http\HttpMessage\Plugins\Request\PhpServer;
-
-class BuilderRequestByServerGlobal 
-    extends aDataOptions
+class BuildRequestByPhpServer
 {
     /** @var PhpServer */
     protected $server;
@@ -26,7 +24,7 @@ class BuilderRequestByServerGlobal
      *
      * - build server environment upon server object
      *
-     * @param PhpServer              $phpServer
+     * @param PhpServer          $phpServer
      * @param array|iOptionsData $options   Options
      */
     function __construct(/*PhpServer*/ $phpServer = null, $options = null)
@@ -41,23 +39,8 @@ class BuilderRequestByServerGlobal
             ));
 
         $this->server = $phpServer;
-
-        parent::__construct($options);
     }
-
-    /**
-     * Set Host
-     *
-     * @param string $host
-     *
-     * @return $this
-     */
-    function setHost($host)
-    {
-        $this->host = $host;
-        return $this;
-    }
-
+    
     /**
      * Get Host
      *
@@ -77,20 +60,7 @@ class BuilderRequestByServerGlobal
         $this->setHost($host);
         return $this->getHost();
     }
-
-    /**
-     * Set Request Uri
-     *
-     * @param string $uri
-     *
-     * @return $this
-     */
-    function setUri($uri)
-    {
-        $this->uri = $uri;
-        return $this;
-    }
-
+    
     /**
      * Get Request Uri
      *
@@ -216,29 +186,7 @@ class BuilderRequestByServerGlobal
 
             return $origPathInfo;
         }
-
-    /**
-     * Set Headers
-     *
-     * @param array|CollectionHeader $headers
-     *
-     * @return $this
-     */
-    function setHeaders($headers)
-    {
-        if (is_array($headers))
-            $headers = new CollectionHeader($headers);
-
-        if (!$headers instanceof CollectionHeader)
-            throw new \InvalidArgumentException(sprintf(
-                'Headers must be array or instance of (Headers), given: %s.'
-                , is_object($headers) ? get_class($headers) : \Poirot\Std\flatten($headers)
-            ));
-
-        $this->headers = $headers;
-        return $this;
-    }
-
+    
     /**
      * Get Headers
      *
@@ -266,20 +214,7 @@ class BuilderRequestByServerGlobal
         $this->setHeaders($headers);
         return $this->getHeaders();
     }
-
-    /**
-     * Set Request Method
-     *
-     * @param $method
-     *
-     * @return $this
-     */
-    function setMethod($method)
-    {
-        $this->method = $method;
-        return $this;
-    }
-
+    
     /**
      * Get Request Method
      *
@@ -298,20 +233,7 @@ class BuilderRequestByServerGlobal
         $this->setMethod($method);
         return $this->getMethod();
     }
-
-    /**
-     * Set Body
-     *
-     * @param mixed $body
-     *
-     * @return $this
-     */
-    function setBody($body)
-    {
-        $this->body = $body;
-        return $this;
-    }
-
+    
     /**
      * Get Body
      *
@@ -348,17 +270,7 @@ class BuilderRequestByServerGlobal
         $this->setBody($body);
         return $this->getBody();
     }
-
-    /**
-     * @param mixed $version
-     * @return $this
-     */
-    function setVersion($version)
-    {
-        $this->version = $version;
-        return $this;
-    }
-
+    
     /**
      * @return mixed
      */

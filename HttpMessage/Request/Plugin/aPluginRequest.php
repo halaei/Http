@@ -1,14 +1,30 @@
 <?php
-namespace Poirot\Http\Plugins\Request;
+namespace Poirot\Http\HttpMessage\Request\Plugin;
 
-use Poirot\Http\Interfaces\Message\ipHttpMessage;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\HttpMessage\Interfaces\iPluginHttp;
+use Poirot\Http\Interfaces\iHttpMessage;
+use Poirot\Http\Interfaces\iHttpRequest;
 
-trait RequestPluginTrait
+class aPluginRequest
+    implements iPluginHttp
 {
-    /** @var ipHttpMessage */
+    /** @var iHttpRequest */
     protected $messageObject;
 
+
+    /**
+     * Wrapper Identifier Around Http Message
+     *
+     * @param iHttpRequest $httpRequest
+     * 
+     * @return static
+     */
+    static function _(iHttpRequest $httpRequest)
+    {
+        $plugin = new static;
+        $plugin->setMessageObject($httpRequest);
+        return $plugin;
+    }
 
     // Implement iHttpPlugin
 
@@ -17,11 +33,11 @@ trait RequestPluginTrait
      *
      * note: so services can have access to http message instance
      *
-     * @param ipHttpMessage $httpMessage
+     * @param iHttpMessage $httpMessage
      *
      * @return $this
      */
-    function setMessageObject(ipHttpMessage $httpMessage)
+    function setMessageObject(iHttpMessage $httpMessage)
     {
         if (!$httpMessage instanceof iHttpRequest)
             throw new \InvalidArgumentException(sprintf(
@@ -30,7 +46,6 @@ trait RequestPluginTrait
             ));
 
         $this->messageObject = $httpMessage;
-
         return $this;
     }
 
@@ -41,7 +56,7 @@ trait RequestPluginTrait
      */
     function getMessageObject()
     {
+        // TODO Current Request if not any present
         return $this->messageObject;
     }
 }
- 

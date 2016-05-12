@@ -1,66 +1,63 @@
 <?php
-namespace Poirot\Http\HttpMessage\Plugins\Request;
+namespace Poirot\Http\HttpMessage\Request\Plugin;
 
-use Poirot\Container\Service\AbstractService;
-use Poirot\Std\Interfaces\Struct\iDataStruct;
-use Poirot\Http\Plugins\iAddOnHttpMessage;
-use Poirot\Http\Psr\Util;
-use Poirot\Std\Interfaces\Struct\iEntityData;
-use Poirot\Std\Struct\EntityData;
+use Poirot\Std\Interfaces\Struct\iDataEntity;
+use Poirot\Std\Struct\aDataOptions;
+use Poirot\Std\Struct\DataEntity;
 
-class PhpServer extends AbstractService
-    implements iAddOnHttpMessage
+class PhpServer 
+    extends aPluginRequest
 {
-    use RequestPluginTrait;
-
-    /** @var string Service Name */
-    protected $name = 'PhpServer';
-
+    /** @var iDataEntity $_ENV*/
     protected $env;
+    /** @var iDataEntity $_GET*/
     protected $get;
-    /** @var iEntityData $_POST */
+    /** @var iDataEntity $_POST */
     protected $post;
+    /** @var iDataEntity $_COOKIE */
     protected $cookie;
+    /** @var iDataEntity $_SERVER */
     protected $server;
+    /** @var iDataEntity $_FILES */
     protected $files;
 
     /**
      * Set Env
-     * @param array|iDataStruct $env
+     * @param null|array|\Traversable $env
      * @return $this
      */
     function setEnv($env)
     {
-        $this->env = new EntityData($env);
+        $this->env = new DataEntity($env);
         return $this;
     }
 
     /**
      * Get Env
-     * @return EntityData
+     * @return DataEntity
      */
     function getEnv()
     {
         if (!$this->env)
             $this->setEnv($_ENV);
-
+        
         return $this->env;
     }
 
     /**
      * Set Query Get
-     * @param array|iDataStruct $get
+     * @param null|array|\Traversable $get
      * @return $this
      */
     function setQuery($get)
     {
-        $this->get = new EntityData($get);
+        $this->get = new DataEntity($get);
         return $this;
     }
 
     /**
      * Get Query
-     * @return EntityData
+     * @return DataEntity
      */
     function getQuery()
     {
@@ -72,21 +69,22 @@ class PhpServer extends AbstractService
 
     /**
      * Set Post
-     * @param array|iDataStruct $post
+     * @param null|array|\Traversable $post
      * @return $this
      */
     function setPost($post)
     {
-        $this->post = new EntityData($post);
+        $this->post = new DataEntity($post);
         return $this;
     }
 
     /**
      * Get Post
+     * 
      * @param null $key
      * @param null $default
      *
-     * @return EntityData|mixed
+     * @return DataEntity|string value of individual post
      */
     function getPost($key = null, $default = null)
     {
@@ -101,18 +99,18 @@ class PhpServer extends AbstractService
 
     /**
      * Set Cookies
-     * @param array|iDataStruct $cookie
+     * @param null|array|\Traversable $cookie
      * @return $this
      */
     function setCookie($cookie)
     {
-        $this->cookie = new EntityData($cookie);
+        $this->cookie = new DataEntity($cookie);
         return $this;
     }
 
     /**
      * Get Cookie
-     * @return EntityData
+     * @return DataEntity
      */
     function getCookie()
     {
@@ -124,20 +122,21 @@ class PhpServer extends AbstractService
 
     /**
      * Set Server
-     * @param array|iDataStruct $server
+     * @param null|array|\Traversable $server
      * @return $this
      */
     function setServer($server)
     {
-        $this->server = new EntityData(
-            $this->__normalizeServer($server)
+        $this->server = new DataEntity(
+            $this->_normalizeServer($server)
         );
+        
         return $this->server;
     }
 
     /**
      * Get Server
-     * @return EntityData
+     * @return DataEntity
      */
     function getServer()
     {
@@ -154,7 +153,7 @@ class PhpServer extends AbstractService
      */
     function setFiles($files)
     {
-        $this->files = Util::normalizeFiles($files);
+        $this->files = \Poirot\Http\Psr\normalizeFiles($files);
         return $this;
     }
 
@@ -181,8 +180,6 @@ class PhpServer extends AbstractService
      */
     function getBaseUrl()
     {
-        $baseUrl        = '';
-
         $filename       = $this->getServer()->get('SCRIPT_FILENAME', '');
         $scriptName     = $this->getServer()->get('SCRIPT_NAME');
         $phpSelf        = $this->getServer()->get('PHP_SELF');
@@ -208,8 +205,7 @@ class PhpServer extends AbstractService
         }
 
         // Does the base URL have anything in common with the request URI?
-        $requestUri = $this->getMessageObject()->getUri()->getPath();
-        $requestUri = $requestUri->toString();
+        $requestUri = $this->getMessageObject()->getUri();
 
         // Full base URL matches.
         if (0 === strpos($requestUri, $baseUrl))
@@ -268,22 +264,10 @@ class PhpServer extends AbstractService
         return rtrim($baseUrl, '/');
     }
 
+    
     // ...
 
-    /**
-     * Create Service
-     *
-     * @return mixed
-     */
-    function createService()
-    {
-        return $this;
-    }
-
-
-    // ...
-
-    protected function __normalizeServer(array $server)
+    protected function _normalizeServer(array $server)
     {
         if (is_callable('apache_request_headers')) {
             $apacheHeaders = apache_request_headers();

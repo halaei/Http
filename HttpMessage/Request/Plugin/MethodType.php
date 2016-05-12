@@ -1,24 +1,17 @@
 <?php
-namespace Poirot\Http\HttpMessage\Plugins\Request;
+namespace Poirot\Http\HttpMessage\Request\Plugin;
 
-use Poirot\Http\HttpMessage\Interfaces\iPluginHttp;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHttpMessage;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Ioc\Container\Interfaces\iContainerService;
-use Poirot\Ioc\Container\Service\aServiceContainer;
+use Poirot\Http\Interfaces\iHttpRequest;
 
-class MethodType 
-    extends aServiceContainer
-    implements iPluginHttp
-    , iContainerService
+class MethodType
+    extends aPluginRequest
 {
-    /** @var string Service Name */
-    protected $name = 'MethodType';
-
     /** @var iHttpMessage */
     protected $messageObject;
 
+    
     /**
      * Is this an OPTIONS method request?
      *
@@ -26,7 +19,7 @@ class MethodType
      */
     function isOptions()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_OPTIONS);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_OPTIONS);
     }
 
     /**
@@ -36,7 +29,7 @@ class MethodType
      */
     function isPropFind()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_PROPFIND);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_PROPFIND);
     }
 
     /**
@@ -46,7 +39,7 @@ class MethodType
      */
     function isGet()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_GET);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_GET);
     }
 
     /**
@@ -56,7 +49,7 @@ class MethodType
      */
     function isHead()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_HEAD);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_HEAD);
     }
 
     /**
@@ -66,7 +59,7 @@ class MethodType
      */
     function isPost()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_POST);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_POST);
     }
 
     /**
@@ -76,7 +69,7 @@ class MethodType
      */
     function isPut()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_PUT);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_PUT);
     }
 
     /**
@@ -86,7 +79,7 @@ class MethodType
      */
     function isDelete()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_DELETE);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_DELETE);
     }
 
     /**
@@ -96,7 +89,7 @@ class MethodType
      */
     function isTrace()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_TRACE);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_TRACE);
     }
 
     /**
@@ -106,7 +99,7 @@ class MethodType
      */
     function isConnect()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_CONNECT);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_CONNECT);
     }
 
     /**
@@ -116,7 +109,7 @@ class MethodType
      */
     function isPatch()
     {
-        return ($this->getMessageObject()->getMethod() === HttpRequest::METHOD_PATCH);
+        return ($this->getMessageObject()->getMethod() === iHttpRequest::METHOD_PATCH);
     }
 
     /**
@@ -129,7 +122,7 @@ class MethodType
     function isXmlHttpRequest()
     {
         /** @var iHeader $header */
-        $header = $this->getMessageObject()->getHeaders()->search(['label' => 'X_REQUESTED_WITH']);
+        $header = $this->getMessageObject()->getHeaders()->has('X_REQUESTED_WITH');
         return false !== $header && $header->renderValueLine() == 'XMLHttpRequest';
     }
 
@@ -141,55 +134,7 @@ class MethodType
     function isFlashRequest()
     {
         /** @var iHeader $header */
-        $header = $this->getMessageObject()->getHeaders()->search(['label' => 'USER_AGENT']);
+        $header = $this->getMessageObject()->getHeaders()->has('USER_AGENT');
         return false !== $header && stristr($header->renderValueLine(), ' flash');
-    }
-
-
-    // Implement iCService
-
-    /**
-     * Create Service
-     *
-     * @return mixed
-     */
-    function createService()
-    {
-        return $this;
-    }
-
-
-    // Implement iHttpPlugin
-
-    /**
-     * Set Http Message Object (Request|Response)
-     *
-     * note: so services can have access to http message instance
-     *
-     * @param ipHttpMessage $httpMessage
-     *
-     * @return $this
-     */
-    function setMessageObject(ipHttpMessage $httpMessage)
-    {
-        if (!$httpMessage instanceof iHttpRequest)
-            throw new \InvalidArgumentException(sprintf(
-                'This plugin need request object instance of iHttpRequest, "%s" given.'
-                , get_class($httpMessage)
-            ));
-
-        $this->messageObject = $httpMessage;
-
-        return $this;
-    }
-
-    /**
-     * Get Http Message
-     *
-     * @return ipHttpMessage
-     */
-    function getMessageObject()
-    {
-        return $this->messageObject;
     }
 }
