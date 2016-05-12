@@ -1,14 +1,14 @@
 <?php
 namespace Poirot\Http\Psr;
 
+use Poirot\Stream\Psr\StreamInterface;
+use Poirot\Stream\Psr\StreamPsr;
+
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
-use Poirot\PathUri\Psr\HttpUri;
-use Poirot\PathUri\Psr\UriInterface;
-use Poirot\Stream\Psr\StreamInterface;
-use Poirot\Stream\Psr\StreamPsr;
+
 
 class HttpRequest extends HttpMessage
     implements RequestInterface
@@ -30,7 +30,7 @@ class HttpRequest extends HttpMessage
     const METHOD_PROPFIND = 'PROPFIND';
     /**#@-*/
 
-    /** @var UriInterface */
+    /** @var string */
     protected $uri;
     /** @var string Request Method */
     protected $method;
@@ -38,7 +38,7 @@ class HttpRequest extends HttpMessage
     protected $uriTarget;
 
     /** @var array Supported HTTP methods */
-    protected $__validMethods = [
+    protected $__validMethods = array(
         'CONNECT',
         'DELETE',
         'GET',
@@ -48,7 +48,7 @@ class HttpRequest extends HttpMessage
         'POST',
         'PUT',
         'TRACE',
-    ];
+    );
 
     /**
      * Construct
@@ -72,7 +72,7 @@ class HttpRequest extends HttpMessage
 
             ## http headers
             /** @var iHeader $h */
-            $httpHeaders = [];
+            $httpHeaders = array();
             foreach($uri->getHeaders() as $h)
                 $httpHeaders[$h->getLabel()] = $h->renderValueLine();
             $headers = array_merge($httpHeaders, $headers);
@@ -107,7 +107,7 @@ class HttpRequest extends HttpMessage
 
         # Headers:
         foreach($headers as $l => $v)
-            $this->__getHeaders()->set(FactoryHttpHeader::of( array($l, $v)) );
+            $this->_getHeaders()->set(FactoryHttpHeader::of( array($l, $v)) );
 
     }
 
@@ -273,7 +273,7 @@ class HttpRequest extends HttpMessage
         $host = $uri->getHost();
         ($uri->getPort() === null) ?: $host .= ':' . $uri->getPort();
 
-        $this->__getHeaders()->set(FactoryHttpHeader::of( array('Host', $host)) );
+        $this->_getHeaders()->set(FactoryHttpHeader::of( array('Host', $host)) );
 
         return $new;
     }

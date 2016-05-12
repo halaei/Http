@@ -1,8 +1,9 @@
 <?php
 namespace Poirot\Http\Psr;
 
+use Poirot\Http\Header\aHeaderHttp;
+use Poirot\Http\Header\CollectionHeader;
 use Poirot\Http\Header\FactoryHttpHeader;
-use Poirot\Http\CollectionHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Psr\Interfaces\MessageInterface;
 use Poirot\Stream\Psr\StreamInterface;
@@ -43,6 +44,7 @@ class HttpMessage implements MessageInterface
      *
      * @param string $version HTTP protocol version
      * @return HttpMessage
+     * @throws \Exception
      */
     function withProtocolVersion($version)
     {
@@ -86,10 +88,10 @@ class HttpMessage implements MessageInterface
      */
     function getHeaders()
     {
-        $headers = [];
+        $headers = array();
         /** @var iHeader $h */
-        foreach ($this->__getHeaders() as $h)
-            $headers[$h->getLabel()] = UHeader::parseParams($h->renderValueLine());
+        foreach ($this->_getHeaders() as $h)
+            $headers[$h->getLabel()] = \Poirot\Http\Header\parseParams($h->renderValueLine());
 
         return $headers;
     }
@@ -104,7 +106,7 @@ class HttpMessage implements MessageInterface
      */
     function hasHeader($name)
     {
-        return $this->__getHeaders()->has($name);
+        return $this->_getHeaders()->has($name);
     }
 
     /**
@@ -123,12 +125,12 @@ class HttpMessage implements MessageInterface
      */
     function getHeader($name)
     {
-        if (!$this->__getHeaders()->has($name))
-            return [];
+        if (!$this->_getHeaders()->has($name))
+            return array();
 
-        $header = $this->__getHeaders()->get($name);
-
-        return UHeader::parseParams($header->renderValueLine());
+        /** @var iHeader $header */
+        $header = $this->_getHeaders()->get($name);
+        return \Poirot\Http\Header\parseParams($header->renderValueLine());
     }
 
     /**
@@ -155,7 +157,9 @@ class HttpMessage implements MessageInterface
         if (!$this->headers->has($name))
             return '';
 
-        return $this->__getHeaders()->get($name)->renderValueLine();
+        /** @var iHeader $header */
+        $header = $this->_getHeaders()->get($name);
+        return $header->renderValueLine();
     }
 
     /**
@@ -178,8 +182,7 @@ class HttpMessage implements MessageInterface
         $header = FactoryHttpHeader::of( array($name, $value) );
 
         $new = clone $this;
-        $new->__getHeaders()->set($header);
-
+        $new->_getHeaders()->insert($header);
         return $new;
     }
 
@@ -201,7 +204,7 @@ class HttpMessage implements MessageInterface
      */
     function withAddedHeader($name, $value)
     {
-        (!is_string($value)) ?: $value = [$value];
+        (!is_string($value)) ?: $value = array($value);
 
         if (! is_array($value))
             throw new \InvalidArgumentException(sprintf(
@@ -209,26 +212,25 @@ class HttpMessage implements MessageInterface
                 , \Poirot\Std\flatten($value)
             ));
 
-        if (!$this->__getHeaders()->has($name))
+        if (!$this->_getHeaders()->has($name))
             return $this->withHeader($name, $value);
 
 
         // ..
 
-        /** @var iHeader $header */
+        /** @var aHeaderHttp $header */
         $header = clone $this->getHeader($name);
 
         $new = clone $this;
         foreach($value as $p => $b)
             if (is_int($p))
                 // ['en_US', ..]
-                $header->__set($b, null);
+                $header->import( array($b => '') );
             else
                 // ['foo' => 'bar']
-                $header->__set($p, $b);
+                $header->import( array($p => $b) );
 
-        $new->__getHeaders()->set($header);
-
+        $new->_getHeaders()->insert($header);
         return $new;
     }
 
@@ -250,9 +252,8 @@ class HttpMessage implements MessageInterface
             return $this;
 
         $new     = clone $this;
-        $headers = $new->__getHeaders()->del($name);
+        $headers = $new->_getHeaders()->del($name);
         $new->headers = $headers;
-
         return $new;
     }
 
@@ -283,13 +284,12 @@ class HttpMessage implements MessageInterface
     {
         $new = clone $this;
         $new->stream = $body;
-
         return $new;
     }
 
     // ...
 
-    protected function __getHeaders()
+    protected function _getHeaders()
     {
         if (!$this->headers)
             $this->headers = new CollectionHeader;
