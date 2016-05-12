@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Http;
 
+use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Psr\Interfaces\RequestInterface;
 
@@ -110,7 +111,7 @@ class HttpRequest
      */
     function setMethod($method)
     {
-        $method = strtoupper($method);
+        $method = strtoupper((string) $method);
         /*if (!defined('static::METHOD_' . $method))
             throw new \InvalidArgumentException("Invalid HTTP method ({$method}).");*/
 
@@ -141,7 +142,7 @@ class HttpRequest
      */
     function setHost($host)
     {
-        $this->host = strtolower($host);
+        $this->host = strtolower((string) $host);
         return $this;
     }
 
@@ -157,46 +158,44 @@ class HttpRequest
      */
     function getHost()
     {
-        if (!$this->host) {
-            // attempt to get host from target uri
-            $host = $this->getUri()->getHost();
-            if (!$host)
-                /** @var iHeader $host */
-                if ($this->getHeaders()->has('Host') && $host = $this->getHeaders()->get('Host'))
-                    $host = $host->render();
-
-            $this->setHost($host);
+        if ($this->host)
+            return $this->host;
+        
+        // attempt to get host from target uri
+        $host  = $this->getUri();
+        $host  = parse_url($host, PHP_URL_HOST);
+        if (!$host && $this->getHeaders()->has('Host')) {
+            /** @var iHeader $host */
+            $host = $this->getHeaders()->get('Host');
+            $host = $host->render();
         }
 
-        return $this->host;
+        return $host;
     }
 
     /**
      * Set Uri Target
      *
-     * @param string|iHttpUri|iSeqPathUri $target
-     * @param bool $preserveHost When this argument is set to true,
-     *                           the returned request will not update
-     *                           the Host header of the returned message
+     * @param string $target
+     * @param bool   $preserveHost When this argument is set to true,
+     *                             the returned request will not update
+     *                             the Host header of the returned message
      *
      * @return $this
      */
     function setUri($target = null, $preserveHost = true)
     {
-        if ($target === null)
+        $target = (string) $target;
+        if (empty($target) && $target !== "0")
             $target = '/';
-
-        if (is_string($target))
-            $target = new HttpUri($target);
-        elseif($target instanceof iSeqPathUri)
-            $target = (new HttpUri)->setPath($target);
-
-        if (!$target instanceof iHttpUri)
+        
+        // validate uri
+        if (parse_url($target) === false)
             throw new \InvalidArgumentException(sprintf(
-                'Invalid URI provided; must be null, a string, or a iHttpUri, iSeqPathUri instance. "%s" given.'
-                , \Poirot\Std\flatten($target)
+                'Malformed URI: (%s).'
+                , $target
             ));
-
+        
         $this->target_uri = $target;
         return $this;
     }
@@ -215,27 +214,5 @@ class HttpRequest
             $this->setUri();
 
         return $this->target_uri;
-    }
-
-    /**
-     * Set Uri Options
-     *
-     * @param iHttpUri|iDataStruct|array $options
-     *
-     * @return $this
-     */
-    function setUriOptions($options)
-    {
-        if ($options instanceof iDataStruct)
-            $options = $options->toArray();
-
-        if(is_array($options))
-            $this->getUri()->fromArray($options);
-        elseif ($options instanceof iHttpUri)
-            $this->getUri()->fromPathUri($options);
-        else
-            throw new \InvalidArgumentException;
-
-        return $this;
     }
 }
