@@ -148,10 +148,7 @@ class DataParseRequestPhp
      */
     function getBody()
     {
-        $_f__readInputStream = function() {
-
-        };
-
+        // TODO read body
 
         // ..
 
@@ -165,10 +162,10 @@ class DataParseRequestPhp
                 ## create MultiPart Stream From _FILES
                 $rawData =  \Poirot\Http\Psr\normalizeFiles($_FILES);
 
-            // TODO
+            // TODO 
             return (new StreamBodyMultiPart($rawData));
         }
-
-
+        
+        
     }
 }
