@@ -1,22 +1,17 @@
 <?php
 namespace Poirot\Http;
 
-use Psr\Http\Message\MessageInterface;
-
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Interfaces\Struct\iDataMean;
 use Poirot\Std\Struct\aDataOptions;
 use Poirot\Std\Struct\DataMean;
-
-use Poirot\Stream\Interfaces\iStreamable;
-use Poirot\Stream\Psr\StreamInterface as PsrStreamInterface;
-use Poirot\Stream\Streamable;
 
 use Poirot\Http\Header\CollectionHeader;
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\Interfaces\iHttpMessage;
+use Psr\Http\Message\StreamInterface;
 
 
 abstract class aHttpMessage
@@ -32,67 +27,11 @@ abstract class aHttpMessage
     protected $version = '1.1';
     /** @var iHeaders */
     protected $headers;
-    /** @var string|iStreamable */
+    /** @var string|StreamInterface */
     protected $body;
 
     
-    // Implement Configurable:
     
-    /**
-     * Parse path string to parts in associateArray
-     * 
-     * !! The classes that extend this abstract must 
-     *    implement parse methods
-     * 
-     * @param string $message
-     * @return mixed
-     */
-    abstract protected function doParseFromString($message);
-
-    /**
-     * Set Options From Psr Http Message Object
-     *
-     * @param MessageInterface $psrMessage
-     *
-     * @return $this
-     */
-    abstract protected function doParseFromPsr($psrMessage);
-    
-    /**
-     * @override Parse String and Psr Message
-     * @inheritdoc
-     */
-    static function parseWith($optionsResource, array $_ = null)
-    {
-        if (!static::isConfigurableWith($optionsResource))
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid Resource provided; given: (%s).'
-                , \Poirot\Std\flatten($optionsResource)
-            ));
-
-
-        $self = new static;
-        if (is_string($optionsResource))
-            $optionsResource = $self->doParseFromString($optionsResource);
-
-        if ($optionsResource instanceof MessageInterface)
-            $optionsResource = $self->doParseFromPsr($optionsResource);
-        
-        return $optionsResource;
-    }
-
-    /**
-     * @override Parse String and Psr Message
-     * @inheritdoc
-     */
-    static function isConfigurableWith($optionsResource)
-    {
-        return $optionsResource instanceof MessageInterface
-        || is_array($optionsResource) || is_string($optionsResource);
-    }
-    
-    // -
-
     /**
      * @return iDataMean
      */
@@ -135,7 +74,7 @@ abstract class aHttpMessage
         $return = $this->renderHeaders();
 
         $body = $this->getBody();
-        if ($body instanceof PsrStreamInterface) {
+        if ($body instanceof StreamInterface) {
             if ($body->isSeekable()) $body->rewind();
             while (!$body->eof())
                 $return .= $body->read(24400);
@@ -163,7 +102,7 @@ abstract class aHttpMessage
 
         $body = $this->getBody();
         ob_start();
-        if ($body instanceof PsrStreamInterface) {
+        if ($body instanceof StreamInterface) {
             if ($body->isSeekable()) $body->rewind();
             while (!$body->eof())
                 echo $body->read(24400);
@@ -200,6 +139,9 @@ abstract class aHttpMessage
      */
     function getVersion()
     {
+        if (empty($this->version))
+            $this->version = self::Vx1_1;
+        
         return $this->version;
     }
 
@@ -254,13 +196,13 @@ abstract class aHttpMessage
     /**
      * Set Message Body Content
      *
-     * @param string|PsrStreamInterface $content
+     * @param string|StreamInterface $content
      *
      * @return $this
      */
     function setBody($content)
     {
-        if (!$content instanceof PsrStreamInterface)
+        if (!$content instanceof StreamInterface)
             ## Instead Of StreamInterface must convert to string
             $content = (string) $content;
 
@@ -271,7 +213,7 @@ abstract class aHttpMessage
     /**
      * Get Message Body Content
      *
-     * @return string|PsrStreamInterface
+     * @return string|StreamInterface
      */
     function getBody()
     {

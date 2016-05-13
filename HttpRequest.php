@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\Http;
 
-use Psr\Http\Message\RequestInterface;
-
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHttpRequest;
 
@@ -14,29 +12,6 @@ class HttpRequest
     protected $host;
     protected $target_uri;
     
-    
-    /**
-     * Parse path string to parts in associateArray
-     * @param string $message
-     * @return mixed
-     */
-    protected function doParseFromString($message)
-    {
-        return \Poirot\Http\parseRequestFromString($message);
-    }
-        
-    /**
-     * Set Options From Psr Http Message Object
-     *
-     * @param RequestInterface $psrRequest
-     *
-     * @return $this
-     */
-    protected function doParseFromPsr($psrRequest)
-    {
-        return \Poirot\Http\parseRequestFromPsr($psrRequest);
-    }
-
     
     /**
      * Return the formatted request line (first line) for this http request

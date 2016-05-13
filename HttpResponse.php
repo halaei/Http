@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\Http;
 
-use Psr\Http\Message\ResponseInterface;
-
 use Poirot\Http\Interfaces\iHttpResponse;
 
 class HttpResponse
@@ -12,32 +10,6 @@ class HttpResponse
     protected $statCode;
     protected $statReason;
 
-    
-    /**
-     * Parse path string to parts in associateArray
-     *
-     * !! The classes that extend this must
-     *    implement parse methods
-     *
-     * @param string $message
-     * @return mixed
-     */
-    protected function doParseFromString($message)
-    {
-        return \Poirot\Http\parseResponseFromString($message);
-    }
-
-    /**
-     * Set Options From Psr Http Message Object
-     *
-     * @param ResponseInterface $psrResponse
-     *
-     * @return $this
-     */
-    protected function doParseFromPsr($psrResponse)
-    {
-        return \Poirot\Http\parseResponseFromPsr($psrResponse);
-    }
     
     /**
      * Render the status line header
