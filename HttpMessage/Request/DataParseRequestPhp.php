@@ -3,6 +3,7 @@ namespace Poirot\Http\HttpMessage\Request;
 
 use Poirot\Http\HttpMessage\Request\Plugin\PhpServer;
 use Poirot\Http\Message\Request\StreamBodyMultiPart;
+use Poirot\Http\Psr\Stream;
 use Poirot\Std\Struct\aDataOptions;
 
 use Poirot\Stream\Streamable;
@@ -30,7 +31,7 @@ class DataParseRequestPhp
         $method = 'GET';
         if (isset($_SERVER['HTTP_METHOD']))
             $method = $_SERVER['HTTP_METHOD'];
-        elseif (isset($_SERVER['HTTP_METHOD']))
+        elseif (isset($_SERVER['REQUEST_METHOD']))
             $method = $_SERVER['REQUEST_METHOD'];
 
         return $method;
@@ -132,12 +133,18 @@ class DataParseRequestPhp
                 if ($name === 'Host') continue;
 
                 $headers[$name] = $val;
+            } elseif(in_array($key, array('CONTENT_TYPE', 'CONTENT_LENGTH'))) {
+                ## specific headers that not always present
+                $name = strtr($key, '_', ' ');
+                $name = strtr(ucwords(strtolower($name)), ' ', '-');
+                $headers[$name] = $val;
             }
 
         // ++-- cookie:
         $cookie = http_build_query($_COOKIE, '', '; ');
         (empty($cookie)) ?: $headers['Cookie'] = $cookie;
 
+        ksort($headers);
         return $headers;
     }
 
@@ -148,24 +155,25 @@ class DataParseRequestPhp
      */
     function getBody()
     {
-        // TODO read body
-
-        // ..
-
-        # multipart data
         $headers = $this->getHeaders();
-        if (isset($headers['Content-Type'])
+        
+        if (
+            $this->getMethod() == 'POST'
+            && isset($headers['Content-Type'])
             && strpos($headers['Content-Type'], 'multipart') !== false
         ) {
-            // it`s multipart form data
-            if ($this->getMethod() == 'POST')
-                ## create MultiPart Stream From _FILES
+            // TODO 
+            // it`s multipart POST form data
+            ## input raw body not represent in php when method is POST
+            #- it can be as sending files or send form data in multipart
+            
+            ## create MultiPart Stream From _FILES
                 $rawData =  \Poirot\Http\Psr\normalizeFiles($_FILES);
 
-            // TODO 
             return (new StreamBodyMultiPart($rawData));
         }
-        
-        
+
+        $stream = new Stream('php://input');
+        return $stream;
     }
 }
