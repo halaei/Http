@@ -1,12 +1,18 @@
 <?php
 namespace Poirot\Http\Message\Request;
 
+use Poirot\Http\Header\CollectionHeader;
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\Psr\UploadedFile;
 use Poirot\Http\Header as UtilHttp;
 use Poirot\Stream\Interfaces\iStreamable;
+use Poirot\Stream\Streamable\SAggregateStreams;
+use Poirot\Stream\Streamable\SDecorateStreamable;
+use Poirot\Stream\Streamable\STemporary;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UploadedFileInterface;
 
 /**
  * RFC 1867 - Form-based File Upload in HTML
@@ -14,15 +20,14 @@ use Poirot\Stream\Interfaces\iStreamable;
  * TODO multipart/mixed
  */
 class StreamBodyMultiPart 
+    extends SDecorateStreamable
     implements iStreamable
 {
-    use StreamWrapTrait;
-
-    /** @var AggregateStream */
+    /** @var SAggregateStreams */
     protected $_t__wrap_stream;
     /** @var string */
     protected $_boundary;
-    /** @var false|TemporaryStream Last Trailing Boundary */
+    /** @var false|STemporary Last Trailing Boundary */
     protected $_trailingBoundary;
 
     /**
@@ -31,26 +36,23 @@ class StreamBodyMultiPart
      * @param array|string $multiPart _FILES, uploadedFiles, raw body string
      * @param null|string  $boundary
      */
-    function __construct($multiPart = [], $boundary = null)
+    function __construct($multiPart = array(), $boundary = null)
     {
-        if ($multiPart instanceof iDataStruct)
-            $multiPart = \Poirot\Std\iterator_to_array($multiPart);
-
+        parent::__construct(new SAggregateStreams());
+        
+        
         if (!is_array($multiPart) && !is_string($multiPart))
             throw new \InvalidArgumentException(sprintf(
                 'The Constructor give array of Files or Raw Body String, given: "%s".'
                 , \Poirot\Std\flatten($multiPart)
             ));
-
-
-        // ...
-
-        $this->_t__wrap_stream = new AggregateStream;
+        
         if ($boundary === null)
-            $this->_boundary = uniqid();
+            $boundary = uniqid();
+        
+        $this->_boundary = (string) $boundary;
 
-
-        if (is_array($multiPart) && !empty($multiPart))
+        if (is_array($multiPart))
             $this->_fromFilesArray($multiPart);
         else
             $this->_fromRawBodyString($multiPart);
@@ -75,7 +77,7 @@ class StreamBodyMultiPart
     protected function _fromFilesArray($files)
     {
         if (current($files) instanceof UploadedFileInterface || isset($files['tmp_name']))
-            $files = Util::normalizeFiles($files);
+            $files = \Poirot\Http\Psr\normalizeFiles($files);
 
         foreach($files as $field => $file)
             $this->addElement($field, $file);
@@ -86,7 +88,8 @@ class StreamBodyMultiPart
      *
      * @param string                      $fieldName Form Field Name
      * @param array|UploadedFileInterface $element
-     * @param null|CollectionHeader|array          $headers   Extra Headers To Be Added
+     * @param null|CollectionHeader|array $headers   Extra Headers To Be Added
+     * 
      * @return $this
      */
     function addElement($fieldName, $element, $headers = null)
@@ -111,7 +114,7 @@ class StreamBodyMultiPart
         if (!$headers instanceof iHeaders)
             $headers = ($headers) ? new CollectionHeader($headers) : new CollectionHeader;
 
-        $headers->set(
+        $headers->insert(
             FactoryHttpHeader::of(array(
                 'Content-Type'
                 , ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
@@ -119,7 +122,7 @@ class StreamBodyMultiPart
         ));
 
         if ($size = $element->getSize())
-            $headers->set(
+            $headers->insert(
                 FactoryHttpHeader::of( array('Content-Length', (string) $size) )
             );
 
@@ -134,7 +137,7 @@ class StreamBodyMultiPart
 
     protected function _addArrayElement($element)
     {
-
+        // TODO implement 
     }
 
     /**
@@ -157,7 +160,7 @@ class StreamBodyMultiPart
 
         // Set a default content-disposition header if one was no provided
         if (!$headers->has('content-disposition'))
-            $headers->set(
+            $headers->insert(
                 FactoryHttpHeader::of(array(
                     'Content-Disposition'
                     , ($filename)
@@ -172,7 +175,7 @@ class StreamBodyMultiPart
         // Set a default content-length header if one was no provided
         if (!$headers->has('content-length'))
             (!$length = $stream->getSize())
-                ?: $headers->set(
+                ?: $headers->insert(
                     FactoryHttpHeader::of(array(
                         'Content-Length', (string) $length
                     )
@@ -181,8 +184,8 @@ class StreamBodyMultiPart
 
         // Set a default Content-Type if one was not supplied
         if (!$headers->has('content-type') && $filename)
-            (!$type = UMime::getFromFilename($filename))
-                ?: $headers->set(FactoryHttpHeader::of( array('Content-Type', $type)) );
+            (!$type = \Poirot\Http\Mime\getFromFilename($filename))
+                ?: $headers->insert(FactoryHttpHeader::of( array('Content-Type', $type)) );
 
 
         ## Add Created Element As Stream
@@ -190,18 +193,19 @@ class StreamBodyMultiPart
 
         ### headers
         $renderHeaders = '';
-        /** @var iHeader $h */
+        /** @var iHeader $first */
         $first = $headers->get('Content-Disposition');
         $renderHeaders .= $first->render()."\r\n";
         ## with new instance on delete
         $headers = $headers->del('Content-Disposition');
+        /** @var iHeader $h */
         foreach($headers as $h)
             $renderHeaders .= $h->render()."\r\n";
         $renderHeaders = "--{$this->_boundary}\r\n" . trim($renderHeaders) . "\r\n\r\n";
 
-        $this->_t__wrap_stream->addStream((new TemporaryStream($renderHeaders))->rewind());
+        $this->_t__wrap_stream->addStream((new STemporary($renderHeaders))->rewind());
         $this->_t__wrap_stream->addStream($stream->rewind());
-        $this->_t__wrap_stream->addStream((new TemporaryStream("\r\n"))->rewind());
+        $this->_t__wrap_stream->addStream((new STemporary("\r\n"))->rewind());
     }
 
     // ...
@@ -220,7 +224,7 @@ class StreamBodyMultiPart
     {
         if (!$this->_trailingBoundary) {
             ## add trailing boundary as stream if not
-            $this->_trailingBoundary = new TemporaryStream("--{$this->_boundary}--\r\n");
+            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--\r\n");
             $this->_t__wrap_stream->addStream($this->_trailingBoundary->rewind());
         }
 
@@ -246,7 +250,7 @@ class StreamBodyMultiPart
     {
         if (!$this->_trailingBoundary) {
             ## add trailing boundary as stream if not
-            $this->_trailingBoundary = new TemporaryStream("--{$this->_boundary}--\r\n");
+            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--\r\n");
             $this->_t__wrap_stream->addStream($this->_trailingBoundary->rewind());
         }
 
