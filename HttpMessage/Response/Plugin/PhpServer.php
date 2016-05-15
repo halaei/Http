@@ -1,22 +1,13 @@
 <?php
 namespace Poirot\Http\HttpMessage\Plugins\Response;
 
-use Poirot\Container\Interfaces\iCService;
-use Poirot\Container\Service\AbstractService;
+use Poirot\Http\HttpMessage\Response\Plugin\aPluginResponse;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Plugins\iAddOnHttpMessage;
+use Psr\Http\Message\StreamInterface;
 
-class PhpServer extends AbstractService
-    implements iAddOnHttpMessage,
-    iCService ## itself can be defined as container service
+class PhpServer 
+    extends aPluginResponse
 {
-    use ResponsePluginTrait;
-
-    /**
-     * @var string Service Name
-     */
-    protected $name = 'PhpServer'; // default name
-
     protected $isHeadersSent;
     protected $isContentSent;
 
@@ -46,16 +37,14 @@ class PhpServer extends AbstractService
         if ($this->isHeadersSent())
             return $this;
 
-        $status  = $this->getMessageObject()->renderStatusLine();
-        header($status);
-
+        
+        \Poirot\Http\Response\httpResponseCode($this->getMessageObject()->getStatusCode());
+        
         /** @var iHeader $header */
-        foreach ($this->getMessageObject()->getHeaders() as $header) {
+        foreach ($this->getMessageObject()->getHeaders() as $header)
             header($header->render());
-        }
 
         $this->isHeadersSent = true;
-
         return $this;
     }
 
@@ -69,10 +58,22 @@ class PhpServer extends AbstractService
         if ($this->isContentSent())
             return $this;
 
-        $this->getMessageObject()->flush(false);
-
+        $body = $this->getMessageObject()->getBody();
+        ob_start();
+        if ($body instanceof StreamInterface) {
+            if ($body->isSeekable()) $body->rewind();
+            while (!$body->eof())
+                echo $body->read(24400);
+            ob_end_flush();
+            flush();
+            ob_start();
+        } else {
+            echo $body;
+        }
+        ob_end_flush();
+        flush();
+        
         $this->isContentSent = true;
-
         return $this;
     }
 
@@ -88,19 +89,6 @@ class PhpServer extends AbstractService
             ->sendContent()
         ;
 
-        return $this;
-    }
-
-
-    // Implement iCService
-
-    /**
-     * Create Service
-     *
-     * @return mixed
-     */
-    function createService()
-    {
         return $this;
     }
 }

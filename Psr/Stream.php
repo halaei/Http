@@ -9,9 +9,6 @@ class Stream
     /** @var resource */
     protected $rHandler;
 
-    /** @var StreamInterface */
-    protected $_stream_cache;
-
     /** @var array Hash of readable and writable stream types */
     private static $readWriteHash = array(
         'read' => array(
@@ -28,7 +25,7 @@ class Stream
         )
     );
 
-    
+
     /**
      * Construct
      *
@@ -107,14 +104,9 @@ class Stream
      */
     function detach()
     {
-        // cache stream
-        if ($cStream = $this->_attainCacheStream())
-            $cStream->close();
-        
-        $this->_stream_cache = null;
-        $this->rHandler      = null;
+        $this->rHandler = null;
     }
-    
+
     /**
      * Get the size of the stream if known.
      *
@@ -122,26 +114,19 @@ class Stream
      */
     function getSize()
     {
+        if (!$this->_assertUsable())
+            return null;
+
         $size  = null;
-        $cSize = null;
-        
-        # cache stream
-        if ($this->_attainCacheStream())
-            $cSize = $this->_attainCacheStream()->getSize();
-        
-        # main stream size
-        if ($this->_assertStreamAlive()) {
-            if ($uri = $this->getMetadata('uri'))
-                ## clear the stat cache of stream URI
-                clearstatcache(true, $uri);
+        if ($uri = $this->getMetadata('uri'))
+            ## clear the stat cache of stream URI
+            clearstatcache(true, $uri);
 
-            // TODO can't achieve size of php input stream
-            $stats = fstat($this->rHandler);
-            if (isset($stats['size']))
-                $size = $stats['size'];
-        }
+        $stats = fstat($this->rHandler);
+        if (isset($stats['size']))
+            $size = $stats['size'];
 
-        return max($cSize, $size);
+        return $size;
     }
 
     /**
@@ -152,12 +137,7 @@ class Stream
      */
     function tell()
     {
-        # cache stream
-        if ($stream = $this->_attainCacheStream())
-            return $stream->tell();
-        
-        # main stream
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             throw new \RuntimeException('No resource available; cannot tell position');
 
         if (false === $r = ftell($this->rHandler))
@@ -173,12 +153,7 @@ class Stream
      */
     function eof()
     {
-        # cache stream
-        if ($stream = $this->_attainCacheStream())
-            return $stream->eof();
-
-        # main stream
-        return ( !$this->_assertStreamAlive() || feof($this->rHandler) );
+        return ( !$this->_assertUsable() || feof($this->rHandler) );
     }
 
     /**
@@ -188,12 +163,7 @@ class Stream
      */
     function isSeekable()
     {
-        # cache stream
-        if ($stream = $this->_attainCacheStream())
-            return $stream->isSeekable();
-        
-        # main stream
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             return false;
 
         return $this->getMetadata('seekable');
@@ -213,36 +183,9 @@ class Stream
      */
     function seek($offset, $whence = SEEK_SET)
     {
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             throw new \RuntimeException('No resource available; cannot seek position');
 
-        if ($whence == SEEK_SET) {
-            $byte = $offset;
-        } elseif ($whence == SEEK_CUR) {
-            $byte = $offset + $this->tell();
-        } elseif ($whence == SEEK_END) {
-            $size = $this->_attainCacheStream()->getSize();
-            if ($size === null) {
-                $size = $this->cacheEntireStream();
-            }
-            $byte = $size + $offset;
-        } else {
-            throw new \InvalidArgumentException('Invalid whence');
-        }
-
-        $diff = $byte - $this->stream->getSize();
-        if ($diff > 0) {
-            // Read the remoteStream until we have read in at least the amount
-            // of bytes requested, or we reach the end of the file.
-            while ($diff > 0 && !$this->remoteStream->eof()) {
-                $this->read($diff);
-                $diff = $byte - $this->stream->getSize();
-            }
-        } else {
-            // We can just do a normal seek since we've already seen this byte.
-            $this->stream->seek($byte);
-        }
-        
         if (-1 === fseek($this->rHandler, $offset, $whence))
             throw new \RuntimeException('Cannot seek on stream');
     }
@@ -269,7 +212,7 @@ class Stream
      */
     function isWritable()
     {
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             return false;
 
         $mode = $this->getMetadata('mode');
@@ -285,7 +228,7 @@ class Stream
      */
     function write($string)
     {
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             throw new \RuntimeException('No resource available; cannot write');
 
         if (!$this->isWritable())
@@ -297,7 +240,11 @@ class Stream
         if (false === $result)
             throw new \RuntimeException('Cannot write on stream.');
 
-        $transCount = mb_strlen($content, '8bit');
+        if (function_exists('mb_strlen'))
+            $transCount = mb_strlen($content, '8bit');
+        else
+            $transCount = strlen($content);
+
         return $transCount;
     }
 
@@ -308,7 +255,7 @@ class Stream
      */
     function isReadable()
     {
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             return false;
 
         $mode = $this->getMetadata('mode');
@@ -328,7 +275,7 @@ class Stream
      */
     function read($length)
     {
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             throw new \RuntimeException('No resource alive; cannot read.');
 
         if (!$this->isReadable())
@@ -353,8 +300,17 @@ class Stream
         if (!$this->isReadable())
             throw new \RuntimeException('Stream is not readable.');
 
-        $contents = $this->_streamGetContents();
-        return $contents;
+        $content = '';
+        while (!$this->eof()) {
+            $buf = $this->read(1048576);
+            // match on '' and false by loose equal
+            if ($buf == null)
+                break;
+
+            $content .= $buf;
+        }
+        
+        return $content;
     }
 
     /**
@@ -371,7 +327,7 @@ class Stream
      */
     function getMetadata($key = null)
     {
-        if (!$this->_assertStreamAlive())
+        if (!$this->_assertUsable())
             return ($key === null) ? array() : null;
 
 
@@ -383,65 +339,10 @@ class Stream
         return (array_key_exists($key, $meta)) ? $meta[$key] : null;
     }
 
-
-    // ..
-
-    /**
-     * Attain Cache Stream
-     *
-     * - cache stream take an action when main stream
-     *   is not seekable. (read once)
-     * - cache stream is rw/seekable
-     *
-     * @return StreamInterface|false
-     */
-    function _attainCacheStream()
-    {
-        if (!is_resource($this->rHandler) || $this->getMetadata('seekable'))
-            ## when resource is closed or isSeekable it's fine to have no cache main stream
-            return false;
-
-        if (!$this->_stream_cache)
-            $this->_stream_cache = new Stream(fopen('php://temp', 'r+'));
-
-        return $this->_stream_cache;
-    }
     
-    /**
-     * @param int $maxLen
-     * @return string|false
-     */
-    protected function _streamGetContents($maxLen = -1)
-    {
-        $buffer = '';
-
-        if ($maxLen === -1) {
-            while (!$this->eof()) {
-                $buf = $this->read(1048576);
-                // Using a loose equality here to match on '' and false.
-                if ($buf == null) {
-                    break;
-                }
-                $buffer .= $buf;
-            }
-            return $buffer;
-        }
-
-        $len = 0;
-        while (!$this->eof() && $len < $maxLen) {
-            $buf = $this->read($maxLen - $len);
-            // Using a loose equality here to match on '' and false.
-            if ($buf == null) {
-                break;
-            }
-            $buffer .= $buf;
-            $len = strlen($buffer);
-        }
-
-        return $buffer;
-    }
-
-    protected function _assertStreamAlive()
+    // ..
+    
+    protected function _assertUsable()
     {
         if (null === $this->rHandler || !is_resource($this->rHandler))
             return false;
@@ -452,7 +353,7 @@ class Stream
     /**
      * Closes the stream when the destructed
      */
-    function x__destruct()
+    function __destruct()
     {
         $this->close();
     }

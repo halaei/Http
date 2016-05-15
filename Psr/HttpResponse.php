@@ -9,6 +9,8 @@ use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Psr\StreamPsr;
 
+// TODO
+
 /**
  * HTTP response encapsulation.
  *
@@ -119,7 +121,7 @@ class Response extends HttpMessage
             ## body stream
             $body = $body->getBody();
             if ($body instanceof iStreamable)
-                $body = $body->getResource();
+                $body = $body->resource();
             else
                 $body = 'php://memory';
         }

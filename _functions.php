@@ -686,6 +686,7 @@ namespace Poirot\Http\Response
      */
     function httpResponseCode($statusCode = null)
     {
+        // TODO @link http://stackoverflow.com/questions/3258634/php-how-to-send-http-response-code
         if (function_exists('http_response_code'))
             return http_response_code($statusCode);
 

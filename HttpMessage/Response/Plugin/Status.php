@@ -1,21 +1,11 @@
 <?php
 namespace Poirot\Http\HttpMessage\Plugins\Response;
 
-use Poirot\Container\Interfaces\iCService;
-use Poirot\Container\Service\AbstractService;
-use Poirot\Http\Plugins\iAddOnHttpMessage;
+use Poirot\Http\HttpMessage\Response\Plugin\aPluginResponse;
 
-class Status extends AbstractService
-    implements iAddOnHttpMessage,
-    iCService ## itself can be defined as container service
+class Status 
+    extends aPluginResponse
 {
-    use ResponsePluginTrait;
-
-    /**
-     * @var string Service Name
-     */
-    protected $name = 'Status'; // default name
-
     /**
      * Does the status code indicate a client error?
      *
@@ -23,7 +13,7 @@ class Status extends AbstractService
      */
     function isClientError()
     {
-        $code = $this->getMessageObject()->getStatCode();
+        $code = $this->getMessageObject()->getStatusCode();
 
         return ($code < 500 && $code >= 400);
     }
@@ -35,7 +25,7 @@ class Status extends AbstractService
      */
     function isForbidden()
     {
-        return (403 == $this->getMessageObject()->getStatCode());
+        return (403 == $this->getMessageObject()->getStatusCode());
     }
 
     /**
@@ -45,7 +35,7 @@ class Status extends AbstractService
      */
     function isInformational()
     {
-        $code = $this->getMessageObject()->getStatCode();
+        $code = $this->getMessageObject()->getStatusCode();
 
         return ($code >= 100 && $code < 200);
     }
@@ -57,7 +47,7 @@ class Status extends AbstractService
      */
     function isNotFound()
     {
-        return (404 === $this->getMessageObject()->getStatCode());
+        return (404 === $this->getMessageObject()->getStatusCode());
     }
 
     /**
@@ -67,7 +57,7 @@ class Status extends AbstractService
      */
     function isOk()
     {
-        return (200 === $this->getMessageObject()->getStatCode());
+        return (200 === $this->getMessageObject()->getStatusCode());
     }
 
     /**
@@ -77,7 +67,7 @@ class Status extends AbstractService
      */
     function isServerError()
     {
-        $code = $this->getMessageObject()->getStatCode();
+        $code = $this->getMessageObject()->getStatusCode();
 
         return (500 <= $code && 600 > $code);
     }
@@ -89,7 +79,7 @@ class Status extends AbstractService
      */
     function isRedirect()
     {
-        $code = $this->getMessageObject()->getStatCode();
+        $code = $this->getMessageObject()->getStatusCode();
 
         return (300 <= $code && 400 > $code);
     }
@@ -101,20 +91,7 @@ class Status extends AbstractService
      */
     function isSuccess()
     {
-        $code = $this->getMessageObject()->getStatCode();
+        $code = $this->getMessageObject()->getStatusCode();
         return (200 <= $code && $code < 300);
-    }
-
-
-    // Implement iCService
-
-    /**
-     * Create Service
-     *
-     * @return mixed
-     */
-    function createService()
-    {
-        return $this;
     }
 }

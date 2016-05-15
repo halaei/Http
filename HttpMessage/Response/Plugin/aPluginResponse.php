@@ -1,28 +1,28 @@
 <?php
-namespace Poirot\Http\HttpMessage\Request\Plugin;
+namespace Poirot\Http\HttpMessage\Response\Plugin;
 
 use Poirot\Http\HttpMessage\Interfaces\iPluginHttp;
 use Poirot\Http\Interfaces\iHttpMessage;
-use Poirot\Http\Interfaces\iHttpRequest;
+use Poirot\Http\Interfaces\iHttpResponse;
 
-class aPluginRequest
+class aPluginResponse
     implements iPluginHttp
 {
-    /** @var iHttpRequest */
+    /** @var iHttpResponse */
     protected $messageObject;
 
 
     /**
      * Wrapper Identifier Around Http Message
      *
-     * @param iHttpRequest $httpRequest
+     * @param iHttpResponse $httpResponse
      * 
      * @return static
      */
-    static function _(iHttpRequest $httpRequest)
+    static function _(iHttpResponse $httpResponse)
     {
         $plugin = new static;
-        $plugin->setMessageObject($httpRequest);
+        $plugin->setMessageObject($httpResponse);
         return $plugin;
     }
 
@@ -39,9 +39,9 @@ class aPluginRequest
      */
     function setMessageObject(iHttpMessage $httpMessage)
     {
-        if (!$httpMessage instanceof iHttpRequest)
+        if (!$httpMessage instanceof iHttpResponse)
             throw new \InvalidArgumentException(sprintf(
-                'This plugin need request object instance of iHttpRequest, "%s" given.'
+                'This plugin need response object instance of iHttpResponse, "%s" given.'
                 , get_class($httpMessage)
             ));
 
@@ -52,7 +52,7 @@ class aPluginRequest
     /**
      * Get Http Message
      *
-     * @return iHttpRequest
+     * @return iHttpResponse
      */
     function getMessageObject()
     {

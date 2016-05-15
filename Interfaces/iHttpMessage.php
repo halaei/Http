@@ -79,13 +79,4 @@ interface iHttpMessage
      * @return string
      */
     function render();
-
-    /**
-     * Flush String Representation To Output
-     *
-     * @param bool $withHeaders Include Headers
-     *
-     * @return void
-     */
-    function flush($withHeaders = true);
 }

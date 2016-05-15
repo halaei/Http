@@ -9,6 +9,8 @@ use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Psr\StreamPsr;
 
+// TODO
+
 class UploadedFile extends aDataOptions
     implements UploadedFileInterface
 {
@@ -357,7 +359,7 @@ class UploadedFile extends aDataOptions
         $stream = $this->getStream();
         if ($stream instanceof iStreamable) {
             $stream->rewind();
-            while (! $stream->getResource()->isEOF())
+            while (! $stream->resource()->isEOF())
                 fwrite($handle, $this->getStream()->read(4096));
         } else {
             /** @var StreamInterface $stream */

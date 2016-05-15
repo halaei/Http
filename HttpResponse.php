@@ -42,20 +42,7 @@ class HttpResponse
 
         return $return;
     }
-
-    /**
-     * Flush String Representation To Output
-     *
-     * @param bool $withHeaders Include Headers
-     *
-     * @return void
-     */
-    function flush($withHeaders = true)
-    {
-        \Poirot\Http\Response\httpResponseCode($this->getStatusCode());
-        parent::flush($withHeaders);
-    }
-
+    
     
     // Options:
     

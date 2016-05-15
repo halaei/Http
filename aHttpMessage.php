@@ -85,38 +85,6 @@ abstract class aHttpMessage
         return $return;
     }
 
-    /**
-     * Flush String Representation To Output
-     *
-     * @param bool $withHeaders Include Headers
-     *
-     * @return void
-     */
-    function flush($withHeaders = true)
-    {
-        if ($withHeaders) {
-            /** @var iHeader $h */
-            foreach($this->getHeaders() as $h)
-                header($h->render());
-        }
-
-        $body = $this->getBody();
-        ob_start();
-        if ($body instanceof StreamInterface) {
-            if ($body->isSeekable()) $body->rewind();
-            while (!$body->eof())
-                echo $body->read(24400);
-            ob_end_flush();
-            flush();
-            ob_start();
-        } else {
-            echo $body;
-        }
-        ob_end_flush();
-        flush();
-    }
-
-
     // Options:
 
     /**

@@ -22,28 +22,9 @@ class HttpRequest
      */
     function renderRequestLine()
     {
-        //TODO can implement protocol HTTP/HTTPS
         return $this->getMethod() . ' ' . $this->getUri() . ' HTTP/' . $this->getVersion()."\r\n";
     }
-
-    /**
-     * // TODO what the mean of flushing request?
-     * Flush String Representation To Output
-     * 
-     * @param bool $withHeaders Include Headers
-     *
-     * @return void
-     */
-    function flush($withHeaders = true)
-    {
-        if ($withHeaders) {
-            // TODO what with status line?
-            header($this->renderRequestLine());
-        }
-
-        parent::flush($withHeaders);
-    }
-
+    
     /**
      * Render Http Message To String
      *
@@ -87,9 +68,7 @@ class HttpRequest
     function setMethod($method)
     {
         $method = strtoupper((string) $method);
-        /*if (!defined('static::METHOD_' . $method))
-            throw new \InvalidArgumentException("Invalid HTTP method ({$method}).");*/
-
+        
         $this->method = $method;
         return $this;
     }

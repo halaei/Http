@@ -7,14 +7,14 @@ use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\Psr\UploadedFile;
 use Poirot\Http\Header as UtilHttp;
 use Poirot\Stream\Interfaces\iStreamable;
-use Poirot\Stream\Psr\StreamInterface;
 
 /**
  * RFC 1867 - Form-based File Upload in HTML
  * @link http://www.faqs.org/rfcs/rfc1867.html
  * TODO multipart/mixed
  */
-class StreamBodyMultiPart implements iStreamable
+class StreamBodyMultiPart 
+    implements iStreamable
 {
     use StreamWrapTrait;
 
