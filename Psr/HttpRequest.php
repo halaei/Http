@@ -1,17 +1,16 @@
 <?php
 namespace Poirot\Http\Psr;
 
+use Poirot\Stream\Psr\StreamPsr;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
 
-// TODO
-
-class HttpRequest extends HttpMessage
+class HttpRequest 
+    extends HttpMessage
     implements RequestInterface
 {
     const STREAM_CONTENT = 'php://memory';
@@ -56,7 +55,7 @@ class HttpRequest extends HttpMessage
      *
      * - this can be used as HttpRequest Psr Driver
      *
-     * @param null|string|iHttpRequest        $uri URI for the request, if any.
+     * @param null|string|                    $uri URI for the request, if any.
      * @param null|string                     $method HTTP method for the request, if any.
      * @param string|resource|StreamInterface $bodyStream Message body, if any.
      * @param array                           $headers Headers for the message, if any.
@@ -65,38 +64,7 @@ class HttpRequest extends HttpMessage
      */
     function __construct($uri = null, $method = null, $bodyStream = null, array $headers = array())
     {
-        if ($uri instanceof iHttpRequest) {
-            ## prepare arguments
-
-            ## request method
-            ($method !== null) ?: $method = $uri->getMethod();
-
-            ## http headers
-            /** @var iHeader $h */
-            $httpHeaders = array();
-            foreach($uri->getHeaders() as $h)
-                $httpHeaders[$h->getLabel()] = $h->renderValueLine();
-            $headers = array_merge($httpHeaders, $headers);
-
-            ## body stream
-            ($bodyStream !== null) ?: $bodyStream = $uri->getBody();
-
-            ## request target uri
-            $uri = new HttpUri($uri->getUri());
-        }
-
-        // ..
-
-        # Uri:
-        if (is_string($uri))
-            $uri = new HttpUri($uri);
-
-        if ($uri !== null && ! $uri instanceof UriInterface)
-            throw new \InvalidArgumentException(
-                'Invalid URI provided; must be null, a string, or a Psr\Http\Message\UriInterface instance'
-            );
-
-        $this->uri = $uri;
+        $this->uriTarget = (string) $uri;
 
         # Method:
         $this->_assertValidMethod($method);
@@ -109,7 +77,6 @@ class HttpRequest extends HttpMessage
         # Headers:
         foreach($headers as $l => $v)
             $this->_getHeaders()->insert(FactoryHttpHeader::of( array($l, $v)) );
-
     }
 
 
@@ -133,10 +100,8 @@ class HttpRequest extends HttpMessage
     {
         if ($this->uriTarget)
             return $this->uriTarget;
-
-        $uri = $this->uri->__toString();
-        $this->uriTarget = ($uri) ? $uri : '/';
-
+        
+        $this->uriTarget = '/';
         return $this->uriTarget;
     }
 
@@ -155,7 +120,7 @@ class HttpRequest extends HttpMessage
      * @link http://tools.ietf.org/html/rfc7230#section-2.7 (for the various
      *     request-target forms allowed in request messages)
      *
-     * @param string|HttpUri $requestTarget
+     * @param string|UriInterface $requestTarget
      *
      * @return self
      */
@@ -167,18 +132,12 @@ class HttpRequest extends HttpMessage
                 , \Poirot\Std\flatten($requestTarget)
             ));
 
-        if (is_string($requestTarget))
-            ## build and validate path again
-            $requestTarget = new HttpUri($requestTarget);
-
-        $requestTarget = $requestTarget->__toString();
-
+        $requestTarget = (string) $requestTarget;
         if ($requestTarget === $this->getRequestTarget())
             return $this;
 
         $new = clone $this;
         $new->uriTarget = $requestTarget;
-
         return $new;
     }
 
@@ -214,7 +173,6 @@ class HttpRequest extends HttpMessage
 
         $new = clone $this;
         $new->method = $method;
-
         return $new;
     }
 
@@ -229,7 +187,7 @@ class HttpRequest extends HttpMessage
      */
     function getUri()
     {
-        return $this->uri;
+        // TODO
     }
 
     /**
@@ -300,10 +258,10 @@ class HttpRequest extends HttpMessage
             $this->headers->insert(FactoryHttpHeader::of( array('Host', $host)) );
         }
 
-        $hdrArray = [];
+        $hdrArray = array();
         /** @var iHeader $h */
         foreach ($headers as $h)
-            $hdrArray[$h->getLabel()] = $h->toArray();
+            $hdrArray[$h->getLabel()] = \Poirot\Std\cast($h)->toArray();
 
         return $hdrArray;
     }
@@ -329,7 +287,7 @@ class HttpRequest extends HttpMessage
             return array();
 
         $header = $this->headers->get($header);
-        return $header->toArray();
+        return \Poirot\Std\cast($header)->toArray();
     }
 
     /**

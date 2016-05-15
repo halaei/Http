@@ -1,17 +1,16 @@
 <?php
 namespace Poirot\Http\Psr;
 
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
 use Poirot\Std\Struct\aDataOptions;
 
 use Poirot\Stream\Interfaces\iStreamable;
-use Poirot\Stream\Psr\StreamInterface;
 use Poirot\Stream\Psr\StreamPsr;
 
-// TODO
-
-class UploadedFile extends aDataOptions
+class UploadedFile 
+    extends aDataOptions
     implements UploadedFileInterface
 {
     const DEFAULT_STREAM = '\Poirot\Stream\Psr\StreamPsr';
@@ -29,7 +28,7 @@ class UploadedFile extends aDataOptions
 
 
     protected $_t__stream;
-    /** @var iStreamable|StreamInterface */
+    /** @var StreamInterface */
     protected $stream;
 
     /** @var string Default Stream Class */
@@ -58,7 +57,7 @@ class UploadedFile extends aDataOptions
      */
     function __construct(array $fileValues)
     {
-        $this->import($fileValues);
+        parent::__construct($fileValues);
     }
 
 
@@ -162,13 +161,11 @@ class UploadedFile extends aDataOptions
      */
     function setStream($resource)
     {
-        if (!$resource instanceof iSResource
-            && !$resource instanceof StreamPsr
-            && !$resource instanceof iStreamable
+        if (!$resource instanceof iStreamable
             && ! is_resource($resource)
         )
             throw new \InvalidArgumentException(
-                'Stream must instance of iSResource, StreamInterface, iStreamable or php resource. '
+                'Stream must instance of StreamInterface or php resource. '
                 .' given: "%s"'
                 , \Poirot\Std\flatten($resource)
             );
@@ -182,7 +179,7 @@ class UploadedFile extends aDataOptions
     /**
      * Get Streamed Object Of Uploaded File
      *
-     * @return StreamInterface|iStreamable
+     * @return StreamInterface
      */
     function getStream()
     {
@@ -357,16 +354,10 @@ class UploadedFile extends aDataOptions
             throw new \RuntimeException('Unable to write to designated path');
 
         $stream = $this->getStream();
-        if ($stream instanceof iStreamable) {
-            $stream->rewind();
-            while (! $stream->resource()->isEOF())
-                fwrite($handle, $this->getStream()->read(4096));
-        } else {
-            /** @var StreamInterface $stream */
-            $stream->rewind();
-            while (! $stream->eof())
-                fwrite($handle, $this->getStream()->read(4096));
-        }
+        /** @var StreamInterface $stream */
+        $stream->rewind();
+        while (! $stream->eof())
+            fwrite($handle, $this->getStream()->read(4096));
 
         fclose($handle);
     }

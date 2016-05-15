@@ -2,12 +2,8 @@
 namespace Poirot\Http\Psr;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
-
-use Poirot\Stream\Psr\StreamInterface;
-
-
-// TODO
 
 class HttpServerRequest extends HttpRequest
     implements ServerRequestInterface
@@ -38,12 +34,12 @@ class HttpServerRequest extends HttpRequest
      * @throws \InvalidArgumentException for any invalid value.
      */
     function __construct(
-        array $serverParams = [],
-        array $uploadedFiles = [],
+        array $serverParams = array(),
+        array $uploadedFiles = array(),
         $uri = null,
         $method = null,
         $body = null,
-        array $headers = []
+        array $headers = array()
     ) {
         $this->_assertValidateUploadedFiles($uploadedFiles);
 
