@@ -4,7 +4,6 @@ namespace Poirot\Http\HttpMessage\Request;
 use Poirot\Http\HttpMessage\Request\Plugin\PhpServer;
 use Poirot\Http\Message\Request\StreamBodyMultiPart;
 use Poirot\Http\Psr\Stream;
-use Poirot\Http\Psr\StreamCache;
 use Poirot\Std\Struct\aDataOptions;
 
 use Poirot\Stream\Streamable;

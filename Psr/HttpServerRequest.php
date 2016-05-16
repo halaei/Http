@@ -5,7 +5,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
-class HttpServerRequest extends HttpRequest
+class HttpServerRequest 
+    extends HttpRequest
     implements ServerRequestInterface
 {
     /** @var array */

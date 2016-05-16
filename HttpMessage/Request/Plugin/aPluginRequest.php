@@ -5,6 +5,11 @@ use Poirot\Http\HttpMessage\Interfaces\iPluginHttp;
 use Poirot\Http\Interfaces\iHttpMessage;
 use Poirot\Http\Interfaces\iHttpRequest;
 
+/*
+ * Plugin::_($request)->helperMethod();
+ * 
+ */
+
 class aPluginRequest
     implements iPluginHttp
 {

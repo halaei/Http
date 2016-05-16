@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Http\Interfaces\Respec;
 
-use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\Interfaces\iHttpRequest;
 
 interface iRequestAware
 {

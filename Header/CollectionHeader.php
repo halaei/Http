@@ -1,8 +1,9 @@
 <?php
 namespace Poirot\Http\Header;
 
-use Poirot\Std\Struct\CollectionObject;
 use Traversable;
+
+use Poirot\Std\Struct\CollectionObject;
 
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;

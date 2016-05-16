@@ -1,7 +1,8 @@
 <?php
 namespace Poirot\Http 
 {
-    use Poirot\Http\Interfaces\Message\iHttpRequest;
+
+    use Poirot\Http\Interfaces\iHttpRequest;
     use Psr\Http\Message\RequestInterface;
     use Psr\Http\Message\ResponseInterface;
 
