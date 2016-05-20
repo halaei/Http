@@ -22,7 +22,7 @@ class HttpRequest
      */
     function renderRequestLine()
     {
-        return $this->getMethod() . ' ' . $this->getUri() . ' HTTP/' . $this->getVersion()."\r\n";
+        return $this->getMethod() . ' ' . $this->getTarget() . ' HTTP/' . $this->getVersion()."\r\n";
     }
     
     /**
@@ -116,7 +116,7 @@ class HttpRequest
             return $this->host;
         
         // attempt to get host from target uri
-        $host  = $this->getUri();
+        $host  = $this->getTarget();
         $host  = parse_url($host, PHP_URL_HOST);
         if (!$host && $this->getHeaders()->has('Host')) {
             /** @var iHeader $host */
@@ -137,7 +137,7 @@ class HttpRequest
      *
      * @return $this
      */
-    function setUri($target = null, $preserveHost = true)
+    function setTarget($target = null, $preserveHost = true)
     {
         $target = (string) $target;
         if (empty($target) && $target !== "0")
@@ -161,11 +161,11 @@ class HttpRequest
      *
      * @return string
      */
-    function getUri()
+    function getTarget()
     {
         if (!$this->target_uri)
             ## build home absolute uri if not exists
-            $this->setUri();
+            $this->setTarget();
 
         return $this->target_uri;
     }

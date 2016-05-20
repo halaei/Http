@@ -56,7 +56,7 @@ interface iHttpRequest
      *
      * @return $this
      */
-    function setUri($target = null, $preserveHost = true);
+    function setTarget($target = null, $preserveHost = true);
 
     /**
      * Get Uri Target
@@ -65,7 +65,7 @@ interface iHttpRequest
      *
      * @return string
      */
-    function getUri();
+    function getTarget();
 
     /**
      * Set Host

@@ -207,7 +207,7 @@ class PhpServer
         }
 
         // Does the base URL have anything in common with the request URI?
-        $requestUri = $this->getMessageObject()->getUri();
+        $requestUri = $this->getMessageObject()->getTarget();
 
         // Full base URL matches.
         if (0 === strpos($requestUri, $baseUrl))

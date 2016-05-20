@@ -31,7 +31,7 @@ class FactoryHttpHeader
         // string:
         if (\Poirot\Std\isStringify($valuable)) {
             ## extract label and value from header
-            $parsed = \Poirot\Http\Header\parseLabelValue( (string) $valuable);
+            $parsed = \Poirot\Http\Header\splitLabelValue( (string) $valuable);
             if ($parsed === false)
                 throw new \InvalidArgumentException(sprintf(
                     'Invalid Header (%s)'
@@ -47,9 +47,12 @@ class FactoryHttpHeader
                 'Header must be valid string or array[$label, $value] or ["label"=>$value]'
             );
 
-        if (count($valuable) >= 2)
-            list($label, $value) = $valuable;
-        else {
+        if (count($valuable) >= 2) {
+            ## [$label, $value, $other_value[] ]
+            $label = array_shift($valuable);
+            $value = $valuable;
+        } else {
+            ## ['label' => $value| $values[] ]
             $label = key(reset($valuable));
             $value = current($valuable);
         }
@@ -63,7 +66,7 @@ class FactoryHttpHeader
             ## avoid to parse again header value
             $header->importFromString($label.': '. $value);
         else {
-            $header->from($value);
+            $header->import($value);
             $header->setLabel($label);
         }
 

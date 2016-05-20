@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\Http 
 {
-
     use Poirot\Http\Interfaces\iHttpRequest;
     use Psr\Http\Message\RequestInterface;
     use Psr\Http\Message\ResponseInterface;
@@ -47,7 +46,7 @@ namespace Poirot\Http
                 ## headers end
                 break;
 
-            $ph = \Poirot\Http\Header\parseLabelValue($nextLine);
+            $ph = \Poirot\Http\Header\splitLabelValue($nextLine);
             $Return['headers'][key($ph)] = current($ph);
         }
 
@@ -114,7 +113,7 @@ namespace Poirot\Http
                 // headers end
                 break;
 
-            $ph = \Poirot\Http\Header\parseLabelValue($nextLine);
+            $ph = \Poirot\Http\Header\splitLabelValue($nextLine);
             $Return['headers'][key($ph)] = current($ph);
         }
 
@@ -442,7 +441,7 @@ namespace Poirot\Http\Header
      *
      * @return false|array[string 'label', string 'value']
      */
-    function parseLabelValue($line)
+    function splitLabelValue($line)
     {
         if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
             return false;
@@ -459,7 +458,7 @@ namespace Poirot\Http\Header
         foreach ($lines[0] as $l) {
             // Todo parse lines have empty string at the end
             if (empty($l)) continue;
-            if (( $h = parseLabelValue($l) ) === false)
+            if (( $h = splitLabelValue($l) ) === false)
                 throw new \Exception(sprintf(
                     'Malformed Header; (%s).'
                     , $h
@@ -498,11 +497,10 @@ namespace Poirot\Http\Header
      *
      * @param mixed $header_values string or array
      * @return array
-     * @static
      */
     function parseParams($header_values)
     {
-        if (!is_array($header_values)) $header_values = [$header_values];
+        if (!is_array($header_values)) $header_values = array($header_values);
 
         $result = array();
         foreach ($header_values as $header) {
