@@ -69,6 +69,6 @@ abstract class aHeaderHttp
         }
 
         // filterValue()
-        return implode('; ', $headerLine);
+        return implode(', ', $headerLine);
     }
 }

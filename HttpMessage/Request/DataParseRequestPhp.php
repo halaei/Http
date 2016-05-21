@@ -32,7 +32,8 @@ class DataParseRequestPhp
     
     /**
      * Get Request Method
-     *
+     * @see HttpRequest::setMethod
+     * 
      * @return string
      */
     function getMethod()
@@ -48,7 +49,8 @@ class DataParseRequestPhp
     
     /**
      * Get Host
-     *
+     * @see HttpRequest::setHost
+     * 
      * @return string
      */
     function getHost()
@@ -74,6 +76,7 @@ class DataParseRequestPhp
     }
 
     /**
+     * @see HttpRequest::setVersion
      * @return mixed
      */
     function getVersion()
@@ -89,10 +92,11 @@ class DataParseRequestPhp
 
     /**
      * Get Request Uri
-     *
+     * @see HttpRequest::setTarget
+     * 
      * @return string
      */
-    function getUri()
+    function getTarget()
     {
         // IIS7 with URL Rewrite: make sure we get the unencoded url
         // (double slash problem).
@@ -128,7 +132,8 @@ class DataParseRequestPhp
 
     /**
      * Get Headers
-     *
+     * @see HttpRequest::setHeaders
+     * 
      * @return array
      */
     function getHeaders()
@@ -159,7 +164,8 @@ class DataParseRequestPhp
 
     /**
      * Get Body
-     *
+     * @see HttpRequest::setBody
+     * 
      * @return mixed
      */
     function getBody()

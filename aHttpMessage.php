@@ -140,7 +140,7 @@ abstract class aHttpMessage
         foreach ($headers as $label => $h) {
             if (!$h instanceof iHeader)
                 // Header-Label: value header
-                $h = FactoryHttpHeader::of( array($label, $h) );
+                $h = FactoryHttpHeader::of( array($label => $h) );
 
             $this->getHeaders()->insert($h);
         }

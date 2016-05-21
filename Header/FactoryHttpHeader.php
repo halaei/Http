@@ -42,10 +42,11 @@ class FactoryHttpHeader
         }
 
         // array:
-        if (!is_array($valuable) || (count($valuable) < 2 && !array_key_exists('label',$valuable)) )
+        if (!is_array($valuable) || (count($valuable) < 2 && array_values($valuable) === $valuable) )
             throw new \InvalidArgumentException(
                 'Header must be valid string or array[$label, $value] or ["label"=>$value]'
             );
+
 
         if (count($valuable) >= 2) {
             ## [$label, $value, $other_value[] ]
@@ -53,7 +54,7 @@ class FactoryHttpHeader
             $value = $valuable;
         } else {
             ## ['label' => $value| $values[] ]
-            $label = key(reset($valuable));
+            $label = key($valuable);
             $value = current($valuable);
         }
 

@@ -116,14 +116,14 @@ class StreamBodyMultiPart
 
         $headers->insert(
             FactoryHttpHeader::of(array(
-                'Content-Type'
-                , ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
+                'Content-Type' =>
+                ($type = $element->getClientMediaType()) ? $type : 'application/octet-stream'
             )
         ));
 
         if ($size = $element->getSize())
             $headers->insert(
-                FactoryHttpHeader::of( array('Content-Length', (string) $size) )
+                FactoryHttpHeader::of( array('Content-Length' => (string) $size) )
             );
 
 
@@ -162,8 +162,8 @@ class StreamBodyMultiPart
         if (!$headers->has('content-disposition'))
             $headers->insert(
                 FactoryHttpHeader::of(array(
-                    'Content-Disposition'
-                    , ($filename)
+                    'Content-Disposition' =>
+                    ($filename)
                         ? sprintf('form-data; name="%s"; filename="%s"'
                             , $name
                             , basename($filename)
@@ -177,7 +177,7 @@ class StreamBodyMultiPart
             (!$length = $stream->getSize())
                 ?: $headers->insert(
                     FactoryHttpHeader::of(array(
-                        'Content-Length', (string) $length
+                        'Content-Length' => (string) $length
                     )
                 ));
 
@@ -185,7 +185,7 @@ class StreamBodyMultiPart
         // Set a default Content-Type if one was not supplied
         if (!$headers->has('content-type') && $filename)
             (!$type = \Poirot\Http\Mime\getFromFilename($filename))
-                ?: $headers->insert(FactoryHttpHeader::of( array('Content-Type', $type)) );
+                ?: $headers->insert(FactoryHttpHeader::of( array('Content-Type' => $type)) );
 
 
         ## Add Created Element As Stream
