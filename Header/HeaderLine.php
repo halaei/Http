@@ -17,7 +17,7 @@ class HeaderLine
      */
     function importFromString($line)
     {
-        $matches = \Poirot\Http\Header\parseLabelValue($line);
+        $matches = \Poirot\Http\Header\splitLabelValue($line);
         if ($matches === false)
             throw new \InvalidArgumentException(sprintf(
                 'Invalid Header (%s).'
