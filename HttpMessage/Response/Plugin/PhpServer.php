@@ -41,7 +41,7 @@ class PhpServer
         \Poirot\Http\Response\httpResponseCode($this->getMessageObject()->getStatusCode());
         
         /** @var iHeader $header */
-        foreach ($this->getMessageObject()->getHeaders() as $header)
+        foreach ($this->getMessageObject()->headers() as $header)
             header($header->render());
 
         $this->isHeadersSent = true;

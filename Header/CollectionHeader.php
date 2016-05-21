@@ -8,6 +8,8 @@ use Poirot\Std\Struct\CollectionObject;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 
+// TODO headers with same name withAddedHeader PSR
+
 class CollectionHeader
     implements iHeaders
     , \IteratorAggregate # implement \Traversable
@@ -55,7 +57,8 @@ class CollectionHeader
                 , \Poirot\Std\flatten($header)
             ));
         
-        $this->ObjectCollection->insert($header);
+        
+        $this->ObjectCollection->insert($header, array('label'=> strtolower($header->getLabel())));
         return $this;
     }
 
@@ -107,8 +110,10 @@ class CollectionHeader
 
         // ..
 
-        $header = $this->get($label);
-        $this->ObjectCollection->del($header);
+        $headers = $this->ObjectCollection->find( array('label' => strtolower($label)) );
+        foreach ($headers as $hash => $object)
+            $this->ObjectCollection->del($hash);
+        
         return $this;
     }
 

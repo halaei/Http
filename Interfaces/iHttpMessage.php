@@ -43,7 +43,7 @@ interface iHttpMessage
      *
      * @return iHeaders
      */
-    function getHeaders();
+    function headers();
 
     /**
      * Set Message Body Content

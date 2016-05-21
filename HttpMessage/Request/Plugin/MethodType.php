@@ -122,7 +122,7 @@ class MethodType
     function isXmlHttpRequest()
     {
         /** @var iHeader $header */
-        $header = $this->getMessageObject()->getHeaders()->has('X_REQUESTED_WITH');
+        $header = $this->getMessageObject()->headers()->has('X_REQUESTED_WITH');
         return false !== $header && $header->renderValueLine() == 'XMLHttpRequest';
     }
 
@@ -134,7 +134,7 @@ class MethodType
     function isFlashRequest()
     {
         /** @var iHeader $header */
-        $header = $this->getMessageObject()->getHeaders()->has('USER_AGENT');
+        $header = $this->getMessageObject()->headers()->has('USER_AGENT');
         return false !== $header && stristr($header->renderValueLine(), ' flash');
     }
 }

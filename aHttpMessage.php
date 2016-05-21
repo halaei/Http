@@ -54,7 +54,7 @@ abstract class aHttpMessage
     {
         $return = '';
         /** @var iHeader $header */
-        foreach ($this->getHeaders() as $header)
+        foreach ($this->headers() as $header)
             $return .= trim($header->render())."\r\n";
         $return .= "\r\n";
 
@@ -142,7 +142,7 @@ abstract class aHttpMessage
                 // Header-Label: value header
                 $h = FactoryHttpHeader::of( array($label => $h) );
 
-            $this->getHeaders()->insert($h);
+            $this->headers()->insert($h);
         }
 
         return $this;
@@ -153,7 +153,7 @@ abstract class aHttpMessage
      *
      * @return iHeaders
      */
-    function getHeaders()
+    function headers()
     {
         if (!$this->headers)
             $this->headers = new CollectionHeader();

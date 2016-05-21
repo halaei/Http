@@ -12,13 +12,16 @@ class RequestBridgeInPsr
     extends aMessageBridgeInPsr
     implements RequestInterface
 {
+    /** @var UriInterface */
+    protected $uri;
+
     /**
      * RequestBridgeInPsr constructor.
      * @param iHttpRequest $request
      */
     function __construct(iHttpRequest $request)
     {
-        $this->httpMessage = $request;
+        $this->httpMessage = clone $request;
     }
     
     /**
@@ -65,7 +68,7 @@ class RequestBridgeInPsr
      * @link http://tools.ietf.org/html/rfc7230#section-2.7 (for the various
      *     request-target forms allowed in request messages)
      * @param mixed $requestTarget
-     * @return self
+     * @return RequestInterface
      */
     public function withRequestTarget($requestTarget)
     {
@@ -125,7 +128,10 @@ class RequestBridgeInPsr
      */
     public function getUri()
     {
-        return new Uri($this->httpMessage->getTarget());
+        if (!$this->uri)
+            $this->uri = new Uri($this->httpMessage->getTarget());
+        
+        return $this->uri;
     }
 
     /**
@@ -161,24 +167,25 @@ class RequestBridgeInPsr
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $new = clone $this;
-        $new->httpMessage->setTarget((string) $uri);
-
+        $new->uri = $uri;
+        
         
         if ($preserveHost && $this->hasHeader('Host'))
             return $new;
-
         if (! $uri->getHost())
             return $new;
 
+        
+        # update host from uri
         
         $host = $uri->getHost();
         if ($uri->getPort())
             $host .= ':' . $uri->getPort();
 
         if ($new->hasHeader('host'))
-            $new->httpMessage->getHeaders()->del('host');
+            $new->httpMessage->headers()->del('host');
 
-        $new->httpMessage->getHeaders()->insert(FactoryHttpHeader::of(array('Host'=>$host)));
+        $new->httpMessage->headers()->insert(FactoryHttpHeader::of(array('Host'=>$host)));
         return $new;
     }
     
@@ -188,5 +195,6 @@ class RequestBridgeInPsr
     function __clone()
     {
         $this->httpMessage = clone $this->httpMessage;
+        ($this->uri === null) ?: $this->uri = clone $this->uri;
     }
 }

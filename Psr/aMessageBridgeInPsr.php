@@ -83,7 +83,7 @@ class aMessageBridgeInPsr
     {
         $headers = array();
         /** @var iHeader $header */
-        foreach ($this->httpMessage->getHeaders() as $header)
+        foreach ($this->httpMessage->headers() as $header)
             $headers[$header->getLabel()] = \Poirot\Http\Header\parseParams($header->renderValueLine());
 
         return $headers;
@@ -99,7 +99,7 @@ class aMessageBridgeInPsr
      */
     public function hasHeader($name)
     {
-        return $this->httpMessage->getHeaders()->has($name);
+        return $this->httpMessage->headers()->has($name);
     }
 
     /**
@@ -122,8 +122,10 @@ class aMessageBridgeInPsr
             return array();
 
         /** @var iHeader $header */
-        $header = $this->httpMessage->getHeaders()->get($name);
-        return \Poirot\Http\Header\parseParams($header->renderValueLine());
+        $header = $this->httpMessage->headers()->get($name);
+        /** @var iHeader $h */
+        foreach ($header as $h)
+            return \Poirot\Http\Header\parseParams($h->renderValueLine());
     }
 
     /**
@@ -151,8 +153,10 @@ class aMessageBridgeInPsr
             return '';
 
         /** @var iHeader $header */
-        $header = $this->httpMessage->getHeaders()->get($name);
-        return $header->renderValueLine();
+        $header = $this->httpMessage->headers()->get($name);
+        /** @var iHeader $h */
+        foreach ($header as $h)
+            return $h->renderValueLine();
     }
 
     /**
@@ -174,9 +178,9 @@ class aMessageBridgeInPsr
     {
         $new = clone $this;
         if ($new->hasHeader($name))
-            $new->httpMessage->getHeaders()->del($name);
+            $new->httpMessage->headers()->del($name);
 
-        $new->httpMessage->getHeaders()->insert(FactoryHttpHeader::of(array($name => $value)));
+        $new->httpMessage->headers()->insert(FactoryHttpHeader::of(array($name => $value)));
         return $new;
     }
 
@@ -199,7 +203,7 @@ class aMessageBridgeInPsr
     public function withAddedHeader($name, $value)
     {
         $new = clone $this;
-        $new->httpMessage->getHeaders()->insert(FactoryHttpHeader::of(array($name => $value)));
+        $new->httpMessage->headers()->insert(FactoryHttpHeader::of(array($name => $value)));
         return $new;
     }
 
@@ -218,7 +222,7 @@ class aMessageBridgeInPsr
     public function withoutHeader($name)
     {
         $new = clone $this;
-        $new->httpMessage->getHeaders()->del($name);
+        $new->httpMessage->headers()->del($name);
         return $new;
     }
 

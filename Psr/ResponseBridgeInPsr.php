@@ -14,7 +14,7 @@ class ResponseBridgeInPsr
      */
     function __construct(iHttpResponse $request)
     {
-        $this->httpMessage = $request;
+        $this->httpMessage = clone $request;
     }
     
     /**

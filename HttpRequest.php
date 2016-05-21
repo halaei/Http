@@ -50,7 +50,7 @@ class HttpRequest
     function renderHeaders()
     {
         $return = parent::renderHeaders();
-        if (!$this->getHeaders()->has('Host') && $host = $this->getHost())
+        if (!$this->headers()->has('Host') && $host = $this->getHost())
             $return = 'Host: '.$host."\r\n" . $return;
         return $return;
     }
@@ -118,9 +118,9 @@ class HttpRequest
         // attempt to get host from target uri
         $host  = $this->getTarget();
         $host  = parse_url($host, PHP_URL_HOST);
-        if (!$host && $this->getHeaders()->has('Host')) {
+        if (!$host && $this->headers()->has('Host')) {
             /** @var iHeader $host */
-            $host = $this->getHeaders()->get('Host');
+            $host = $this->headers()->get('Host');
             $host = $host->render();
         }
 
