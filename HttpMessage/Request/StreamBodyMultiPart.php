@@ -129,7 +129,7 @@ class StreamBodyMultiPart
 
         if ($element instanceof UploadedFile)
             ## using poirot stream
-            $element->setDefaultStreamClass('\Poirot\Stream\Streamable');
+            $element->setDefaultStream('\Poirot\Stream\Streamable');
 
 
         $this->__createElement($fieldName, $element->getStream(), $element->getClientFilename(), $headers);
