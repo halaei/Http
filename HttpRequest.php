@@ -121,7 +121,7 @@ class HttpRequest
         if (!$host && $this->headers()->has('Host')) {
             /** @var iHeader $host */
             $host = $this->headers()->get('Host');
-            $host = $host->render();
+            $host = $host->renderValueLine();
         }
 
         return $host;

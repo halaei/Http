@@ -144,7 +144,7 @@ class DataParseRequestPhp
                 $name = strtr(substr($key, 5), '_', ' ');
                 $name = strtr(ucwords(strtolower($name)), ' ', '-');
                 ## host header represent separately on request object
-                if ($name === 'Host') continue;
+                // if ($name === 'Host') continue;
 
                 $headers[$name] = $val;
             } elseif(in_array($key, array('CONTENT_TYPE', 'CONTENT_LENGTH'))) {
