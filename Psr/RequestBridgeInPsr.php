@@ -42,10 +42,15 @@ class RequestBridgeInPsr
      */
     public function getRequestTarget()
     {
-        $uri = $this->getUri();
-        $target = $uri->getPath();
-        if ($uri->getQuery())
-            $target .= '?' . $uri->getQuery();
+        if ($target = $this->httpMessage->getTarget())
+            return $target;
+
+        if (! $this->uri)
+            return '/';
+
+        $target = $this->uri->getPath();
+        if ($this->uri->getQuery())
+            $target .= '?' . $this->uri->getQuery();
 
         if (empty($target))
             $target = '/';
