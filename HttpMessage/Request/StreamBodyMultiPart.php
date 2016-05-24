@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Http\Message\Request;
+namespace Poirot\Http\HttpMessage\Request;
 
 use Poirot\Http\Header\CollectionHeader;
 use Poirot\Http\Header\FactoryHttpHeader;
