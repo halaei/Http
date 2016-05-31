@@ -138,9 +138,16 @@ abstract class aHttpMessage
             throw new \InvalidArgumentException;
 
         foreach ($headers as $label => $h) {
-            if (!$h instanceof iHeader)
-                // Header-Label: value header
-                $h = FactoryHttpHeader::of( array($label => $h) );
+            if (!$h instanceof iHeader) {
+                if (is_int($label) && is_string($h))
+                    // ['X-Powered-By: PHP/5.5.9-1ubuntu4.16', ]
+                    // in form of headers_list()
+                    $valuable = $h;
+                else
+                    $valuable = array($label => $h);
+                        
+                $h = FactoryHttpHeader::of($valuable);
+            }
 
             $this->headers()->insert($h);
         }
