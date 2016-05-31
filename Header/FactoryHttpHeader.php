@@ -43,9 +43,10 @@ class FactoryHttpHeader
 
         // array:
         if (!is_array($valuable) || (count($valuable) < 2 && array_values($valuable) === $valuable) )
-            throw new \InvalidArgumentException(
-                'Header must be valid string or array[$label, $value] or ["label"=>$value]'
-            );
+            throw new \InvalidArgumentException(sprintf(
+                'Header must be valid string or array[$label, $value] or ["label"=>$value]; given (%s).'
+                , \Poirot\Std\flatten($valuable)
+            ));
 
 
         if (count($valuable) >= 2) {
