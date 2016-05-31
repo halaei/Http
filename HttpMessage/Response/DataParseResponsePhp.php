@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Http\Message\Response;
+namespace Poirot\Http\HttpMessage\Response;
 
 use Poirot\Std\Struct\aDataOptions;
 
