@@ -1,7 +1,6 @@
 <?php
-namespace Poirot\Http\HttpMessage\Plugins\Response;
+namespace Poirot\Http\HttpMessage\Response\Plugin;
 
-use Poirot\Http\HttpMessage\Response\Plugin\aPluginResponse;
 use Poirot\Http\Interfaces\iHeader;
 use Psr\Http\Message\StreamInterface;
 
