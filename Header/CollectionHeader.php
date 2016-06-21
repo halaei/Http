@@ -69,7 +69,7 @@ class CollectionHeader
      *
      * @param string $label Header Label
      *
-     * @return \Traversable[iHeader]
+     * @return \Generator|\Traversable[iHeader]
      * @throws \Exception header not found
      */
     function get($label)
