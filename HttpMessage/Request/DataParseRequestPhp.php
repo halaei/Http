@@ -138,7 +138,7 @@ class DataParseRequestPhp
     function getHeaders()
     {
         $headers = array();
-        foreach($_SERVER as $key => $val)
+        foreach($_SERVER as $key => $val) {
             if (strpos($key, 'HTTP_') === 0) {
                 $name = strtr(substr($key, 5), '_', ' ');
                 $name = strtr(ucwords(strtolower($name)), ' ', '-');
@@ -152,8 +152,27 @@ class DataParseRequestPhp
                 $name = strtr(ucwords(strtolower($name)), ' ', '-');
                 $headers[$name] = $val;
             }
+        }
 
-        // ++-- cookie:
+        // ++-- Authorization
+        if (isset($_SERVER['PHP_AUTH_PW']) && isset($_SERVER['PHP_AUTH_USER'])) {
+            if (!isset($headers['Authorization'])) {
+                /*
+                 * note: either can use .htaccess configuration
+                 * 
+                 * ## FIX Missing Authorization Request Header
+                 * RewriteCond %{HTTP:Authorization} ^(.*)
+                 * RewriteRule .* - [e=HTTP_AUTHORIZATION:%1] 
+                 */
+                if (function_exists(apache_request_headers())) {
+                    $apacheHeaders = apache_request_headers();
+                    if (isset($apacheHeaders['Authorization']))
+                        $headers['Authorization'] = $apacheHeaders['Authorization'];
+                }
+            }
+        }
+
+        // ++-- Cookie
         $cookie = http_build_query($_COOKIE, '', '; ');
         (empty($cookie)) ?: $headers['Cookie'] = $cookie;
 
