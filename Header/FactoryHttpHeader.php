@@ -38,7 +38,7 @@ class FactoryHttpHeader
                     , $valuable
                 ));
 
-            return self::of( array(key($parsed), current($parsed)) );
+            return self::of( array(key($parsed) => current($parsed)) );
         }
 
         // array:
@@ -47,7 +47,6 @@ class FactoryHttpHeader
                 'Header must be valid string or array[$label, $value] or ["label"=>$value]; given (%s).'
                 , \Poirot\Std\flatten($valuable)
             ));
-
 
         if (count($valuable) >= 2) {
             ## [$label, $value, $other_value[] ]
