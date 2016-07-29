@@ -27,14 +27,17 @@ class PhpServer
     }
 
     /**
+     * TODO clear or merge or something with current headers; header()
+     * 
      * Send HTTP headers
      *
      * @return $this
+     * @throws \Exception headers sent
      */
     function sendHeaders()
     {
         if ($this->isHeadersSent())
-            return $this;
+            throw new \Exception('Headers was sent.');
 
         
         \Poirot\Http\Response\httpResponseCode($this->getMessageObject()->getStatusCode());

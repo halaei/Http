@@ -27,6 +27,7 @@ class DataParseResponsePhp
      */
     public function getHeaders()
     {
-        return headers_list();
+        $headers = headers_list();
+        return $headers;
     }
 }
