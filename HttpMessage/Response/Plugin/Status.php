@@ -1,7 +1,5 @@
 <?php
-namespace Poirot\Http\HttpMessage\Plugins\Response;
-
-use Poirot\Http\HttpMessage\Response\Plugin\aPluginResponse;
+namespace Poirot\Http\HttpMessage\Response\Plugin;
 
 class Status 
     extends aPluginResponse

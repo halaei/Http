@@ -27,8 +27,6 @@ class PhpServer
     }
 
     /**
-     * TODO clear or merge or something with current headers; header()
-     * 
      * Send HTTP headers
      *
      * @return $this
