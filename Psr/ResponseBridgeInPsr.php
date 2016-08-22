@@ -9,12 +9,12 @@ class ResponseBridgeInPsr
     implements ResponseInterface
 {
     /**
-     * RequestBridgeInPsr constructor.
-     * @param iHttpResponse $request
+     * Construct
+     * @param iHttpResponse $response
      */
-    function __construct(iHttpResponse $request)
+    function __construct(iHttpResponse $response)
     {
-        $this->httpMessage = clone $request;
+        $this->httpMessage = clone $response;
     }
     
     /**

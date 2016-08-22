@@ -16,7 +16,8 @@ class aMessageBridgeInPsr
 {
     /** @var iHttpRequest */
     protected $httpMessage;
-    
+    protected $stream;
+
     /**
      * Retrieves the HTTP protocol version as a string.
      *
@@ -233,15 +234,18 @@ class aMessageBridgeInPsr
      */
     public function getBody()
     {
+        if ($this->stream)
+            return $this->stream;
+        
         $stream = $this->httpMessage->getBody();
-        if (is_string($stream)) {
-            $body   = $stream;
+        if ($stream === null || is_string($stream)) {
+            $body   = (string) $stream;
             $stream = new Stream('php://temp', 'wb+');
             $stream->write($body);
             $stream->rewind();
         }
 
-        return $stream;
+        return $this->stream = $stream;
     }
 
     /**
@@ -260,7 +264,7 @@ class aMessageBridgeInPsr
     public function withBody(StreamInterface $body)
     {
         $new = clone $this;
-        $new->httpMessage->setBody($body);
+        $new->stream = $body;
         return $new;
     }
 }

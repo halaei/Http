@@ -160,6 +160,7 @@ class CollectionHeader
 
     function __clone()
     {
-        $this->ObjectCollection = clone $this->ObjectCollection;
+        if ($this->ObjectCollection)
+            $this->ObjectCollection = clone $this->ObjectCollection;
     }
 }
