@@ -58,7 +58,7 @@ class FactoryHttpHeader
             $value = current($valuable);
         }
 
-        if (self::plugins()->has($label))
+        if (self::isEnabledPlugins() && self::plugins()->has($label))
             $header = self::plugins()->get($label);
         else
             $header = new HeaderLine;
@@ -76,7 +76,17 @@ class FactoryHttpHeader
     
     
     // ..
-    
+
+    /**
+     * Is Enabled Plugins?
+     *
+     * @return bool
+     */
+    static function isEnabledPlugins()
+    {
+        return class_exists('Poirot\Ioc\Container\aContainerCapped');
+    }
+
     /**
      * Headers Plugin Manager
      *

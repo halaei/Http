@@ -19,14 +19,14 @@ class DataParseRequestPhp
     protected $body;
     protected $version;
 
-
+    
     /**
      * @override This is readonly option
      * @inheritdoc
      */
     function __construct()
     {
-        return parent::__construct();
+        parent::__construct();
     }
     
     /**
@@ -189,7 +189,7 @@ class DataParseRequestPhp
     function getBody()
     {
         $headers = $this->getHeaders();
-        
+
         if (
             $this->getMethod() == 'POST'
             && isset($headers['Content-Type'])
@@ -215,7 +215,7 @@ class DataParseRequestPhp
             $stream  = new StreamBodyMultiPart($rawData);
             return $stream;
         }
-        
+
         // TODO Implement upstream cache
         $stream = new Stream('php://temp', 'r+');
         $stream->write(file_get_contents('php://input'));

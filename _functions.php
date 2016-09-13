@@ -363,7 +363,7 @@ namespace Poirot\Http\Header
             if ($ascii === 13) {
                 $lf = @ord($value[$i + 1]);
                 $ws = @ord($value[$i + 2]);
-                if ($lf === 10 && in_array($ws, [9, 32], true)) {
+                if ($lf === 10 && in_array($ws, array(9, 32), true)) {
                     $string .= $value[$i] . $value[$i + 1];
                     $i += 1;
                 }
@@ -423,7 +423,7 @@ namespace Poirot\Http\Header
             // 32-126, 128-254 === visible
             // 127 === DEL
             // 255 === null byte
-            if (($ascii < 32 && ! in_array($ascii, [9, 10, 13], true))
+            if (($ascii < 32 && ! in_array($ascii, array(9, 10, 13), true))
                 || $ascii === 127
                 || $ascii > 254
             ) {

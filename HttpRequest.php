@@ -11,8 +11,8 @@ class HttpRequest
     protected $method = 'GET';
     protected $host;
     protected $target_uri;
-    
-    
+
+
     /**
      * Return the formatted request line (first line) for this http request
      *

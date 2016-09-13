@@ -203,9 +203,16 @@ class StreamBodyMultiPart
             $renderHeaders .= $h->render()."\r\n";
         $renderHeaders = "--{$this->_boundary}\r\n" . trim($renderHeaders) . "\r\n\r\n";
 
-        $this->_t__wrap_stream->addStream((new STemporary($renderHeaders))->rewind());
+
+        $tStream = new STemporary($renderHeaders);
+        $tStream->rewind();
+        $this->_t__wrap_stream->addStream($tStream);
+
         $this->_t__wrap_stream->addStream($stream->rewind());
-        $this->_t__wrap_stream->addStream((new STemporary("\r\n"))->rewind());
+
+        $tStream = new STemporary($renderHeaders);
+        $tStream->rewind();
+        $this->_t__wrap_stream->addStream($tStream);
     }
 
     // ...
