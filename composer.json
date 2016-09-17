@@ -11,11 +11,10 @@
     ],
     "require": {
         "poirot/std": "dev-devel"
-        , "poirot/psr7-http": "dev-devel"
-        , "psr/http-message": "1.0"
     },
     "suggest": {
-      "poirot/stream": "dev-devel"
+      "poirot/psr7-http": "dev-devel"
+      , "poirot/stream": "dev-devel"
       , "poirot/ioc": "dev-devel"
     },
     "target-dir": "Poirot/Http",

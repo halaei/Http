@@ -64,8 +64,8 @@ namespace Poirot\Http
     function parseRequestFromPsr(RequestInterface $psrRequest)
     {
         $headers = array();
-        foreach($psrRequest->getHeaders() as $h => $v)
-            $headers[$h] = $v;
+        foreach($psrRequest->getHeaders() as $h => $_)
+            $headers[$h] = $psrRequest->getHeaderLine($h);
 
         $Return = array(
             'method'  => $psrRequest->getMethod(),
@@ -131,8 +131,8 @@ namespace Poirot\Http
     function parseResponseFromPsr(ResponseInterface $psrResponse)
     {
         $headers = array();
-        foreach($psrResponse->getHeaders() as $h => $v)
-            $headers[$h] = \Poirot\Http\Header\joinParams($v);
+        foreach($psrResponse->getHeaders() as $h => $_)
+            $headers[$h] = $psrResponse->getHeaderLine($h);
 
         $Return = array(
             'version'     => $psrResponse->getProtocolVersion(),
@@ -148,38 +148,11 @@ namespace Poirot\Http
 
 namespace Poirot\Http\Psr 
 {
-    use Psr\Http\Message\MessageInterface;
-    use Psr\Http\Message\RequestInterface;
-    use Psr\Http\Message\ResponseInterface;
+    // TODO take out psr dependency
+
+    use Poirot\Psr7\UploadedFile;
     use Psr\Http\Message\UploadedFileInterface;
 
-    /**
-     * String representation of an HTTP message.
-     *
-     * @param MessageInterface $httpMessage
-     *
-     * @return string
-     */
-    function messageToString(MessageInterface $httpMessage)
-    {
-        if ($httpMessage instanceof RequestInterface) {
-            $msg = trim($httpMessage->getMethod() . ' '
-                    . $httpMessage->getRequestTarget())
-                . ' HTTP/' . $httpMessage->getProtocolVersion();
-            if (!$httpMessage->hasHeader('host'))
-                $msg .= "\r\nHost: " . $httpMessage->getUri()->getHost();
-        } elseif ($httpMessage instanceof ResponseInterface) {
-            $msg = 'HTTP/' . $httpMessage->getProtocolVersion() . ' '
-                . $httpMessage->getStatusCode() . ' '
-                . $httpMessage->getReasonPhrase();
-        } else
-            throw new \InvalidArgumentException('Unknown message type');
-
-        foreach ($httpMessage->getHeaders() as $name => $values)
-            $msg .= "\r\n{$name}: " . implode(', ', $values);
-
-        return "{$msg}\r\n\r\n" . $httpMessage->getBody();
-    }
 
     /**
      * Normalize uploaded files

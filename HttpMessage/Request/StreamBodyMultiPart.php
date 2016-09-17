@@ -5,7 +5,6 @@ use Poirot\Http\Header\CollectionHeader;
 use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
-use Poirot\Http\Psr\UploadedFile;
 use Poirot\Http\Header as UtilHttp;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable\SAggregateStreams;
@@ -126,10 +125,6 @@ class StreamBodyMultiPart
                 FactoryHttpHeader::of( array('Content-Length' => (string) $size) )
             );
 
-
-        if ($element instanceof UploadedFile)
-            ## using poirot stream
-            $element->setDefaultStream('\Poirot\Stream\Streamable');
 
 
         $this->__createElement($fieldName, $element->getStream(), $element->getClientFilename(), $headers);

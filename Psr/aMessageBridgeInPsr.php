@@ -85,6 +85,7 @@ class aMessageBridgeInPsr
         $headers = array();
         /** @var iHeader $header */
         foreach ($this->httpMessage->headers() as $header)
+            // TODO
             $headers[$header->getLabel()] = \Poirot\Http\Header\parseParams($header->renderValueLine());
 
         return $headers;
@@ -126,6 +127,7 @@ class aMessageBridgeInPsr
         $header = $this->httpMessage->headers()->get($name);
         /** @var iHeader $h */
         foreach ($header as $h)
+            // TODO
             return \Poirot\Http\Header\parseParams($h->renderValueLine());
     }
 
@@ -153,11 +155,18 @@ class aMessageBridgeInPsr
         if (! $this->hasHeader($name))
             return '';
 
+        $r = array();
         /** @var iHeader $header */
         $header = $this->httpMessage->headers()->get($name);
-        /** @var iHeader $h */
-        foreach ($header as $h)
-            return $h->renderValueLine();
+        /** @var iHeader $v */
+        foreach ($header as $h) {
+            foreach ($h as $v) {
+                 $r[] = $v->renderValueLine();
+            }
+        }
+
+        $r = implode(';', $r);
+        return $r;
     }
 
     /**
