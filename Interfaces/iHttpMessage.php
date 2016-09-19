@@ -5,6 +5,8 @@ use Psr\Http\Message\StreamInterface;
 
 use Poirot\Std\Interfaces\Pact\ipMetaProvider;
 
+// TODO render methods can move outside as functional; get parsedObject array or struct  
+
 interface iHttpMessage 
     extends ipMetaProvider
 {
