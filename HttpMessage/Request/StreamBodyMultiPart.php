@@ -209,22 +209,14 @@ class StreamBodyMultiPart
         ### headers
         $renderHeaders = '';
         /** @var iHeader $first */
-        foreach ($headers->get('Content-Disposition') as $header) {
-            foreach ($header as $first) {
-                $renderHeaders .= $first->render()."\r\n";
-                break;
-            }
-        }
+        foreach ($headers->get('Content-Disposition') as $first)
+            $renderHeaders .= $first->render()."\r\n";
 
         ## with new instance on delete
         $headers = $headers->del('Content-Disposition');
         /** @var iHeader $h */
-        foreach($headers as $hs) {
-            foreach ($hs as $h) {
-                $renderHeaders .= $h->render()."\r\n";
-                break;
-            }
-        }
+        foreach($headers as $h)
+            $renderHeaders .= $h->render()."\r\n";
 
         $renderHeaders = "--{$this->_boundary}\r\n" . trim($renderHeaders) . "\r\n\r\n";
 
