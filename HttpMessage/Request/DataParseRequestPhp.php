@@ -2,10 +2,11 @@
 namespace Poirot\Http\HttpMessage\Request;
 
 use Poirot\Http\HttpMessage\Request\Plugin\PhpServer;
-use Poirot\Psr7\Stream;
 use Poirot\Std\Struct\aDataOptions;
 
+use Poirot\Stream\Psr\StreamBridgeInPsr;
 use Poirot\Stream\Streamable;
+
 
 class DataParseRequestPhp
     extends aDataOptions
@@ -199,27 +200,20 @@ class DataParseRequestPhp
             ## input raw body not represent in php when method is POST
             #- it can be as sending files or send form data in multipart
 
-            // TODO
-            /*
-            print_r($headers);
-            echo "\r\n\r\n".str_repeat('=', 100)."\r\n\r\n";
-            print_r($_FILES);
-            echo "\r\n\r\n".str_repeat('=', 100)."\r\n\r\n";
-            print_r($_POST);
-            echo "\r\n\r\n".str_repeat('=', 100)."\r\n\r\n";
-            */
+            $boundary = $headers['Content-Type'];
+            preg_match('/boundary=(?P<boundary>.*)/', $boundary, $matches);
+            $boundary = $matches['boundary'];
 
-            ## create MultiPart Stream From _FILES
-            $rawData = \Poirot\Http\Psr\normalizeFiles($_FILES);
-            // TODO add $_POST if has
-            $stream  = new StreamBodyMultiPart($rawData);
-            return $stream;
+            $rawData = array_merge($_FILES, $_POST);
+            $stream  = new StreamBodyMultiPart($rawData, $boundary);
+        } else {
+            // TODO it can be implemented with Buffer Stream
+            $stream = new Streamable\STemporary('php://temp', 'r+');
+            $stream->write(file_get_contents('php://input'));
         }
 
-        // TODO Implement upstream cache
-        $stream = new Stream('php://temp', 'r+');
-        $stream->write(file_get_contents('php://input'));
         $stream->rewind();
+        $stream = new StreamBridgeInPsr($stream);
         return $stream;
     }
 }
