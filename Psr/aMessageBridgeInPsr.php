@@ -158,11 +158,9 @@ class aMessageBridgeInPsr
         $r = array();
         /** @var iHeader $header */
         $header = $this->httpMessage->headers()->get($name);
-        /** @var iHeader $v */
         foreach ($header as $h) {
-            foreach ($h as $v) {
-                 $r[] = $v->renderValueLine();
-            }
+            /** @var iHeader $h */
+             $r[] = $h->renderValueLine();
         }
 
         $r = implode(';', $r);
