@@ -165,7 +165,7 @@ namespace Poirot\Http\Psr
      *
      * @throws \InvalidArgumentException for unrecognized values
      */
-    function normalizeFiles(array $files, $stream = null)
+    function normalizeFiles(array $files)
     {
         $normalized = array();
         foreach ($files as $key => $value) {
@@ -175,12 +175,12 @@ namespace Poirot\Http\Psr
             }
 
             if (is_array($value) && isset($value['tmp_name'])) {
-                $normalized[$key] = __createUploadedFileFromSpec($value, $stream);
+                $normalized[$key] = makeUploadedFileFromSpec($value);
                 continue;
             }
 
             if (is_array($value)) {
-                $normalized[$key] = normalizeFiles($value, $stream);
+                $normalized[$key] = normalizeFiles($value);
                 continue;
             }
 
@@ -202,12 +202,11 @@ namespace Poirot\Http\Psr
      * @param array $value $_FILES struct
      * @return array|UploadedFileInterface
      */
-    function __createUploadedFileFromSpec(array $value, $stream)
+    function makeUploadedFileFromSpec(array $value)
     {
         if (is_array($value['tmp_name']))
-            return __normalizeNestedFileSpec($value, $stream);
+            return __normalizeNestedFileSpec($value);
     
-        ($value === null) ?: $value['default_stream_class'] = $stream;
         return new UploadedFile($value);
     }
 
@@ -220,7 +219,7 @@ namespace Poirot\Http\Psr
      * @param array $files
      * @return UploadedFileInterface[]
      */
-    function __normalizeNestedFileSpec(array $files, $stream)
+    function __normalizeNestedFileSpec(array $files)
     {
         $files = array();
         foreach (array_keys($files['tmp_name']) as $key) {
@@ -231,7 +230,7 @@ namespace Poirot\Http\Psr
                 'name'     => $files['name'][$key],
                 'type'     => $files['type'][$key],
             );
-            $files[$key] = __createUploadedFileFromSpec($spec, $stream);
+            $files[$key] = makeUploadedFileFromSpec($spec);
         }
     
         return $files;
