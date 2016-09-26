@@ -9,6 +9,7 @@ use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 
 // TODO headers with same name withAddedHeader PSR
+// TODO prepare using of CollectionObject Within
 
 class CollectionHeader
     implements iHeaders
@@ -28,8 +29,6 @@ class CollectionHeader
      */
     function __construct(array $headers = array())
     {
-        $this->ObjectCollection = new CollectionObject;
-
         foreach ($headers as $label => $h) {
             if (!$h instanceof iHeader)
                 // Header-Label: value header
@@ -58,7 +57,7 @@ class CollectionHeader
             ));
         
         
-        $this->ObjectCollection->insert($header, array('label'=> strtolower($header->getLabel())));
+        $this->getIterator()->insert($header, array('label'=> strtolower($header->getLabel())));
         return $this;
     }
 
@@ -74,7 +73,7 @@ class CollectionHeader
      */
     function get($label)
     {
-        $r = $this->ObjectCollection->find( array('label' => strtolower($label)) );
+        $r = $this->getIterator()->find( array('label' => strtolower($label)) );
         return $r;
     }
 
@@ -89,7 +88,7 @@ class CollectionHeader
      */
     function has($label)
     {
-        $r = $this->ObjectCollection->find( array('label' => strtolower($label)) );
+        $r = $this->getIterator()->find( array('label' => strtolower($label)) );
         foreach ($r as $v)
             return true;
 
@@ -110,9 +109,10 @@ class CollectionHeader
 
         // ..
 
-        $headers = $this->ObjectCollection->find( array('label' => strtolower($label)) );
-        foreach ($headers as $hash => $object)
-            $this->ObjectCollection->del($hash);
+        $headers = $this->getIterator()->find( array('label' => strtolower($label)) );
+        foreach ($headers as $header)
+            foreach ($header as $hash => $object)
+                $this->getIterator()->del($hash);
         
         return $this;
     }
@@ -124,7 +124,7 @@ class CollectionHeader
      */
     function clean()
     {
-        $this->ObjectCollection->clean();
+        $this->getIterator()->clean();
     }
 
     
@@ -139,6 +139,9 @@ class CollectionHeader
      */
     public function getIterator()
     {
+        if (!$this->ObjectCollection)
+            $this->ObjectCollection = new CollectionObject;
+
         return $this->ObjectCollection;
     }
 
@@ -153,7 +156,7 @@ class CollectionHeader
      */
     public function count()
     {
-        return $this->ObjectCollection->count();
+        return $this->getIterator()->count();
     }
 
     // ..
@@ -161,6 +164,6 @@ class CollectionHeader
     function __clone()
     {
         if ($this->ObjectCollection)
-            $this->ObjectCollection = clone $this->ObjectCollection;
+            $this->ObjectCollection = null;
     }
 }
