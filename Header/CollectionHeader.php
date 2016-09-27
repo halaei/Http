@@ -110,9 +110,8 @@ class CollectionHeader
         // ..
 
         $headers = $this->getIterator()->find( array('label' => strtolower($label)) );
-        foreach ($headers as $header)
-            foreach ($header as $hash => $object)
-                $this->getIterator()->del($hash);
+        foreach ($headers as $hash => $header)
+            $this->getIterator()->del($hash);
         
         return $this;
     }

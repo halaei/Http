@@ -212,6 +212,7 @@ class StreamBodyMultiPart
         foreach ($headers->get('Content-Disposition') as $first)
             $renderHeaders .= $first->render()."\r\n";
 
+        
         ## with new instance on delete
         $headers = $headers->del('Content-Disposition');
         /** @var iHeader $h */
