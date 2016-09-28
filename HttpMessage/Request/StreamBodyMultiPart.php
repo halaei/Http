@@ -183,7 +183,7 @@ class StreamBodyMultiPart
     protected function _addTextElement($fieldName, $element, $headers)
     {
         if (!$element instanceof StreamInterface && ! $element instanceof iStreamable)
-            $element = new STemporary( (string) $element);
+            $element = new STemporary( trim( (string) $element) );
 
         $this->_createElement($fieldName, $element, $headers);
     }
@@ -219,7 +219,7 @@ class StreamBodyMultiPart
         foreach($headers as $h)
             $renderHeaders .= $h->render()."\r\n";
 
-        $renderHeaders = "--{$this->_boundary}\r\n" . trim($renderHeaders) . "\r\n\r\n";
+        $renderHeaders = "--{$this->_boundary}\r\n" .$renderHeaders. "\r\n";
 
 
         $tStream = new STemporary($renderHeaders);
@@ -246,7 +246,7 @@ class StreamBodyMultiPart
     {
         if (!$this->_trailingBoundary) {
             ## add trailing boundary as stream if not
-            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--\r\n");
+            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--");
             $this->_t__wrap_stream->addStream($this->_trailingBoundary->rewind());
         }
 
@@ -272,7 +272,7 @@ class StreamBodyMultiPart
     {
         if (!$this->_trailingBoundary) {
             ## add trailing boundary as stream if not
-            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--\r\n");
+            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--");
             $this->_t__wrap_stream->addStream($this->_trailingBoundary->rewind());
         }
 
