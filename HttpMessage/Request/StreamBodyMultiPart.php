@@ -69,10 +69,15 @@ class StreamBodyMultiPart
                 , \Poirot\Std\flatten($multiPart)
             ));
         
-        if (is_array($multiPart))
+        if (is_array($multiPart)) 
+        {
             $this->_fromElementsArray($multiPart);
-        else
+            $this->addElementDone();
+        } 
+        else 
+        {
             $this->_fromRawBodyString($multiPart);
+        }
         
         return $this;
     }
@@ -85,11 +90,13 @@ class StreamBodyMultiPart
      * @param null|array                                   $headers   Extra Headers To Be Added
      * 
      * @return $this
+     * @throws \Exception
      */
     function addElement($fieldName, $element, $headers = null)
     {
-        $this->_trailingBoundary = false;
-
+        if ($this->_trailingBoundary)
+            throw new \Exception('Trailing Boundary Is Added.');
+        
         if (!$headers instanceof iHeaders)
             $headers = ($headers) ? new CollectionHeader($headers) : new CollectionHeader;
 
@@ -115,6 +122,18 @@ class StreamBodyMultiPart
         return $this;
     }
 
+    /**
+     * Add Trailing Boundary And Finish Data
+     * 
+     * @return void
+     */
+    function addElementDone()
+    {
+        ## add trailing boundary as stream if not
+        $this->_trailingBoundary = new STemporary("--{$this->_boundary}--");
+        $this->_t__wrap_stream->addStream($this->_trailingBoundary->rewind());
+    }
+    
     
     // ...
 
@@ -228,54 +247,5 @@ class StreamBodyMultiPart
         ($stream instanceof iStreamable) ?: $stream = new StreamBridgeFromPsr($stream);
         $this->_t__wrap_stream->addStream($stream);
         $this->_t__wrap_stream->addStream(new STemporary("\r\n"));
-    }
-
-    // ...
-
-    /**
-     * Read Data From Stream
-     *
-     * - if $inByte argument not set, read entire stream
-     *
-     * @param int $inByte Read Data in byte
-     *
-     * @throws \Exception Error On Read Data
-     * @return string
-     */
-    function read($inByte = null)
-    {
-        if (!$this->_trailingBoundary) {
-            ## add trailing boundary as stream if not
-            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--");
-            $this->_t__wrap_stream->addStream($this->_trailingBoundary->rewind());
-        }
-
-        return $this->_t__wrap_stream->read($inByte);
-    }
-
-    /**
-     * Gets line from stream resource up to a given delimiter
-     *
-     * Reading ends when length bytes have been read,
-     * when the string specified by ending is found
-     * (which is not included in the return value),
-     * or on EOF (whichever comes first)
-     *
-     * ! does not return the ending delimiter itself
-     *
-     * @param string $ending
-     * @param int $inByte
-     *
-     * @return string
-     */
-    function readLine($ending = "\n", $inByte = null)
-    {
-        if (!$this->_trailingBoundary) {
-            ## add trailing boundary as stream if not
-            $this->_trailingBoundary = new STemporary("--{$this->_boundary}--");
-            $this->_t__wrap_stream->addStream($this->_trailingBoundary->rewind());
-        }
-
-        return $this->_t__wrap_stream->readLine($ending, $inByte);
     }
 }
