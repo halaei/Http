@@ -165,7 +165,7 @@ class DataParseRequestPhp
                  * RewriteCond %{HTTP:Authorization} ^(.*)
                  * RewriteRule .* - [e=HTTP_AUTHORIZATION:%1] 
                  */
-                if (function_exists(apache_request_headers())) {
+                if (function_exists('apache_request_headers')) {
                     $apacheHeaders = apache_request_headers();
                     if (isset($apacheHeaders['Authorization']))
                         $headers['Authorization'] = $apacheHeaders['Authorization'];
