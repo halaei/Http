@@ -165,7 +165,7 @@ class DataParseRequestPhp
                  * RewriteCond %{HTTP:Authorization} ^(.*)
                  * RewriteRule .* - [e=HTTP_AUTHORIZATION:%1] 
                  */
-                if (function_exists(apache_request_headers())) {
+                if (function_exists('apache_request_headers')) {
                     $apacheHeaders = apache_request_headers();
                     if (isset($apacheHeaders['Authorization']))
                         $headers['Authorization'] = $apacheHeaders['Authorization'];
@@ -208,7 +208,7 @@ class DataParseRequestPhp
             $stream  = new StreamBodyMultiPart($rawData, $boundary);
         } else {
             // TODO it can be implemented with Buffer Stream
-            $stream = new Streamable\STemporary('php://temp', 'r+');
+            $stream = new Streamable\STemporary;
             $stream->write(file_get_contents('php://input'));
         }
 
