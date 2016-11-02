@@ -4,6 +4,7 @@ namespace Poirot\Http\HttpMessage\Response\Plugin;
 use Poirot\Http\Interfaces\iHeader;
 use Psr\Http\Message\StreamInterface;
 
+
 class PhpServer 
     extends aPluginResponse
 {
