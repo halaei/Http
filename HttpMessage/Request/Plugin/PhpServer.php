@@ -4,10 +4,7 @@ namespace Poirot\Http\HttpMessage\Request\Plugin;
 use Poirot\Std\Interfaces\Struct\iDataEntity;
 use Poirot\Std\Struct\DataEntity;
 
-// TODO Detach from Http Package; cause this all php sapi server dependant
-// ---- maybe a member of foundation module or std library?!!
-
-class PhpServer 
+class PhpServer
     extends aPluginRequest
 {
     /** @var iDataEntity $_ENV*/
