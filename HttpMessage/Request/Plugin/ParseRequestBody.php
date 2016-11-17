@@ -2,6 +2,7 @@
 namespace Poirot\Http\HttpMessage\Request\Plugin;
 
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Std\Type\StdTravers;
 
 
 class ParseRequestBody
@@ -36,6 +37,11 @@ class ParseRequestBody
             case 'application/x-www-form-urlencoded':
             case strpos($contentType, 'multipart') !== false:
                 $parsedData = PhpServer::_($request)->getPost();
+                $parsedData = new StdTravers($parsedData);
+                $parsedData = $parsedData->toArray(function ($v) {
+                    // not empty fields
+                    return empty($v) && $v !== "0";
+                }, true);
                 break;
 
             default:
