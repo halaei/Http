@@ -5,7 +5,7 @@ use Poirot\Http\Interfaces\iHeader;
 use Poirot\Std\Type\StdTravers;
 
 
-class ParseRequestBody
+class ParseRequestData
     extends aPluginRequest
 {
     /**
@@ -14,7 +14,7 @@ class ParseRequestBody
      * @return array
      * @throws \Exception
      */
-    function parseData()
+    function parseBody()
     {
         $request = $this->getMessageObject();
 
@@ -52,5 +52,37 @@ class ParseRequestBody
         }
 
         return $parsedData;
+    }
+
+    /**
+     * Parse Request Query Params
+     *
+     * @return array
+     */
+    function parseQueryParams()
+    {
+        $request = $this->getMessageObject();
+
+        $data = array();
+        $url  = $request->getTarget();
+        if ($p = parse_url($url, PHP_URL_QUERY))
+            parse_str($p, $data);
+
+        return $data;
+    }
+
+    /**
+     * Parse Request Query Params and Request Body
+     *
+     * Body Params will override Query Params if Exists
+     *
+     * @return array
+     */
+    function parse()
+    {
+        return array_merge(
+            $this->parseQueryParams(),
+            $this->parseBody()
+        );
     }
 }
