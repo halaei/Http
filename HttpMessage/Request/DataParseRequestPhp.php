@@ -1,6 +1,9 @@
 <?php
 namespace Poirot\Http\HttpMessage\Request;
 
+if (!class_exists('\Poirot\Stream\Streamable'))
+    throw new \Exception('"poirot/stream" package required.');
+
 use Poirot\Http\HttpMessage\Request\Plugin\PhpServer;
 use Poirot\Std\Struct\aDataOptions;
 
