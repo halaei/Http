@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Http\HttpMessage\Request;
 
+// TODO skeleton app rise error handle or require dependency
 if (!class_exists('\Poirot\Stream\Streamable'))
     throw new \Exception('"poirot/stream" package required.');
 
