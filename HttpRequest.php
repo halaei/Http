@@ -4,6 +4,7 @@ namespace Poirot\Http;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHttpRequest;
 
+
 class HttpRequest 
     extends aHttpMessage
     implements iHttpRequest
@@ -22,6 +23,7 @@ class HttpRequest
      */
     function renderRequestLine()
     {
+        // TODO get protocol (http|https)
         return $this->getMethod() . ' ' . $this->getTarget() . ' HTTP/' . $this->getVersion()."\r\n";
     }
     
