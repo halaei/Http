@@ -13,7 +13,45 @@ class HttpRequest
     protected $host;
     protected $target_uri;
 
+    protected $protocol;
 
+    
+    /**
+     * Set Protocol Scheme
+     *
+     * @param string $protocol
+     *
+     * @return $this
+     * @throws \Exception Protocol not supported
+     */
+    function setProtocol($protocol)
+    {
+        $protocol = (string) $protocol;
+        $protocol = strtolower($protocol);
+        
+        if ($protocol !== 'http' && $protocol !== 'https')
+            throw new \InvalidArgumentException(sprintf(
+                'Protocol (%s) not supported; using "http" or "https".'
+                , $protocol
+            ));
+        
+        $this->protocol = $protocol;
+        return $this;
+    }
+
+    /**
+     * Get Protocol Scheme
+     *
+     * @return string
+     */
+    function getProtocol()
+    {
+        if (!$this->protocol)
+            $this->setProtocol('http');
+        
+        return $this->protocol;
+    }
+    
     /**
      * Return the formatted request line (first line) for this http request
      *
@@ -23,8 +61,10 @@ class HttpRequest
      */
     function renderRequestLine()
     {
-        // TODO get protocol (http|https)
-        return $this->getMethod() . ' ' . $this->getTarget() . ' HTTP/' . $this->getVersion()."\r\n";
+        return $this->getMethod()
+               .' '.$this->getTarget()
+               .' '.$this->getProtocol().'/'.$this->getVersion()."\r\n"
+        ;
     }
     
     /**

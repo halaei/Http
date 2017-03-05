@@ -30,6 +30,27 @@ interface iHttpRequest
     const METHOD_PROPFIND = 'PROPFIND';
     /**#@-*/
     
+    const PROTOCOL_HTTP = 'http';
+    const PROTOCOL_HTTPS = 'https';
+
+    
+    /**
+     * Set Protocol Scheme
+     * 
+     * @param string $protocol
+     * 
+     * @return $this
+     * @throws \Exception Protocol not supported
+     */
+    function setProtocol($protocol);
+
+    /**
+     * Get Protocol Scheme
+     * 
+     * @return string
+     */
+    function getProtocol();
+    
     /**
      * Set Request Method
      *
