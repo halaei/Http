@@ -6,7 +6,6 @@ use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\Header as UtilHttp;
-use Poirot\Psr7\Stream;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Psr\StreamBridgeFromPsr;
 use Poirot\Stream\Streamable\SAggregateStreams;
@@ -32,6 +31,11 @@ class StreamBodyMultiPart
     protected $_boundary;
     /** @var false|STemporary Last Trailing Boundary */
     protected $_trailingBoundary;
+    
+    /** @var array Elements Added To MultiPart Body*/
+    protected $elementsAdded = array(
+        # 'field_name' => (iStreamable) | (string) | (UploadedFileInterface)
+    );
 
 
     /**
@@ -63,21 +67,17 @@ class StreamBodyMultiPart
      */
     function addElements($multiPart)
     {
-        if (! (is_array($multiPart) || is_string($multiPart)) )
+        if (! is_array($multiPart) )
             throw new \InvalidArgumentException(sprintf(
-                'Accept array of Files or Raw Body String, given: "%s".'
+                'Accept array of Files; given: "%s".'
                 , \Poirot\Std\flatten($multiPart)
             ));
+
+
+        foreach($multiPart as $name => $element)
+            $this->addElement($name, $element);
         
-        if (is_array($multiPart)) 
-        {
-            $this->_fromElementsArray($multiPart);
-            $this->addElementDone();
-        } 
-        else 
-        {
-            $this->_fromRawBodyString($multiPart);
-        }
+        $this->addElementDone();
         
         return $this;
     }
@@ -99,19 +99,13 @@ class StreamBodyMultiPart
         
         if (!$headers instanceof iHeaders)
             $headers = ($headers) ? new CollectionHeader($headers) : new CollectionHeader;
-
-
-        if (is_array($element) && (isset($element['tmp_name']) && isset($element['size'])))
-            // Boundary Element is File
-            # Convert to UploadedFileInterface
-            $element = \Poirot\Http\Psr\makeUploadedFileFromSpec($element);
-
+        
         
         $headers = clone $headers;
 
         if ($element instanceof UploadedFileInterface)
             $this->_addUploadedFileElement($fieldName, $element, $headers);
-        elseif (\Poirot\Std\isStringify($element) || $element instanceof StreamInterface)
+        elseif (\Poirot\Std\isStringify($element) || $element instanceof iStreamable)
             $this->_addTextElement($fieldName, $element, $headers);
         else
             throw new \InvalidArgumentException(sprintf(
@@ -119,9 +113,20 @@ class StreamBodyMultiPart
                 , \Poirot\Std\flatten($element)
             ));
 
+        $this->elementsAdded[$fieldName] = $element; 
         return $this;
     }
 
+    /**
+     * Get Elements Lists Added To StreamBody
+     * 
+     * @return array
+     */
+    function listElements()
+    {
+        return $this->elementsAdded;
+    }
+    
     /**
      * Add Trailing Boundary And Finish Data
      * 
@@ -138,28 +143,6 @@ class StreamBodyMultiPart
     // ...
 
     /**
-     * Build Stream From _FILES or uploadedFiles
-     * @param $elements
-     */
-    protected function _fromElementsArray($elements)
-    {
-        foreach($elements as $name => $element)
-            $this->addElement($name, $element);
-    }
-
-    /**
-     * Build Stream By Parsing Raw Body
-     *
-     * ! parse string to array that can be used by class
-     *
-     * @param string $rawBody
-     */
-    protected function _fromRawBodyString($rawBody)
-    {
-        // TODO https://gist.github.com/jas-/5c3fdc26fedd11cb9fb5#file-stream-php
-    }
-
-    /**
      * @param string                $fieldName
      * @param UploadedFileInterface $element
      * @param CollectionHeader      $headers
@@ -172,8 +155,13 @@ class StreamBodyMultiPart
 
         if ($size = $element->getSize())
             $headers->insert(FactoryHttpHeader::of( array('Content-Length' => (string) $size)) );
+        else
+            // Set a default content-length header if it was no provided
+            $headers->insert(FactoryHttpHeader::of(
+                array( 'Content-Length' => (string) $element->getStream()->getSize() )
+            ));
 
-
+        
         // Set a default content-disposition header if one was no provided
         $headers->insert(FactoryHttpHeader::of(
             array( 'Content-Disposition' => sprintf(
@@ -183,25 +171,14 @@ class StreamBodyMultiPart
                 )
             )
         ));
-
-        // Set a default content-length header if one was no provided
-        $headers->insert(FactoryHttpHeader::of(
-            array( 'Content-Length' => (string) $element->getStream()->getSize() )
-        ));
-
-
-        // Set a default Content-Type if one was not supplied
-        $headers->insert(FactoryHttpHeader::of(
-            array( 'Content-Type' => $element->getClientMediaType() )
-        ));
-
-
+        
+        
         $this->_createElement($fieldName, $element->getStream(), $headers);
     }
 
     protected function _addTextElement($fieldName, $element, $headers)
     {
-        if (!$element instanceof StreamInterface && ! $element instanceof iStreamable)
+        if (!$element instanceof StreamInterface && !$element instanceof iStreamable)
             $element = new STemporary( trim( (string) $element) );
 
         $this->_createElement($fieldName, $element, $headers);
