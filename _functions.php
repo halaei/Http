@@ -418,28 +418,64 @@ namespace Poirot\Http\Header
         if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
             return false;
 
-        return array( $matches['label'] => $matches['value'] );
+        return array( $matches['label'] => trim($matches['value'], "\r\n") );
     }
-    
-    function parseHeaderLines($headers)
+
+    /**
+     * Parse Headers
+     * 
+     * @param string $content String content include headers
+     * @param null   $offset  Read until headers end (double return afterward) and set
+     *                        offset position here
+     *
+     * @return array [ [Content-Type] =>  application/javascript, .. ]
+     * @throws \Exception
+     */
+    function parseHeaderLines($content, &$offset = null)
     {
-        if (!preg_match_all('/.*[\n]?/', $headers, $lines))
+        $content = (string) $content;
+
+        $heads = ''; $offset = 0; $flagEndHeades = false;
+        while (preg_match('/.*[\n]?/', $content, $matchLines, null, $offset))
+        {
+            $line = $matchLines[0];
+            $offset += strlen($line);
+
+            $line = trim($line, "\r\n");
+
+            if (empty($line)) {
+                if ($flagEndHeades)
+                    // end headers section
+                    break;
+                $flagEndHeades = true;
+
+            } else {
+                $flagEndHeades = false;
+                $heads .= $line."\r\n";
+            }
+        }
+
+        
+        // TODO can combined into same while loop at the top
+
+        if (!preg_match_all('/.*[\n]?/', $heads, $lines))
             throw new \InvalidArgumentException('Error Parsing Request Message.');
 
-        $headers = array();
-        foreach ($lines[0] as $l) {
-            // Todo parse lines have empty string at the end
-            if (empty($l)) continue;
+        $lines = $lines[0];
+        array_pop($lines); // get rid of last empty line
+
+        $heads = array();
+        foreach ($lines as $l) {
             if (( $h = splitLabelValue($l) ) === false)
                 throw new \Exception(sprintf(
                     'Malformed Header; (%s).'
                     , $h
                 ));
 
-            $headers[key($h)] = current($h);
+            $heads[key($h)] = current($h);
         }
         
-        return $headers;
+        return $heads;
     }
 
     /**
