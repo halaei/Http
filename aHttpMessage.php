@@ -11,6 +11,7 @@ use Poirot\Http\Header\FactoryHttpHeader;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Interfaces\iHeaders;
 use Poirot\Http\Interfaces\iHttpMessage;
+use Poirot\Stream\Interfaces\iStreamable;
 use Psr\Http\Message\StreamInterface;
 
 
@@ -38,7 +39,7 @@ abstract class aHttpMessage
     function meta()
     {
         if (!$this->meta)
-            $this->meta = new DataMean();
+            $this->meta = new DataMean;
 
         return $this->meta;
     }
@@ -74,9 +75,9 @@ abstract class aHttpMessage
         $return = $this->renderHeaders();
 
         $body = $this->getBody();
-        if ($body instanceof StreamInterface) {
-            if ($body->isSeekable()) $body->rewind();
-            while (!$body->eof())
+        if ($body instanceof iStreamable) {
+            if ($body->resource()->isSeekable()) $body->rewind();
+            while (!$body->isEOF())
                 $return .= $body->read(24400);
         } else {
             $return .= $body;
@@ -163,7 +164,7 @@ abstract class aHttpMessage
     function headers()
     {
         if (!$this->headers)
-            $this->headers = new CollectionHeader();
+            $this->headers = new CollectionHeader;
 
         return $this->headers;
     }
@@ -177,7 +178,7 @@ abstract class aHttpMessage
      */
     function setBody($content)
     {
-        if (!$content instanceof StreamInterface)
+        if (!$content instanceof iStreamable)
             ## Instead Of StreamInterface must convert to string
             $content = (string) $content;
 
@@ -188,7 +189,7 @@ abstract class aHttpMessage
     /**
      * Get Message Body Content
      *
-     * @return string|StreamInterface
+     * @return string|iStreamable|null
      */
     function getBody()
     {

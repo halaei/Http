@@ -1,13 +1,13 @@
 <?php
 namespace Poirot\Http\Interfaces;
 
+use Poirot\Stream\Interfaces\iStreamable;
 use Psr\Http\Message\StreamInterface;
 
 use Poirot\Std\Interfaces\Pact\ipMetaProvider;
 
 
 // TODO render methods can move outside as functional; get parsedObject array or struct  
-// TODO get protocol (http|https)
 
 interface iHttpMessage 
     extends ipMetaProvider
@@ -61,7 +61,7 @@ interface iHttpMessage
     /**
      * Get Message Body Content
      *
-     * @return string|StreamInterface
+     * @return string|iStreamable|null
      */
     function getBody();
 

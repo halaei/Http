@@ -3,6 +3,8 @@ namespace Poirot\Http\Psr;
 
 use Poirot\Psr7\Stream;
 
+use Poirot\Stream\Interfaces\iStreamable;
+use Poirot\Stream\Psr\StreamBridgeInPsr;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -245,13 +247,16 @@ class aMessageBridgeInPsr
             return $this->stream;
         
         $stream = $this->httpMessage->getBody();
-        if ($stream === null || is_string($stream)) {
+
+        if ($stream instanceof iStreamable)
+            $stream = new StreamBridgeInPsr($stream);
+        else {
             $body   = (string) $stream;
             $stream = new Stream('php://temp', 'wb+');
             $stream->write($body);
             $stream->rewind();
         }
-
+        
         return $this->stream = $stream;
     }
 

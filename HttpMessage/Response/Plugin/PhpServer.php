@@ -2,6 +2,7 @@
 namespace Poirot\Http\HttpMessage\Response\Plugin;
 
 use Poirot\Http\Interfaces\iHeader;
+use Poirot\Stream\Interfaces\iStreamable;
 use Psr\Http\Message\StreamInterface;
 
 
@@ -61,9 +62,9 @@ class PhpServer
 
         $body = $this->getMessageObject()->getBody();
         ob_start();
-        if ($body instanceof StreamInterface) {
-            if ($body->isSeekable()) $body->rewind();
-            while (!$body->eof())
+        if ($body instanceof iStreamable) {
+            if ($body->resource()->isSeekable()) $body->rewind();
+            while (!$body->isEOF())
                 echo $body->read(24400);
             ob_end_flush();
             flush();
