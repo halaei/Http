@@ -47,7 +47,7 @@ abstract class aHeaderHttp
     /**
      * Get Field Value As String
      *
-     * ['label'=>'Set-Cookie', 'SID'=>'31d4d96e407aad42', 'Path'=>'/', 'HttpSecure' => null]
+     * ['label'=>'Set-Cookie', 'SID'=>'31d4d96e407aad42', 'Path'=>'/', 'HttpSecure' => VOID]
      * Set-Cookie: SID=31d4d96e407aad42; Path="/"; HttpSecure
      *
      * @return string
