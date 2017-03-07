@@ -107,7 +107,11 @@ class StreamBodyMultiPart
             $this->_addUploadedFileElement($fieldName, $element, $headers);
         elseif (\Poirot\Std\isStringify($element) || $element instanceof iStreamable)
             $this->_addTextElement($fieldName, $element, $headers);
-        else
+        elseif (is_array($element)) {
+            // use the infamous input name="array[]"
+            foreach ($element as $k => $v) 
+                $this->_addTextElement($fieldName."[$k]", $v, $headers);
+        } else
             throw new \InvalidArgumentException(sprintf(
                 'Element must be defined array represent element or UploadedFileInterface. given: "%s".'
                 , \Poirot\Std\flatten($element)
