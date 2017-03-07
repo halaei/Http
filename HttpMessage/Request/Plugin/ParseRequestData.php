@@ -144,31 +144,21 @@ class ParseRequestData
             if (empty($blockContent))
                 continue;
 
-
-            // parse uploaded files
-            if (strpos($blockContent, 'application/octet-stream') !== false) {
-                // TODO Implement Feature
-                // match "name", then everything after "stream" (optional) except for prepending newlines
-                preg_match("/name=\"([^\"]*)\".*stream[\n|\r]+([^\n\r].*)?$/s", $blockContent, $matches);
-                $return[$matches[1]] = $matches[2];
-
-                continue;
-            }
+            /*
+             Content-Disposition: form-data; name="content"; filename="postman_dump.json"
+             Content-Type: application/octet-stream
+             */
+            $headers = \Poirot\Http\Header\parseHeaderLines($blockContent, $offset);
 
 
             // file upload php
-            if (strpos($blockContent, 'filename') !== false)
+            if (preg_match('/name=\"([^\"]*)\"; filename=\"([^\"]*)\"/', $headers['Content-Disposition'], $matches))
             {
-                $headers = \Poirot\Http\Header\parseHeaderLines($blockContent, $offset);
-
-                preg_match('/name=\"([^\"]*)\"; filename=\"([^\"]*)\"/', $headers['Content-Disposition'], $matches);
-
                 $mime     = $headers['Content-Type'];
                 $size     = isset($headers['Content-Length']) ? $headers['Content-Length'] : null;
                 $name     = $matches[1];
                 $filename = $matches[2];
                 $content = substr($blockContent, $offset);
-
 
                 // get current system path and create tempory file name & path
                 $path = sys_get_temp_dir().'/phpPoirot'.substr(sha1(rand()), 0, 6);
@@ -179,20 +169,26 @@ class ParseRequestData
                     unlink($path);
                 });
 
-                if (preg_match('/^(.*)\[\]$/i', $name, $tmp))
-                    // TODO Did the user use the infamous input name="array[]" for multiple file uploads?
-                    VOID;
-                
                 $fileSpec = array();
                 $fileSpec['name']     = $filename;
                 $fileSpec['type']     = $mime;
                 $fileSpec['tmp_name'] = $path;
                 $fileSpec['size']     = ($size) ? $size : strlen($content);
                 $fileSpec['error']    = ($err === false) ? UPLOAD_ERR_CANT_WRITE : 0;
-                
-                $return[$name] = \Poirot\Http\Psr\makeUploadedFileFromSpec($fileSpec); 
-                
-                continue;
+
+                $VALUE = \Poirot\Http\Psr\makeUploadedFileFromSpec($fileSpec);
+                $NAME  = $name;
+
+                goto finish;
+            }
+
+            if (preg_match("/name=\"([^\"]*)\".*stream[\n|\r]+([^\n\r].*)?$/s", $blockContent, $matches))
+            {
+                // match "name", then everything after "stream" (optional) except for prepending newlines
+                $NAME  = $matches[1];
+                $VALUE = $matches[2];
+
+                goto finish;
             }
 
 
@@ -200,13 +196,26 @@ class ParseRequestData
 
             // match "name" and optional value in between newline sequences
             preg_match('/name=\"([^\"]*)\"[\n|\r]+([^\n\r].*)?\r$/s', $blockContent, $matches);
+            // $matches:
+            /*
+            [
+              1 => 'meta[option]' // field name
+              2 => 'value'        // field value
+            ]
+            */
 
-            if (preg_match('/^(.*)\[\]$/i', $matches[1], $tmp))
-                $return[$tmp[1]][] = $matches[2];
+            $NAME  = $matches[1];
+            $VALUE = $matches[2];
+
+            
+finish:
+            if ( preg_match('/^(?P<variable>.*)\[(?P<key>\w+)\]/', $NAME, $tmp) ) {
+                $return[$tmp['variable']][$tmp['key']] = $VALUE;
+            }
             else
-                $return[$matches[1]] = $matches[2];
-        }
+                $return[$NAME] = $VALUE;
 
+        }
 
         return $return;
     }
