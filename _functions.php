@@ -435,7 +435,7 @@ namespace Poirot\Http\Header
     {
         $content = (string) $content;
 
-        $heads = ''; $offset = 0; $flagEndHeades = false;
+        $heads = ''; $offset = 0; $headStarting = false;
         while (preg_match('/.*[\n]?/', $content, $matchLines, null, $offset))
         {
             $line = $matchLines[0];
@@ -444,13 +444,14 @@ namespace Poirot\Http\Header
             $line = trim($line, "\r\n");
 
             if (empty($line)) {
-                if ($flagEndHeades)
-                    // end headers section
-                    break;
-                $flagEndHeades = true;
+                // When headers start parse headers until one break line reached
+                if (!$headStarting)
+                    // lines not started; trim begining empty lines
+                    continue;
 
+                break;
             } else {
-                $flagEndHeades = false;
+                $headStarting = true;
                 $heads .= $line."\r\n";
             }
         }
@@ -469,7 +470,7 @@ namespace Poirot\Http\Header
             if (( $h = splitLabelValue($l) ) === false)
                 throw new \Exception(sprintf(
                     'Malformed Header; (%s).'
-                    , $h
+                    , $l
                 ));
 
             $heads[key($h)] = current($h);
