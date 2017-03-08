@@ -308,6 +308,83 @@ namespace Poirot\Http\Cookie
 namespace Poirot\Http\Header 
 {
     /**
+     * Parse Headers
+     *
+     * @param string $content String content include headers
+     * @param null   $offset  Read until headers end (double return afterward) and set
+     *                        offset position here
+     *
+     * @return array [ [Content-Type] =>  application/javascript, .. ]
+     * @throws \Exception
+     */
+    function parseHeaderLines($content, &$offset = null)
+    {
+        $content = (string) $content;
+
+        $heads = ''; $offset = 0; $headStarting = false;
+        while (preg_match('/.*[\n]?/', $content, $matchLines, null, $offset))
+        {
+            $line = $matchLines[0];
+            $offset += strlen($line);
+
+            $line = trim($line, "\r\n");
+
+            if (empty($line)) {
+                // When headers start parse headers until one break line reached
+                if (!$headStarting)
+                    // lines not started; trim begining empty lines
+                    continue;
+
+                break;
+            } else {
+                $headStarting = true;
+                $heads .= $line."\r\n";
+            }
+        }
+
+
+        // TODO can combined into same while loop at the top
+
+        if (!preg_match_all('/.*[\n]?/', $heads, $lines))
+            throw new \InvalidArgumentException('Error Parsing Request Message.');
+
+        $lines = $lines[0];
+        array_pop($lines); // get rid of last empty line
+
+        $heads = array();
+        foreach ($lines as $l) {
+            if (( $h = splitLabelValue($l) ) === false)
+                throw new \Exception(sprintf(
+                    'Malformed Header; (%s).'
+                    , $l
+                ));
+
+            $heads[key($h)] = current($h);
+        }
+
+        return $heads;
+    }
+
+    /**
+     * Parse Header line
+     *
+     * @param string $line
+     *
+     * @return array['label' => 'value_line']
+     */
+    function splitLabelValue($line)
+    {
+        if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
+            if ($matches === false)
+                throw new \InvalidArgumentException(sprintf(
+                    'Invalid Header (%s).'
+                    , $line
+                ));
+
+        return array( $matches['label'] => trim($matches['value'], "\r\n") );
+    }
+
+    /**
      * Filter a header value
      *
      * Ensures CRLF header injection vectors are filtered.
@@ -404,79 +481,6 @@ namespace Poirot\Http\Header
         }
 
         return true;
-    }
-
-    /**
-     * Parse Header line
-     *
-     * @param string $line
-     *
-     * @return false|array[string 'label', string 'value']
-     */
-    function splitLabelValue($line)
-    {
-        if (! preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
-            return false;
-
-        return array( $matches['label'] => trim($matches['value'], "\r\n") );
-    }
-
-    /**
-     * Parse Headers
-     * 
-     * @param string $content String content include headers
-     * @param null   $offset  Read until headers end (double return afterward) and set
-     *                        offset position here
-     *
-     * @return array [ [Content-Type] =>  application/javascript, .. ]
-     * @throws \Exception
-     */
-    function parseHeaderLines($content, &$offset = null)
-    {
-        $content = (string) $content;
-
-        $heads = ''; $offset = 0; $headStarting = false;
-        while (preg_match('/.*[\n]?/', $content, $matchLines, null, $offset))
-        {
-            $line = $matchLines[0];
-            $offset += strlen($line);
-
-            $line = trim($line, "\r\n");
-
-            if (empty($line)) {
-                // When headers start parse headers until one break line reached
-                if (!$headStarting)
-                    // lines not started; trim begining empty lines
-                    continue;
-
-                break;
-            } else {
-                $headStarting = true;
-                $heads .= $line."\r\n";
-            }
-        }
-
-        
-        // TODO can combined into same while loop at the top
-
-        if (!preg_match_all('/.*[\n]?/', $heads, $lines))
-            throw new \InvalidArgumentException('Error Parsing Request Message.');
-
-        $lines = $lines[0];
-        array_pop($lines); // get rid of last empty line
-
-        $heads = array();
-        foreach ($lines as $l) {
-            if (( $h = splitLabelValue($l) ) === false)
-                throw new \Exception(sprintf(
-                    'Malformed Header; (%s).'
-                    , $l
-                ));
-
-            $heads[key($h)] = current($h);
-        }
-        
-        return $heads;
     }
 
     /**

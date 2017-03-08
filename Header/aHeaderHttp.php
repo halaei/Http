@@ -4,15 +4,37 @@ namespace Poirot\Http\Header;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Std\Struct\DataOptionsOpen;
 
+
 abstract class aHeaderHttp 
     extends DataOptionsOpen
     implements iHeader
 {
     protected $label;
 
+
+    /**
+     * Set Header Label
+     *
+     * @param string $label
+     *
+     * @return $this
+     */
+    function setLabel($label)
+    {
+        $label = (string) $label;
+        if (! preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $label))
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid header name "%s".'
+                , is_null($label) ? 'null' : $label
+            ));
+
+        $this->label = $label;
+        return $this;
+    }
+    
     /**
      * Get Header Label
-     * @ignored
+     * @ignore
      * 
      * @return string
      */
@@ -20,17 +42,6 @@ abstract class aHeaderHttp
     {
         return $this->label;
     }
-    
-    /**
-     * Build Header From Header String Representation
-     *
-     * @param string $line
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    abstract function importFromString($line);
-
     
     /**
      * Represent Header As String
@@ -54,21 +65,11 @@ abstract class aHeaderHttp
      */
     function renderValueLine()
     {
-        $headerLine = array();
-        foreach($this as $key => $value) {
-            if (!is_scalar($value))
-                // TODO
-                VOID;
+        $values = \Poirot\Std\cast($this)->toArray(null, true);
+        if (empty($values))
+            return '';
 
-            if (($value!==''&&$value!==null) && !preg_match('/^\w+$/', $value)) {
-                $value = preg_replace('/(["\\\\])/', "\\\\$1", $value);
-                $value = "\"$value\"";
-            }
-
-            $headerLine[] = (($value) ? $key.'='.$value : $key);
-        }
-
-        // filterValue()
-        return implode(', ', $headerLine);
+        $render = joinParams($values);
+        return filterValue($render);
     }
 }

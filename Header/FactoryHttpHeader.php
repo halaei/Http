@@ -63,14 +63,19 @@ class FactoryHttpHeader
         else
             $header = new HeaderLine;
 
-        if (is_string($value))
-            ## avoid to parse again header value
-            $header->importFromString($label.': '. $value);
-        else {
-            $header->import($value);
-            $header->setLabel($label);
+        # Check Value
+        if (!(is_array($value) || $value instanceof \Traversable)) {
+            (is_string($value)) ?: $value = \Poirot\Std\toStrVar($value);
+
+            if ($header instanceof HeaderLine)
+                $header->setValueLine($value);
+
+            $value = \Poirot\Http\Header\parseParams($value);
         }
 
+
+        $header->import($value);
+        $header->setLabel($label);
         return $header;
     }
     

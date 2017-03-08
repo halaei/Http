@@ -4,89 +4,37 @@ namespace Poirot\Http\Header;
 class HeaderLine 
     extends aHeaderHttp
 {
-    protected $label;
-    protected $headerLine;
-
+    protected $valueLine;
+    
+    
     /**
-     * Build Header From Header String Representation
+     * Set Header Value Line
      *
-     * @param string $line
+     * - given header value line will parse and import as data set
      *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    function importFromString($line)
-    {
-        $matches = \Poirot\Http\Header\splitLabelValue($line);
-        if ($matches === false)
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid Header (%s).'
-                , $line
-            ));
-
-        $this->setLabel(key($matches));
-        $this->setHeaderLine(current($matches));
-
-        return $this;
-    }
-
-    /**
-     * Set Header Label
-     *
-     * @param string $label
+     * @param string $headerValue
      *
      * @return $this
      */
-    function setLabel($label)
+    function setValueLine($headerValue)
     {
-        $label = (string) $label;
-        if (! preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $label))
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid header name "%s".'
-                , is_null($label) ? 'null' : $label
-            ));
-
-        $this->label = $label;
+        $this->valueLine = (string) $headerValue;
         return $this;
-    }
-
-    /**
-     * Set Header Value String Line
-     *
-     * @param string $headerLine
-     *
-     * @return $this
-     */
-    function setHeaderLine($headerLine)
-    {
-        $headerLine = (string) $headerLine;
-
-        if (!\Poirot\Http\Header\isValidValue($headerLine))
-            throw new \InvalidArgumentException(
-                "Header value ({$headerLine}) is not valid or contains some unwanted chars."
-            );
-
-        $this->headerLine = $headerLine;
-        return $this;
-    }
-
-    /**
-     * Get Header Value String Line
-     *
-     * @return string
-     */
-    function getHeaderLine()
-    {
-        return $this->headerLine;
     }
 
     /**
      * Get Field Value As String
      *
+     * ['label'=>'Set-Cookie', 'SID'=>'31d4d96e407aad42', 'Path'=>'/', 'HttpSecure' => VOID]
+     * Set-Cookie: SID=31d4d96e407aad42; Path="/"; HttpSecure
+     *
      * @return string
      */
     function renderValueLine()
     {
-        return \Poirot\Http\Header\filterValue($this->getHeaderLine());
+        if ($this->valueLine)
+            return $this->valueLine;
+        
+        return $this->valueLine = parent::renderValueLine();
     }
 }

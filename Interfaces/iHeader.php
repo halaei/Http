@@ -7,23 +7,22 @@ interface iHeader
     extends iDataOptions
 {
     /**
+     * Set Header Label
+     *
+     * @param string $label
+     *
+     * @return $this
+     */
+    function setLabel($label);
+    
+    /**
      * Get Header Label
      * @ignored not consider as data options
      * 
      * @return string
      */
     function getLabel();
-
-    /**
-     * Build Header From Header String Representation
-     *
-     * @param string $line
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    function importFromString($line);
-
+    
     /**
      * Get Field Value As String
      *
